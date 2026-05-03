@@ -78,7 +78,7 @@ export default function HomeScreen() {
       textAlign: "right",
       writingDirection: "rtl",
     },
-    section: { marginTop: 22 },
+    section: { marginTop: 8 },
     horizontalList: { paddingHorizontal: 16, gap: 12 },
     horizontalCard: { width: width * 0.42 },
     productGrid: {
@@ -192,7 +192,7 @@ export default function HomeScreen() {
         </View>
 
         <View style={[styles.section, { paddingBottom: 4 }]}>
-          <SectionHeader title="التصنيفات" showSeeAll={false} />
+          <SectionHeader title="" showSeeAll={false} />
           <CategoryRow
             categories={CATEGORIES}
             selected={selectedCategory}
