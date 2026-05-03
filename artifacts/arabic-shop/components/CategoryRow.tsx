@@ -36,15 +36,20 @@ const CategoryRow = React.memo(function CategoryRow({
     categoryItem: {
       alignItems: "center",
       gap: 6,
-      width: 56,
+      width: 48,
     },
     pill: {
-      width: 56,
-      height: 56,
+      width: 48,
+      height: 48,
       alignItems: "center",
       justifyContent: "center",
-      borderRadius: 28,
+      borderRadius: 24,
       borderWidth: 1.5,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.12,
+      shadowRadius: 4,
+      elevation: 3,
     },
     label: {
       fontSize: 11,
@@ -80,7 +85,7 @@ const CategoryRow = React.memo(function CategoryRow({
             >
               <Ionicons
                 name={cat.icon as any}
-                size={16}
+                size={20}
                 color={isSelected ? "#fff" : cat.color}
               />
             </TouchableOpacity>
