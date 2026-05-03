@@ -175,7 +175,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 80 + bottomPad }}
       >
-        <View style={{ height: 16 }} />
+        <View style={{ height: 6 }} />
         <View style={styles.searchBar}>
           <TouchableOpacity onPress={() => setVoiceVisible(true)} accessibilityLabel="البحث الصوتي">
             <Ionicons name="mic" size={20} color={colors.primary} />
