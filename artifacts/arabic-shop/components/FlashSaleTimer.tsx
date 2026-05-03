@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { useEffect, useState, useRef, useMemo } from "react";
+import { View, Text, StyleSheet, Animated } from "react-native";
 import { useColors } from "@/hooks/useColors";
 
 function getTimeLeft(target: Date) {
@@ -15,55 +15,92 @@ const TARGET = new Date(Date.now() + 6 * 3600 * 1000 + 23 * 60 * 1000 + 41 * 100
 export default function FlashSaleTimer() {
   const colors = useColors();
   const [time, setTime] = useState(getTimeLeft(TARGET));
+  const glowAnim = useRef(new Animated.Value(0.4)).current;
 
   useEffect(() => {
     const id = setInterval(() => setTime(getTimeLeft(TARGET)), 1000);
     return () => clearInterval(id);
   }, []);
 
+  useEffect(() => {
+    const pulse = Animated.loop(
+      Animated.sequence([
+        Animated.timing(glowAnim, {
+          toValue: 1,
+          duration: 900,
+          useNativeDriver: true,
+        }),
+        Animated.timing(glowAnim, {
+          toValue: 0.4,
+          duration: 900,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    pulse.start();
+    return () => pulse.stop();
+  }, []);
+
   const pad = (n: number) => String(n).padStart(2, "0");
 
-  const styles = useMemo(() => StyleSheet.create({
-    row: {
-      flexDirection: "row-reverse",
-      alignItems: "center",
-      gap: 4,
-    },
-    block: {
-      backgroundColor: colors.primary,
-      borderRadius: 6,
-      minWidth: 30,
-      paddingHorizontal: 5,
-      paddingVertical: 2,
-      alignItems: "center",
-    },
-    digit: {
-      color: "#fff",
-      fontSize: 13,
-      fontFamily: "Cairo_700Bold",
-    },
-    sep: {
-      color: colors.primary,
-      fontSize: 13,
-      fontFamily: "Cairo_700Bold",
-      marginTop: -2,
-    },
-    label: {
-      fontSize: 11,
-      fontFamily: "Cairo_400Regular",
-      color: colors.mutedForeground,
-      marginRight: 4,
-    },
-  }), [colors]);
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        row: {
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          gap: 4,
+        },
+        glowWrapper: {
+          borderRadius: 8,
+          overflow: "visible",
+        },
+        block: {
+          backgroundColor: colors.primary,
+          borderRadius: 7,
+          minWidth: 32,
+          paddingHorizontal: 6,
+          paddingVertical: 3,
+          alignItems: "center",
+        },
+        digit: {
+          color: "#fff",
+          fontSize: 14,
+          fontFamily: "Cairo_700Bold",
+          letterSpacing: 0.5,
+        },
+        sep: {
+          color: colors.primary,
+          fontSize: 14,
+          fontFamily: "Cairo_700Bold",
+          marginTop: -3,
+        },
+        label: {
+          fontSize: 11,
+          fontFamily: "Cairo_400Regular",
+          color: colors.mutedForeground,
+          marginRight: 4,
+        },
+      }),
+    [colors]
+  );
 
   return (
     <View style={styles.row}>
       <Text style={styles.label}>ينتهي بعد:</Text>
-      <View style={styles.block}><Text style={styles.digit}>{pad(time.s)}</Text></View>
+      <Animated.View style={[styles.glowWrapper, { opacity: glowAnim }]}>
+        <View style={styles.block}>
+          <Text style={styles.digit}>{pad(time.s)}</Text>
+        </View>
+      </Animated.View>
       <Text style={styles.sep}>:</Text>
-      <View style={styles.block}><Text style={styles.digit}>{pad(time.m)}</Text></View>
+      <View style={styles.block}>
+        <Text style={styles.digit}>{pad(time.m)}</Text>
+      </View>
       <Text style={styles.sep}>:</Text>
-      <View style={styles.block}><Text style={styles.digit}>{pad(time.h)}</Text></View>
+      <View style={styles.block}>
+        <Text style={styles.digit}>{pad(time.h)}</Text>
+      </View>
     </View>
   );
 }

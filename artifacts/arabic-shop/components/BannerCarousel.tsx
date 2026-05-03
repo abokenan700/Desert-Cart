@@ -9,13 +9,15 @@ import {
   Dimensions,
   Animated,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import * as Haptics from "expo-haptics";
 import { Banner } from "@/data/mockData";
 import { useColors } from "@/hooks/useColors";
 
 const { width } = Dimensions.get("window");
-const BANNER_HEIGHT = 180;
+const BANNER_HEIGHT = 210;
 const BANNER_WIDTH = width - 32;
-const AUTO_PLAY_INTERVAL = 3500;
+const AUTO_PLAY_INTERVAL = 4200;
 
 interface BannerCarouselProps {
   banners: Banner[];
@@ -26,19 +28,24 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
   const scrollRef = useRef<ScrollView>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const dotScale = useRef(banners.map(() => new Animated.Value(1))).current;
+  const progressAnims = useRef(banners.map(() => new Animated.Value(0))).current;
+  const activeProgressAnim = useRef<Animated.CompositeAnimation | null>(null);
 
-  const animateDot = useCallback(
+  const startProgress = useCallback(
     (index: number) => {
-      banners.forEach((_, i) => {
-        Animated.spring(dotScale[i], {
-          toValue: i === index ? 1.4 : 1,
-          useNativeDriver: true,
-          speed: 30,
-        }).start();
+      progressAnims.forEach((a, i) => {
+        if (i !== index) a.setValue(i < index ? 1 : 0);
       });
+      progressAnims[index].setValue(0);
+      if (activeProgressAnim.current) activeProgressAnim.current.stop();
+      activeProgressAnim.current = Animated.timing(progressAnims[index], {
+        toValue: 1,
+        duration: AUTO_PLAY_INTERVAL,
+        useNativeDriver: false,
+      });
+      activeProgressAnim.current.start();
     },
-    [banners, dotScale]
+    [progressAnims]
   );
 
   const startTimer = useCallback(() => {
@@ -47,18 +54,20 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
       setActiveIndex((prev) => {
         const next = (prev + 1) % banners.length;
         scrollRef.current?.scrollTo({ x: next * BANNER_WIDTH, animated: true });
-        animateDot(next);
+        startProgress(next);
         return next;
       });
     }, AUTO_PLAY_INTERVAL);
-  }, [banners.length, animateDot]);
+  }, [banners.length, startProgress]);
 
   useEffect(() => {
     startTimer();
+    startProgress(0);
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
+      if (activeProgressAnim.current) activeProgressAnim.current.stop();
     };
-  }, [startTimer]);
+  }, [startTimer, startProgress]);
 
   const handleScroll = useCallback(
     (e: any) => {
@@ -66,85 +75,85 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
       const index = Math.round(x / BANNER_WIDTH);
       if (index !== activeIndex && index >= 0 && index < banners.length) {
         setActiveIndex(index);
-        animateDot(index);
+        startProgress(index);
         startTimer();
       }
     },
-    [activeIndex, banners.length, animateDot, startTimer]
+    [activeIndex, banners.length, startProgress, startTimer]
   );
 
-  const styles = useMemo(() => StyleSheet.create({
-    container: { marginHorizontal: 16, marginVertical: 8 },
-    scroll: { borderRadius: 20, overflow: "hidden" },
-    slide: {
-      width: BANNER_WIDTH,
-      height: BANNER_HEIGHT,
-      position: "relative",
-      borderRadius: 20,
-      overflow: "hidden",
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.15,
-      shadowRadius: 8,
-      elevation: 5,
-    },
-    image: { width: "100%", height: "100%" },
-    overlay: {
-      position: "absolute",
-      inset: 0,
-      backgroundColor: "rgba(0,0,0,0.38)",
-      justifyContent: "center",
-      alignItems: "flex-end",
-      paddingHorizontal: 20,
-      paddingVertical: 18,
-    },
-    title: {
-      color: "#fff",
-      fontSize: 22,
-      fontFamily: "Cairo_800ExtraBold",
-      textAlign: "right",
-      writingDirection: "rtl",
-      lineHeight: 30,
-      textShadowColor: "rgba(0,0,0,0.4)",
-      textShadowOffset: { width: 0, height: 2 },
-      textShadowRadius: 6,
-    },
-    subtitle: {
-      color: "rgba(255,255,255,0.95)",
-      fontSize: 13,
-      fontFamily: "Cairo_400Regular",
-      textAlign: "right",
-      writingDirection: "rtl",
-      marginTop: 6,
-      lineHeight: 20,
-      textShadowColor: "rgba(0,0,0,0.3)",
-      textShadowOffset: { width: 0, height: 1 },
-      textShadowRadius: 3,
-    },
-    cta: {
-      marginTop: 12,
-      backgroundColor: "#fff",
-      borderRadius: 20,
-      paddingHorizontal: 16,
-      paddingVertical: 7,
-      alignSelf: "flex-end",
-    },
-    ctaText: {
-      fontSize: 13,
-      fontFamily: "Cairo_700Bold",
-    },
-    dotsContainer: {
-      flexDirection: "row-reverse",
-      justifyContent: "center",
-      marginTop: 10,
-      gap: 5,
-    },
-    dot: {
-      height: 6,
-      borderRadius: 3,
-      backgroundColor: colors.primary,
-    },
-  }), [colors]);
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: { marginHorizontal: 16, marginVertical: 10 },
+        scroll: { borderRadius: 22, overflow: "hidden" },
+        slide: {
+          width: BANNER_WIDTH,
+          height: BANNER_HEIGHT,
+          borderRadius: 22,
+          overflow: "hidden",
+        },
+        image: {
+          width: "100%",
+          height: "100%",
+          resizeMode: "cover",
+          position: "absolute",
+        },
+        gradient: {
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: BANNER_HEIGHT * 0.8,
+          justifyContent: "flex-end",
+          paddingHorizontal: 20,
+          paddingBottom: 20,
+        },
+        title: {
+          fontSize: 24,
+          fontFamily: "Cairo_800ExtraBold",
+          textAlign: "right",
+          writingDirection: "rtl",
+          lineHeight: 34,
+          marginBottom: 4,
+          textShadowColor: "rgba(0,0,0,0.25)",
+          textShadowOffset: { width: 0, height: 1 },
+          textShadowRadius: 4,
+        },
+        subtitle: {
+          fontSize: 13,
+          fontFamily: "Cairo_400Regular",
+          textAlign: "right",
+          writingDirection: "rtl",
+          marginBottom: 14,
+          lineHeight: 20,
+          textShadowColor: "rgba(0,0,0,0.2)",
+          textShadowOffset: { width: 0, height: 1 },
+          textShadowRadius: 3,
+        },
+        ctaBtn: {
+          alignSelf: "flex-end",
+          backgroundColor: "rgba(255,255,255,0.95)",
+          borderRadius: 22,
+          paddingHorizontal: 20,
+          paddingVertical: 9,
+        },
+        progressBars: {
+          flexDirection: "row-reverse",
+          justifyContent: "center",
+          marginTop: 10,
+          gap: 5,
+        },
+        progressTrack: {
+          flex: 1,
+          height: 3,
+          backgroundColor: `${colors.border}`,
+          borderRadius: 2,
+          overflow: "hidden",
+        },
+      }),
+    [colors]
+  );
 
   return (
     <View style={styles.container}>
@@ -161,25 +170,79 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
         snapToAlignment="center"
       >
         {banners.map((banner) => (
-          <TouchableOpacity key={banner.id} activeOpacity={0.97} style={styles.slide}>
-            <Image source={banner.image} style={styles.image} resizeMode="cover" />
+          <TouchableOpacity
+            key={banner.id}
+            activeOpacity={0.97}
+            style={styles.slide}
+            onPress={() =>
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+            }
+          >
+            <Image source={banner.image} style={styles.image} />
+            <LinearGradient
+              colors={[
+                "transparent",
+                `${banner.bgGradient[0]}BB`,
+                banner.bgGradient[1],
+              ]}
+              style={styles.gradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+            >
+              <Text
+                style={[styles.title, { color: banner.textColor }]}
+                numberOfLines={2}
+              >
+                {banner.titleAr}
+              </Text>
+              <Text
+                style={[styles.subtitle, { color: banner.textColor }]}
+                numberOfLines={2}
+              >
+                {banner.subtitleAr}
+              </Text>
+              <TouchableOpacity
+                style={styles.ctaBtn}
+                activeOpacity={0.85}
+                onPress={() =>
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+                }
+              >
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontFamily: "Cairo_700Bold",
+                    color: banner.bgGradient[1],
+                  }}
+                >
+                  {banner.ctaAr} ←
+                </Text>
+              </TouchableOpacity>
+            </LinearGradient>
           </TouchableOpacity>
         ))}
       </ScrollView>
 
-      <View style={styles.dotsContainer}>
+      <View style={styles.progressBars}>
         {banners.map((_, i) => (
-          <Animated.View
-            key={i}
-            style={[
-              styles.dot,
-              {
-                width: i === activeIndex ? 20 : 6,
-                opacity: i === activeIndex ? 1 : 0.35,
-                transform: [{ scaleY: dotScale[i] }],
-              },
-            ]}
-          />
+          <View key={i} style={styles.progressTrack}>
+            {i === activeIndex ? (
+              <Animated.View
+                style={{
+                  height: "100%",
+                  backgroundColor: colors.primary,
+                  width: progressAnims[i].interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ["0%", "100%"],
+                  }),
+                }}
+              />
+            ) : i < activeIndex ? (
+              <View
+                style={{ height: "100%", backgroundColor: colors.primary }}
+              />
+            ) : null}
+          </View>
         ))}
       </View>
     </View>

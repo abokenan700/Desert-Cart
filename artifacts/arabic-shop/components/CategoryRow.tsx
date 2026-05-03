@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Category } from "@/data/mockData";
@@ -23,40 +24,49 @@ const CategoryRow = React.memo(function CategoryRow({
 }: CategoryRowProps) {
   const colors = useColors();
 
-  const styles = useMemo(() => StyleSheet.create({
-    scroll: { 
-      paddingVertical: 12,
-      backgroundColor: colors.card,
-    },
-    contentContainer: {
-      paddingHorizontal: 16,
-      flexDirection: "row-reverse",
-      gap: 20,
-    },
-    categoryItem: {
-      alignItems: "center",
-      gap: 6,
-      width: 48,
-    },
-    pill: {
-      width: 48,
-      height: 48,
-      alignItems: "center",
-      justifyContent: "center",
-      borderRadius: 24,
-      borderWidth: 1.5,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.12,
-      shadowRadius: 4,
-      elevation: 3,
-    },
-    label: {
-      fontSize: 11,
-      fontFamily: "Cairo_600SemiBold",
-      textAlign: "center",
-    },
-  }), [colors]);
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        scroll: {
+          paddingVertical: 14,
+          backgroundColor: colors.card,
+        },
+        contentContainer: {
+          paddingHorizontal: 16,
+          flexDirection: "row-reverse",
+          gap: 10,
+        },
+        categoryItem: {
+          alignItems: "center",
+          gap: 6,
+        },
+        tile: {
+          width: 62,
+          height: 62,
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: 18,
+          borderWidth: 2,
+          ...Platform.select({
+            ios: {
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 6,
+            },
+            android: { elevation: 3 },
+            web: { boxShadow: "0 2px 8px rgba(0,0,0,0.1)" } as any,
+          }),
+        },
+        label: {
+          fontSize: 11,
+          fontFamily: "Cairo_600SemiBold",
+          textAlign: "center",
+          maxWidth: 64,
+        },
+      }),
+    [colors]
+  );
 
   return (
     <ScrollView
@@ -71,10 +81,10 @@ const CategoryRow = React.memo(function CategoryRow({
           <View key={cat.id} style={styles.categoryItem}>
             <TouchableOpacity
               style={[
-                styles.pill,
+                styles.tile,
                 {
-                  backgroundColor: isSelected ? cat.color : colors.card,
-                  borderColor: isSelected ? cat.color : colors.border,
+                  backgroundColor: isSelected ? cat.color : cat.bgColor,
+                  borderColor: isSelected ? cat.color : `${cat.color}40`,
                 },
               ]}
               onPress={() => onSelect(cat.id)}
@@ -85,14 +95,17 @@ const CategoryRow = React.memo(function CategoryRow({
             >
               <Ionicons
                 name={cat.icon as any}
-                size={20}
+                size={24}
                 color={isSelected ? "#fff" : cat.color}
               />
             </TouchableOpacity>
             <Text
               style={[
                 styles.label,
-                { color: isSelected ? cat.color : colors.text },
+                {
+                  color: isSelected ? cat.color : colors.text,
+                  fontFamily: isSelected ? "Cairo_700Bold" : "Cairo_600SemiBold",
+                },
               ]}
               numberOfLines={1}
             >

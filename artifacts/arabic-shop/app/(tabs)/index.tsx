@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useRef } from "react";
 import {
   View,
   Text,
@@ -9,12 +9,14 @@ import {
   Dimensions,
   Platform,
   RefreshControl,
+  Animated,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useAppToast } from "@/context/AppToastContext";
+import { useCart } from "@/context/CartContext";
 import BannerCarousel from "@/components/BannerCarousel";
 import CategoryRow from "@/components/CategoryRow";
 import ProductCard from "@/components/ProductCard";
@@ -22,6 +24,8 @@ import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import SectionHeader from "@/components/SectionHeader";
 import HomeHeader from "@/components/HomeHeader";
 import AnnouncementBar from "@/components/AnnouncementBar";
+import BrandStrip from "@/components/BrandStrip";
+import StoryStrip from "@/components/StoryStrip";
 import VoiceSearch from "@/components/VoiceSearch";
 import NotificationDrawer from "@/components/NotificationDrawer";
 import FlashSaleTimer from "@/components/FlashSaleTimer";
@@ -37,17 +41,32 @@ import {
 } from "@/data/mockData";
 
 const { width } = Dimensions.get("window");
+const STICKY_THRESHOLD = 140;
 
 export default function HomeScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { showToast } = useAppToast();
+  const { totalCount } = useCart();
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [voiceVisible, setVoiceVisible] = useState(false);
   const [notificationsVisible, setNotificationsVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const { notifications, markAllRead } = useNotifications();
+  const { notifications, markAllRead, unreadCount } = useNotifications();
   const { recentlyViewed } = useRecentlyViewed();
+
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  const stickyOpacity = scrollY.interpolate({
+    inputRange: [STICKY_THRESHOLD - 20, STICKY_THRESHOLD + 30],
+    outputRange: [0, 1],
+    extrapolate: "clamp",
+  });
+  const stickyTranslateY = scrollY.interpolate({
+    inputRange: [STICKY_THRESHOLD - 20, STICKY_THRESHOLD + 30],
+    outputRange: [-48, 0],
+    extrapolate: "clamp",
+  });
 
   const filteredProducts = useMemo(
     () =>
@@ -57,7 +76,13 @@ export default function HomeScreen() {
     [selectedCategory]
   );
 
+  const todaysPicks = useMemo(
+    () => PRODUCTS.filter((p) => p.isFeatured).slice(0, 4),
+    []
+  );
+
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
+  const topPad = Platform.OS === "web" ? 67 : insets.top;
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -67,140 +92,219 @@ export default function HomeScreen() {
     }, 900);
   }, [showToast]);
 
-  const styles = useMemo(() => StyleSheet.create({
-    container: { flex: 1, backgroundColor: colors.background },
-    scroll: { flex: 1 },
-    searchBar: {
-      marginHorizontal: 16,
-      marginBottom: 0,
-      flexDirection: "row-reverse",
-      alignItems: "center",
-      backgroundColor: colors.card,
-      borderRadius: 14,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderWidth: 1,
-      borderColor: `${colors.border}60`,
-      gap: 8,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.06,
-      shadowRadius: 4,
-      elevation: 2,
-    },
-    searchText: {
-      flex: 1,
-      fontSize: 13,
-      fontFamily: "Cairo_400Regular",
-      color: colors.mutedForeground,
-      textAlign: "right",
-      writingDirection: "rtl",
-    },
-    section: { marginTop: 0 },
-    horizontalList: { paddingHorizontal: 16, gap: 12 },
-    horizontalCard: { width: width * 0.42 },
-    productGrid: {
-      flexDirection: "row-reverse",
-      flexWrap: "wrap",
-      paddingHorizontal: 12,
-      justifyContent: "space-between",
-    },
-    skeletonGrid: {
-      flexDirection: "row-reverse",
-      flexWrap: "wrap",
-      paddingHorizontal: 12,
-      justifyContent: "space-between",
-      gap: 0,
-    },
-    gridItem: { paddingHorizontal: 4 },
-    promoRow: {
-      flexDirection: "row-reverse",
-      marginHorizontal: 16,
-      gap: 10,
-      marginBottom: 20,
-    },
-    promoCard: {
-      flex: 1,
-      borderRadius: 14,
-      padding: 14,
-      alignItems: "flex-end",
-      minHeight: 90,
-      justifyContent: "space-between",
-    },
-    promoTitle: {
-      color: "#fff",
-      fontSize: 14,
-      fontFamily: "Cairo_700Bold",
-      textAlign: "right",
-    },
-    promoSub: {
-      color: "rgba(255,255,255,0.85)",
-      fontSize: 11,
-      fontFamily: "Cairo_400Regular",
-      textAlign: "right",
-    },
-    promoBtn: {
-      backgroundColor: "rgba(255,255,255,0.25)",
-      borderRadius: 8,
-      paddingHorizontal: 10,
-      paddingVertical: 5,
-    },
-    promoBtnText: {
-      color: "#fff",
-      fontSize: 11,
-      fontFamily: "Cairo_600SemiBold",
-    },
-    sectionDivider: {
-      height: 1,
-      backgroundColor: `${colors.border}30`,
-      marginVertical: 16,
-      marginHorizontal: 16,
-    },
-    flashSaleHeader: {
-      flexDirection: "row-reverse",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingHorizontal: 16,
-      marginBottom: 12,
-    },
-    flashSaleLeft: {
-      flexDirection: "row-reverse",
-      alignItems: "center",
-      gap: 8,
-    },
-    flashTitle: {
-      fontSize: 17,
-      fontFamily: "Cairo_700Bold",
-      color: colors.text,
-    },
-    flashBadge: {
-      backgroundColor: colors.primary,
-      borderRadius: 10,
-      paddingHorizontal: 8,
-      paddingVertical: 2,
-    },
-    flashBadgeText: {
-      color: "#fff",
-      fontSize: 11,
-      fontFamily: "Cairo_700Bold",
-    },
-    seeAllText: {
-      fontSize: 13,
-      fontFamily: "Cairo_600SemiBold",
-      color: colors.primary,
-    },
-  }), [colors, bottomPad]);
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: { flex: 1, backgroundColor: colors.background },
+        scroll: { flex: 1 },
+        searchBar: {
+          marginHorizontal: 16,
+          marginVertical: 10,
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          backgroundColor: colors.card,
+          borderRadius: 14,
+          paddingHorizontal: 12,
+          paddingVertical: 10,
+          borderWidth: 1,
+          borderColor: `${colors.border}70`,
+          gap: 8,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.06,
+          shadowRadius: 4,
+          elevation: 2,
+        },
+        searchText: {
+          flex: 1,
+          fontSize: 13,
+          fontFamily: "Cairo_400Regular",
+          color: colors.mutedForeground,
+          textAlign: "right",
+          writingDirection: "rtl",
+        },
+        sectionDivider: {
+          height: 8,
+          backgroundColor: colors.secondary,
+          marginVertical: 4,
+        },
+        thinDivider: {
+          height: 1,
+          backgroundColor: `${colors.border}40`,
+          marginVertical: 8,
+          marginHorizontal: 16,
+        },
+        horizontalList: { paddingHorizontal: 16, gap: 12 },
+        horizontalCard: { width: width * 0.42 },
+        productGrid: {
+          flexDirection: "row-reverse",
+          flexWrap: "wrap",
+          paddingHorizontal: 12,
+          justifyContent: "space-between",
+        },
+        skeletonGrid: {
+          flexDirection: "row-reverse",
+          flexWrap: "wrap",
+          paddingHorizontal: 12,
+          justifyContent: "space-between",
+        },
+        gridItem: { paddingHorizontal: 4 },
+        promoRow: {
+          flexDirection: "row-reverse",
+          marginHorizontal: 16,
+          gap: 10,
+          marginTop: 4,
+          marginBottom: 4,
+        },
+        promoCard: {
+          flex: 1,
+          borderRadius: 16,
+          padding: 14,
+          alignItems: "flex-end",
+          minHeight: 100,
+          justifyContent: "space-between",
+        },
+        promoTitle: {
+          color: "#fff",
+          fontSize: 14,
+          fontFamily: "Cairo_700Bold",
+          textAlign: "right",
+        },
+        promoSub: {
+          color: "rgba(255,255,255,0.85)",
+          fontSize: 11,
+          fontFamily: "Cairo_400Regular",
+          textAlign: "right",
+        },
+        promoBtn: {
+          backgroundColor: "rgba(255,255,255,0.25)",
+          borderRadius: 10,
+          paddingHorizontal: 12,
+          paddingVertical: 6,
+        },
+        promoBtnText: {
+          color: "#fff",
+          fontSize: 11,
+          fontFamily: "Cairo_600SemiBold",
+        },
+        flashSaleHeader: {
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          justifyContent: "space-between",
+          paddingHorizontal: 16,
+          marginBottom: 12,
+          marginTop: 4,
+        },
+        flashSaleLeft: {
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          gap: 8,
+        },
+        flashTitle: {
+          fontSize: 17,
+          fontFamily: "Cairo_700Bold",
+          color: colors.text,
+        },
+        flashBadge: {
+          backgroundColor: colors.primary,
+          borderRadius: 10,
+          paddingHorizontal: 8,
+          paddingVertical: 2,
+        },
+        flashBadgeText: {
+          color: "#fff",
+          fontSize: 11,
+          fontFamily: "Cairo_700Bold",
+        },
+        sectionLabel: {
+          fontSize: 13,
+          fontFamily: "Cairo_600SemiBold",
+          color: colors.mutedForeground,
+          textAlign: "right",
+          paddingHorizontal: 16,
+          paddingTop: 16,
+          paddingBottom: 10,
+        },
+        todaysPicksGrid: {
+          flexDirection: "row-reverse",
+          flexWrap: "wrap",
+          paddingHorizontal: 12,
+          justifyContent: "space-between",
+        },
+        stickyHeader: {
+          position: "absolute",
+          left: 0,
+          right: 0,
+          zIndex: 100,
+          backgroundColor: colors.primary,
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          justifyContent: "space-between",
+          paddingHorizontal: 16,
+          paddingVertical: 10,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.15,
+          shadowRadius: 6,
+          elevation: 8,
+        },
+        stickyTitle: {
+          fontSize: 16,
+          fontFamily: "Cairo_800ExtraBold",
+          color: "#fff",
+        },
+        stickyActions: {
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          gap: 6,
+        },
+        stickyBtn: {
+          width: 36,
+          height: 36,
+          borderRadius: 18,
+          backgroundColor: "rgba(255,255,255,0.18)",
+          alignItems: "center",
+          justifyContent: "center",
+          position: "relative",
+        },
+        stickyBadge: {
+          position: "absolute",
+          top: -3,
+          right: -3,
+          width: 15,
+          height: 15,
+          borderRadius: 8,
+          backgroundColor: "#fff",
+          alignItems: "center",
+          justifyContent: "center",
+          borderWidth: 1.5,
+          borderColor: colors.primary,
+        },
+        stickyBadgeText: {
+          color: colors.primary,
+          fontSize: 8,
+          fontFamily: "Cairo_700Bold",
+        },
+      }),
+    [colors, bottomPad, topPad]
+  );
+
+  const stickyTop = Platform.OS === "web" ? 67 + 30 + 60 : insets.top + 30 + 60;
 
   return (
     <View style={styles.container}>
       <AnnouncementBar />
-      <View style={{ height: 2, backgroundColor: `${colors.border}30` }} />
       <HomeHeader onPressNotifications={() => setNotificationsVisible(true)} />
 
-      <ScrollView
+      <Animated.ScrollView
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 80 + bottomPad }}
+        scrollEventThrottle={16}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true }
+        )}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -210,176 +314,242 @@ export default function HomeScreen() {
           />
         }
       >
-        <View style={{ height: 6 }} />
-        <View style={styles.searchBar}>
-          <TouchableOpacity onPress={() => setVoiceVisible(true)} accessibilityLabel="البحث الصوتي">
+        <TouchableOpacity
+          style={styles.searchBar}
+          onPress={() => router.push("/(tabs)/search")}
+          activeOpacity={0.8}
+        >
+          <TouchableOpacity
+            onPress={() => setVoiceVisible(true)}
+            accessibilityLabel="البحث الصوتي"
+            hitSlop={8}
+          >
             <Ionicons name="mic" size={20} color={colors.primary} />
           </TouchableOpacity>
-          <TouchableOpacity
-            style={{ flex: 1 }}
-            onPress={() => router.push("/(tabs)/search")}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.searchText}>ابحث عن منتجات، ماركات...</Text>
-          </TouchableOpacity>
+          <Text style={styles.searchText}>ابحث عن منتجات، ماركات...</Text>
           <Ionicons name="search-outline" size={18} color={colors.mutedForeground} />
-        </View>
+        </TouchableOpacity>
 
-        <View style={[styles.section, { paddingBottom: 12 }]}>
-          <CategoryRow
-            categories={CATEGORIES}
-            selected={selectedCategory}
-            onSelect={setSelectedCategory}
-          />
-        </View>
+        <CategoryRow
+          categories={CATEGORIES}
+          selected={selectedCategory}
+          onSelect={setSelectedCategory}
+        />
 
         <BannerCarousel banners={BANNERS} />
 
         <View style={styles.sectionDivider} />
 
-        <View style={styles.section}>
-          <View style={styles.flashSaleHeader}>
-            <FlashSaleTimer />
-            <View style={styles.flashSaleLeft}>
-              <Text style={styles.flashTitle}>عروض اليوم</Text>
-              <View style={styles.flashBadge}>
-                <Text style={styles.flashBadgeText}>يومي</Text>
-              </View>
-            </View>
-          </View>
-          {refreshing ? (
-            <View style={{ flexDirection: "row-reverse", paddingHorizontal: 16, gap: 12 }}>
-              {[1, 2].map((k) => (
-                <ProductCardSkeleton key={k} />
-              ))}
-            </View>
-          ) : (
-            <FlatList
-              data={FLASH_SALE_PRODUCTS}
-              horizontal
-              inverted
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.horizontalList}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <ProductCard product={item} style={styles.horizontalCard} />
-              )}
-              scrollEnabled={FLASH_SALE_PRODUCTS.length > 0}
-            />
-          )}
-        </View>
+        <Text style={styles.sectionLabel}>تسوق حسب الماركة</Text>
+        <BrandStrip onBrandPress={() => router.push("/(tabs)/search")} />
 
         <View style={styles.sectionDivider} />
 
-        <View style={[styles.section, { marginBottom: 0 }]}>
-          <View style={styles.promoRow}>
-            <TouchableOpacity
-              style={[styles.promoCard, { backgroundColor: "#7C3AED" }]}
-              activeOpacity={0.85}
-            >
-              <Ionicons name="flash" size={22} color="rgba(255,255,255,0.7)" />
-              <View>
-                <Text style={styles.promoTitle}>شحن مجاني</Text>
-                <Text style={styles.promoSub}>على طلبات +500 ر.س</Text>
-              </View>
-              <View style={styles.promoBtn}>
-                <Text style={styles.promoBtnText}>تسوق</Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.promoCard, { backgroundColor: colors.primary }]}
-              activeOpacity={0.85}
-            >
-              <Ionicons name="gift" size={22} color="rgba(255,255,255,0.7)" />
-              <View>
-                <Text style={styles.promoTitle}>عروض حصرية</Text>
-                <Text style={styles.promoSub}>خصم ٣٠٪ للأعضاء</Text>
-              </View>
-              <View style={styles.promoBtn}>
-                <Text style={styles.promoBtnText}>انضم</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
+        <SectionHeader title="أبرز المجموعات" showSeeAll={false} />
+        <StoryStrip onCollectionPress={() => router.push("/(tabs)/search")} />
 
         <View style={styles.sectionDivider} />
 
-        <View style={styles.section}>
-          <SectionHeader
-            title="وصل حديثاً"
-            onSeeAll={() => router.push("/(tabs)/search")}
+        <View style={styles.flashSaleHeader}>
+          <FlashSaleTimer />
+          <View style={styles.flashSaleLeft}>
+            <Text style={styles.flashTitle}>عروض اليوم</Text>
+            <View style={styles.flashBadge}>
+              <Text style={styles.flashBadgeText}>يومي 🔥</Text>
+            </View>
+          </View>
+        </View>
+        {refreshing ? (
+          <View style={{ flexDirection: "row-reverse", paddingHorizontal: 16, gap: 12 }}>
+            {[1, 2].map((k) => <ProductCardSkeleton key={k} />)}
+          </View>
+        ) : (
+          <FlatList
+            data={FLASH_SALE_PRODUCTS}
+            horizontal
+            inverted
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.horizontalList}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <ProductCard product={item} style={styles.horizontalCard} />
+            )}
+            scrollEnabled={FLASH_SALE_PRODUCTS.length > 0}
           />
-          {refreshing ? (
-            <View style={{ flexDirection: "row-reverse", paddingHorizontal: 16, gap: 12 }}>
-              {[1, 2].map((k) => (
-                <ProductCardSkeleton key={k} />
-              ))}
+        )}
+
+        <View style={styles.sectionDivider} />
+
+        <View style={styles.promoRow}>
+          <TouchableOpacity
+            style={[styles.promoCard, { backgroundColor: "#7C3AED" }]}
+            activeOpacity={0.85}
+          >
+            <Ionicons name="flash" size={24} color="rgba(255,255,255,0.7)" />
+            <View>
+              <Text style={styles.promoTitle}>شحن مجاني</Text>
+              <Text style={styles.promoSub}>على طلبات +500 ر.س</Text>
             </View>
-          ) : (
-            <FlatList
-              data={NEW_ARRIVALS}
-              horizontal
-              inverted
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.horizontalList}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <ProductCard product={item} style={styles.horizontalCard} />
-              )}
-              scrollEnabled={NEW_ARRIVALS.length > 0}
-            />
-          )}
+            <View style={styles.promoBtn}>
+              <Text style={styles.promoBtnText}>تسوق الآن</Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.promoCard, { backgroundColor: colors.primary }]}
+            activeOpacity={0.85}
+          >
+            <Ionicons name="gift" size={24} color="rgba(255,255,255,0.7)" />
+            <View>
+              <Text style={styles.promoTitle}>عروض حصرية</Text>
+              <Text style={styles.promoSub}>خصم ٣٠٪ للأعضاء</Text>
+            </View>
+            <View style={styles.promoBtn}>
+              <Text style={styles.promoBtnText}>انضم الآن</Text>
+            </View>
+          </TouchableOpacity>
         </View>
+
+        <View style={styles.sectionDivider} />
+
+        <SectionHeader
+          title="وصل حديثاً"
+          onSeeAll={() => router.push("/(tabs)/search")}
+        />
+        {refreshing ? (
+          <View style={{ flexDirection: "row-reverse", paddingHorizontal: 16, gap: 12 }}>
+            {[1, 2].map((k) => <ProductCardSkeleton key={k} />)}
+          </View>
+        ) : (
+          <FlatList
+            data={NEW_ARRIVALS}
+            horizontal
+            inverted
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.horizontalList}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <ProductCard product={item} style={styles.horizontalCard} />
+            )}
+            scrollEnabled={NEW_ARRIVALS.length > 0}
+          />
+        )}
 
         <View style={styles.sectionDivider} />
 
         {recentlyViewed.length > 0 && (
           <>
-            <View style={styles.section}>
-              <SectionHeader title="شاهدته مؤخراً" showSeeAll={false} />
-              <FlatList
-                data={recentlyViewed}
-                horizontal
-                inverted
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.horizontalList}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                  <ProductCard product={item} style={styles.horizontalCard} />
-                )}
-              />
-            </View>
+            <SectionHeader title="شاهدته مؤخراً" showSeeAll={false} />
+            <FlatList
+              data={recentlyViewed}
+              horizontal
+              inverted
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.horizontalList}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <ProductCard product={item} style={styles.horizontalCard} />
+              )}
+            />
             <View style={styles.sectionDivider} />
           </>
         )}
 
-        <View style={styles.section}>
-          <SectionHeader
-            title="الأكثر مبيعاً"
-            onSeeAll={() => router.push("/(tabs)/search")}
-          />
-          {refreshing ? (
-            <View style={styles.skeletonGrid}>
-              {[1, 2, 3, 4].map((k) => (
-                <View key={k} style={styles.gridItem}>
-                  <ProductCardSkeleton />
-                </View>
-              ))}
-            </View>
-          ) : (
-            <View style={styles.productGrid}>
-              {(selectedCategory === "all" ? FEATURED_PRODUCTS : filteredProducts).map(
-                (product) => (
-                  <View key={product.id} style={styles.gridItem}>
-                    <ProductCard product={product} />
-                  </View>
-                )
-              )}
-            </View>
-          )}
+        <SectionHeader
+          title="اختيارات اليوم ✨"
+          onSeeAll={() => router.push("/(tabs)/search")}
+        />
+        {refreshing ? (
+          <View style={styles.skeletonGrid}>
+            {[1, 2, 3, 4].map((k) => (
+              <View key={k} style={styles.gridItem}>
+                <ProductCardSkeleton />
+              </View>
+            ))}
+          </View>
+        ) : (
+          <View style={styles.todaysPicksGrid}>
+            {todaysPicks.map((product) => (
+              <View key={product.id} style={styles.gridItem}>
+                <ProductCard product={product} />
+              </View>
+            ))}
+          </View>
+        )}
+
+        <View style={styles.sectionDivider} />
+
+        <SectionHeader
+          title="الأكثر مبيعاً"
+          onSeeAll={() => router.push("/(tabs)/search")}
+        />
+        {refreshing ? (
+          <View style={styles.skeletonGrid}>
+            {[1, 2, 3, 4].map((k) => (
+              <View key={k} style={styles.gridItem}>
+                <ProductCardSkeleton />
+              </View>
+            ))}
+          </View>
+        ) : (
+          <View style={styles.productGrid}>
+            {(selectedCategory === "all"
+              ? FEATURED_PRODUCTS
+              : filteredProducts
+            ).map((product) => (
+              <View key={product.id} style={styles.gridItem}>
+                <ProductCard product={product} />
+              </View>
+            ))}
+          </View>
+        )}
+      </Animated.ScrollView>
+
+      <Animated.View
+        style={[
+          styles.stickyHeader,
+          {
+            top: stickyTop,
+            opacity: stickyOpacity,
+            transform: [{ translateY: stickyTranslateY }],
+          },
+        ]}
+        pointerEvents="box-none"
+      >
+        <Text style={styles.stickyTitle}>الأسطورة</Text>
+        <View style={styles.stickyActions}>
+          <TouchableOpacity
+            style={styles.stickyBtn}
+            onPress={() => setNotificationsVisible(true)}
+          >
+            <Ionicons name="notifications-outline" size={18} color="#fff" />
+            {unreadCount > 0 && (
+              <View style={styles.stickyBadge}>
+                <Text style={styles.stickyBadgeText}>{unreadCount}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.stickyBtn}
+            onPress={() => router.push("/(tabs)/search")}
+          >
+            <Ionicons name="search-outline" size={18} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.stickyBtn}
+            onPress={() => router.push("/(tabs)/cart" as any)}
+          >
+            <Ionicons name="bag-outline" size={18} color="#fff" />
+            {totalCount > 0 && (
+              <View style={styles.stickyBadge}>
+                <Text style={styles.stickyBadgeText}>
+                  {totalCount > 9 ? "9+" : totalCount}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
         </View>
-      </ScrollView>
+      </Animated.View>
 
       <VoiceSearch
         visible={voiceVisible}

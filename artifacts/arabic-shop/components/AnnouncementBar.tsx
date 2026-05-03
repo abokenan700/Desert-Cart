@@ -1,102 +1,119 @@
-import React, { useRef, useEffect, useMemo } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   Animated,
-  Platform,
 } from "react-native";
-import { useColors } from "@/hooks/useColors";
+import { LinearGradient } from "expo-linear-gradient";
 
 const ANNOUNCEMENTS = [
-  "🎉 شحن مجاني على جميع الطلبات فوق ٥٠٠ ر.س",
+  "✦ شحن مجاني على جميع الطلبات فوق ٥٠٠ ر.س ✦",
   "⚡ خصم ٣٠٪ على منتجات مختارة — استخدم SAUDI30",
   "🎁 كل عملية شراء تدخلك سحب جوائز أسبوعي",
-  "💳 الدفع الآن أسهل مع خدمة التقسيط المتاح",
+  "💳 ادفع لاحقاً بالتقسيط بدون فوائد",
 ];
 
-const DISPLAY_DURATION = 3000;
-const ANIMATION_DURATION = 500;
+const DISPLAY_DURATION = 3200;
+const ANIM_DURATION = 450;
 
 export default function AnnouncementBar() {
-  const colors = useColors();
-  const translateY = useRef(new Animated.Value(24)).current;
+  const translateY = useRef(new Animated.Value(28)).current;
   const opacity = useRef(new Animated.Value(0)).current;
   const currentIndex = useRef(0);
+  const [displayText, setDisplayText] = useState(ANNOUNCEMENTS[0]);
 
   useEffect(() => {
-    const animateNext = () => {
-      const announcement = ANNOUNCEMENTS[currentIndex.current];
-      
+    let cancelled = false;
+
+    const runCycle = () => {
+      if (cancelled) return;
+      setDisplayText(ANNOUNCEMENTS[currentIndex.current]);
+      translateY.setValue(28);
+      opacity.setValue(0);
+
       Animated.parallel([
         Animated.timing(translateY, {
           toValue: 0,
-          duration: ANIMATION_DURATION,
+          duration: ANIM_DURATION,
           useNativeDriver: true,
         }),
         Animated.timing(opacity, {
           toValue: 1,
-          duration: ANIMATION_DURATION,
+          duration: ANIM_DURATION,
           useNativeDriver: true,
         }),
       ]).start();
 
-      const displayTimer = setTimeout(() => {
+      const timer = setTimeout(() => {
+        if (cancelled) return;
         Animated.parallel([
           Animated.timing(translateY, {
-            toValue: -24,
-            duration: ANIMATION_DURATION,
+            toValue: -28,
+            duration: ANIM_DURATION,
             useNativeDriver: true,
           }),
           Animated.timing(opacity, {
             toValue: 0,
-            duration: ANIMATION_DURATION,
+            duration: ANIM_DURATION,
             useNativeDriver: true,
           }),
         ]).start(() => {
-          currentIndex.current = (currentIndex.current + 1) % ANNOUNCEMENTS.length;
-          translateY.setValue(24);
-          animateNext();
+          if (cancelled) return;
+          currentIndex.current =
+            (currentIndex.current + 1) % ANNOUNCEMENTS.length;
+          runCycle();
         });
       }, DISPLAY_DURATION);
 
-      return () => clearTimeout(displayTimer);
+      return () => clearTimeout(timer);
     };
 
-    animateNext();
-  }, [translateY, opacity]);
-
-  const styles = useMemo(() => StyleSheet.create({
-    container: {
-      backgroundColor: colors.primary,
-      height: 24,
-      overflow: "hidden",
-      justifyContent: "center",
-    },
-    text: {
-      fontSize: 12,
-      fontFamily: "Cairo_600SemiBold",
-      color: "#fff",
-      paddingHorizontal: 16,
-      textAlign: "center",
-      writingDirection: "rtl",
-    },
-  }), [colors]);
+    runCycle();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
-    <View style={styles.container}>
-      <Animated.Text
-        style={[
-          styles.text,
-          {
-            transform: [{ translateY }],
-            opacity,
-          },
-        ]}
-        numberOfLines={1}
-      >
-        {ANNOUNCEMENTS[currentIndex.current]}
-      </Animated.Text>
-    </View>
+    <LinearGradient
+      colors={["#E63946", "#C1121F"]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+      style={styles.container}
+    >
+      <View style={styles.inner}>
+        <Animated.Text
+          style={[
+            styles.text,
+            { transform: [{ translateY }], opacity },
+          ]}
+          numberOfLines={1}
+        >
+          {displayText}
+        </Animated.Text>
+      </View>
+    </LinearGradient>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    height: 30,
+    overflow: "hidden",
+    justifyContent: "center",
+  },
+  inner: {
+    height: 30,
+    overflow: "hidden",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  text: {
+    fontSize: 12,
+    fontFamily: "Cairo_600SemiBold",
+    color: "#fff",
+    textAlign: "center",
+    letterSpacing: 0.3,
+  },
+});
