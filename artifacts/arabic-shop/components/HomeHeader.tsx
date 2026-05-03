@@ -36,7 +36,12 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
       alignItems: "center",
       justifyContent: "space-between",
       borderBottomWidth: 1,
-      borderBottomColor: colors.border,
+      borderBottomColor: `${colors.border}50`,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.06,
+      shadowRadius: 3,
+      elevation: 2,
     },
     logoSection: {
       flexDirection: "row-reverse",
