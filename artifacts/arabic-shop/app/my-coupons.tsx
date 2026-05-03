@@ -19,56 +19,15 @@ interface Coupon {
   descAr: string;
   discount: string;
   expiry: string;
-  type: "percent" | "free_shipping" | "fixed";
   minOrder?: number;
-  used?: boolean;
 }
 
 const COUPONS: Coupon[] = [
-  {
-    code: "SAUDI30",
-    descAr: "خصم ٣٠٪ على جميع المنتجات",
-    discount: "٣٠٪",
-    expiry: "٣١ مايو ٢٠٢٦",
-    type: "percent",
-    minOrder: 200,
-  },
-  {
-    code: "WELCOME10",
-    descAr: "خصم ترحيبي ١٠٪ للعملاء الجدد",
-    discount: "١٠٪",
-    expiry: "٣٠ يونيو ٢٠٢٦",
-    type: "percent",
-  },
-  {
-    code: "FLASH50",
-    descAr: "خصم ٥٠٪ - عرض محدود المدة",
-    discount: "٥٠٪",
-    expiry: "٥ مايو ٢٠٢٦",
-    type: "percent",
-    minOrder: 500,
-  },
-  {
-    code: "VIP20",
-    descAr: "خصم ٢٠٪ حصري للعملاء المميزين",
-    discount: "٢٠٪",
-    expiry: "٣١ ديسمبر ٢٠٢٦",
-    type: "percent",
-    minOrder: 100,
-  },
+  { code: "SAUDI30", descAr: "خصم ٣٠٪ على جميع المنتجات", discount: "٣٠٪", expiry: "٣١ مايو ٢٠٢٦", minOrder: 200 },
+  { code: "WELCOME10", descAr: "خصم ترحيبي ١٠٪ للعملاء الجدد", discount: "١٠٪", expiry: "٣٠ يونيو ٢٠٢٦" },
+  { code: "FLASH50", descAr: "خصم ٥٠٪ - عرض محدود المدة", discount: "٥٠٪", expiry: "٥ مايو ٢٠٢٦", minOrder: 500 },
+  { code: "VIP20", descAr: "خصم ٢٠٪ حصري للعملاء المميزين", discount: "٢٠٪", expiry: "٣١ ديسمبر ٢٠٢٦", minOrder: 100 },
 ];
-
-const TYPE_COLORS: Record<string, string> = {
-  percent: "#7C3AED",
-  free_shipping: "#0D9488",
-  fixed: "#E63946",
-};
-
-const TYPE_ICONS: Record<string, string> = {
-  percent: "pricetag-outline",
-  free_shipping: "car-outline",
-  fixed: "cash-outline",
-};
 
 export default function MyCouponsScreen() {
   const colors = useColors();
@@ -81,11 +40,11 @@ export default function MyCouponsScreen() {
   const handleCopy = async (code: string) => {
     try {
       await Share.share({ message: code });
+      setCopiedCode(code);
+      setTimeout(() => setCopiedCode(null), 2000);
     } catch {
-      Alert.alert("نسخ الكود", code);
+      Alert.alert("كود الخصم", code);
     }
-    setCopiedCode(code);
-    setTimeout(() => setCopiedCode(null), 2000);
   };
 
   const styles = StyleSheet.create({
@@ -229,40 +188,29 @@ export default function MyCouponsScreen() {
         <Text style={styles.headerTitle}>كوبونات الخصم</Text>
       </View>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 24 + bottomPad }}
-      >
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 + bottomPad }}>
         <View style={styles.infoBar}>
           <Ionicons name="information-circle-outline" size={18} color="#3B82F6" />
-          <Text style={styles.infoText}>
-            انسخ الكود وأدخله في خطوة الدفع عند الشراء للحصول على الخصم
-          </Text>
+          <Text style={styles.infoText}>انسخ الكود وأدخله في خطوة الدفع عند الشراء للحصول على الخصم</Text>
         </View>
 
         {COUPONS.map((coupon) => {
-          const typeColor = TYPE_COLORS[coupon.type];
           const isCopied = copiedCode === coupon.code;
+          const badgeColor = isCopied ? colors.success : colors.primary;
           return (
             <View key={coupon.code} style={styles.couponCard}>
               <View style={styles.couponTop}>
-                <View style={[styles.iconBox, { backgroundColor: typeColor + "20" }]}>
-                  <Ionicons
-                    name={TYPE_ICONS[coupon.type] as any}
-                    size={22}
-                    color={typeColor}
-                  />
+                <View style={[styles.iconBox, { backgroundColor: "#F3E8FF" }]}>
+                  <Ionicons name="pricetag-outline" size={22} color="#7C3AED" />
                 </View>
                 <View style={styles.couponInfo}>
                   <Text style={styles.couponDesc}>{coupon.descAr}</Text>
                   <Text style={styles.couponMeta}>
-                    {coupon.minOrder
-                      ? `الحد الأدنى للطلب: ${coupon.minOrder} ر.س · `
-                      : ""}
+                    {coupon.minOrder ? `الحد الأدنى للطلب: ${coupon.minOrder} ر.س · ` : ""}
                     ينتهي {coupon.expiry}
                   </Text>
                 </View>
-                <View style={[styles.discountBadge, { backgroundColor: typeColor }]}>
+                <View style={[styles.discountBadge, { backgroundColor: "#7C3AED" }]}>
                   <Text style={styles.discountText}>{coupon.discount}</Text>
                 </View>
               </View>
@@ -271,27 +219,13 @@ export default function MyCouponsScreen() {
 
               <View style={styles.couponBottom}>
                 <TouchableOpacity
-                  style={[
-                    styles.copyBtn,
-                    {
-                      backgroundColor: isCopied ? colors.successLight : colors.primaryLight,
-                    },
-                  ]}
+                  style={[styles.copyBtn, { backgroundColor: isCopied ? colors.successLight : colors.primaryLight }]}
                   onPress={() => handleCopy(coupon.code)}
                 >
-                  <Text
-                    style={[
-                      styles.copyBtnText,
-                      { color: isCopied ? colors.success : colors.primary },
-                    ]}
-                  >
+                  <Text style={[styles.copyBtnText, { color: badgeColor }]}>
                     {isCopied ? "تم النسخ!" : "نسخ الكود"}
                   </Text>
-                  <Ionicons
-                    name={isCopied ? "checkmark-circle" : "copy-outline"}
-                    size={16}
-                    color={isCopied ? colors.success : colors.primary}
-                  />
+                  <Ionicons name={isCopied ? "checkmark-circle" : "copy-outline"} size={16} color={badgeColor} />
                 </TouchableOpacity>
                 <View style={styles.codeBox}>
                   <Text style={styles.codeText}>{coupon.code}</Text>
