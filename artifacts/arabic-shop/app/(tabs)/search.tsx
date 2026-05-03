@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -14,9 +14,11 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import ProductCard from "@/components/ProductCard";
 import CategoryRow from "@/components/CategoryRow";
+import VoiceSearch from "@/components/VoiceSearch";
 import { PRODUCTS, CATEGORIES } from "@/data/mockData";
 
 const { height } = Dimensions.get("window");
@@ -34,13 +36,19 @@ const POPULAR_SEARCHES = ["فستان", "حقيبة", "ساعة ذكية", "سم
 export default function SearchScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const [query, setQuery] = useState("");
+  const params = useLocalSearchParams<{ q?: string }>();
+  const [query, setQuery] = useState(params.q ?? "");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("popular");
   const [filterVisible, setFilterVisible] = useState(false);
+  const [voiceVisible, setVoiceVisible] = useState(false);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
   const filterAnim = useRef(new Animated.Value(height)).current;
   const inputRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    if (params.q) setQuery(params.q);
+  }, [params.q]);
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
@@ -314,7 +322,9 @@ export default function SearchScreen() {
                 <Ionicons name="close-circle" size={18} color={colors.mutedForeground} />
               </TouchableOpacity>
             ) : (
-              <Ionicons name="search-outline" size={18} color={colors.mutedForeground} />
+              <TouchableOpacity onPress={() => setVoiceVisible(true)}>
+                <Ionicons name="mic" size={19} color={colors.primary} />
+              </TouchableOpacity>
             )}
           </View>
         </View>
@@ -388,6 +398,13 @@ export default function SearchScreen() {
           </View>
         )}
       </ScrollView>
+
+      {/* Voice Search */}
+      <VoiceSearch
+        visible={voiceVisible}
+        onResult={(text) => setQuery(text)}
+        onClose={() => setVoiceVisible(false)}
+      />
 
       {/* Filter Sheet Modal */}
       <Modal transparent visible={filterVisible} animationType="none" statusBarTranslucent>

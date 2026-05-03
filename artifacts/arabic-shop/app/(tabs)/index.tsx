@@ -18,6 +18,7 @@ import CategoryRow from "@/components/CategoryRow";
 import ProductCard from "@/components/ProductCard";
 import SectionHeader from "@/components/SectionHeader";
 import HomeHeader from "@/components/HomeHeader";
+import VoiceSearch from "@/components/VoiceSearch";
 import {
   BANNERS,
   CATEGORIES,
@@ -33,6 +34,7 @@ export default function HomeScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [voiceVisible, setVoiceVisible] = useState(false);
 
   const filteredProducts =
     selectedCategory === "all"
@@ -134,14 +136,19 @@ export default function HomeScreen() {
       >
         {/* Search Bar */}
         <View style={{ height: 16 }} />
-        <TouchableOpacity
-          style={styles.searchBar}
-          onPress={() => router.push("/(tabs)/search")}
-          activeOpacity={0.8}
-        >
+        <View style={styles.searchBar}>
+          <TouchableOpacity onPress={() => setVoiceVisible(true)}>
+            <Ionicons name="mic" size={20} color="#E63946" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ flex: 1 }}
+            onPress={() => router.push("/(tabs)/search")}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.searchText}>ابحث عن منتجات، ماركات...</Text>
+          </TouchableOpacity>
           <Ionicons name="search-outline" size={18} color={colors.mutedForeground} />
-          <Text style={styles.searchText}>ابحث عن منتجات، ماركات...</Text>
-        </TouchableOpacity>
+        </View>
 
         {/* Banner Carousel */}
         <BannerCarousel banners={BANNERS} />
@@ -255,6 +262,16 @@ export default function HomeScreen() {
           </View>
         </View>
       </ScrollView>
+
+      {/* Voice Search Modal */}
+      <VoiceSearch
+        visible={voiceVisible}
+        onResult={(text) => {
+          setVoiceVisible(false);
+          router.push({ pathname: "/(tabs)/search", params: { q: text } });
+        }}
+        onClose={() => setVoiceVisible(false)}
+      />
     </View>
   );
 }
