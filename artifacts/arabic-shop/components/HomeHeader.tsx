@@ -53,7 +53,7 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
       fontFamily: "Cairo_800ExtraBold",
       color: colors.text,
       writingDirection: "rtl",
-      marginTop: 2,
+      marginTop: -6,
     },
     actions: {
       flexDirection: "row-reverse",
@@ -97,7 +97,7 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
           source={require("@/assets/logo.png")}
           style={styles.logoImage}
         />
-        <Text style={styles.storeName}>سوق</Text>
+        <Text style={styles.storeName}>الاسطورة</Text>
       </View>
 
       <View style={styles.actions}>
