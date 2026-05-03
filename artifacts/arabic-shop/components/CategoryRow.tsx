@@ -31,7 +31,7 @@ const CategoryRow = React.memo(function CategoryRow({
     contentContainer: {
       paddingHorizontal: 16,
       flexDirection: "row-reverse",
-      gap: 12,
+      gap: 20,
     },
     categoryItem: {
       alignItems: "center",
