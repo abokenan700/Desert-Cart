@@ -24,26 +24,32 @@ const CategoryRow = React.memo(function CategoryRow({
   const colors = useColors();
 
   const styles = useMemo(() => StyleSheet.create({
-    scroll: { paddingVertical: 12 },
+    scroll: { 
+      paddingVertical: 12,
+      backgroundColor: colors.card,
+    },
     contentContainer: {
       paddingHorizontal: 16,
       flexDirection: "row-reverse",
       gap: 12,
     },
+    categoryItem: {
+      alignItems: "center",
+      gap: 6,
+      width: 56,
+    },
     pill: {
-      width: 70,
+      width: 56,
+      height: 56,
       alignItems: "center",
       justifyContent: "center",
-      borderRadius: 35,
-      gap: 6,
+      borderRadius: 28,
       borderWidth: 1.5,
-      paddingVertical: 10,
     },
     label: {
       fontSize: 11,
       fontFamily: "Cairo_600SemiBold",
       textAlign: "center",
-      marginHorizontal: 4,
     },
   }), [colors]);
 
@@ -57,35 +63,37 @@ const CategoryRow = React.memo(function CategoryRow({
       {categories.map((cat) => {
         const isSelected = selected === cat.id;
         return (
-          <TouchableOpacity
-            key={cat.id}
-            style={[
-              styles.pill,
-              {
-                backgroundColor: isSelected ? cat.color : colors.card,
-                borderColor: isSelected ? cat.color : colors.border,
-              },
-            ]}
-            onPress={() => onSelect(cat.id)}
-            activeOpacity={0.75}
-            accessibilityLabel={cat.nameAr}
-            accessibilityRole="button"
-            accessibilityState={{ selected: isSelected }}
-          >
-            <Ionicons
-              name={cat.icon as any}
-              size={18}
-              color={isSelected ? "#fff" : cat.color}
-            />
+          <View key={cat.id} style={styles.categoryItem}>
+            <TouchableOpacity
+              style={[
+                styles.pill,
+                {
+                  backgroundColor: isSelected ? cat.color : colors.card,
+                  borderColor: isSelected ? cat.color : colors.border,
+                },
+              ]}
+              onPress={() => onSelect(cat.id)}
+              activeOpacity={0.75}
+              accessibilityLabel={cat.nameAr}
+              accessibilityRole="button"
+              accessibilityState={{ selected: isSelected }}
+            >
+              <Ionicons
+                name={cat.icon as any}
+                size={16}
+                color={isSelected ? "#fff" : cat.color}
+              />
+            </TouchableOpacity>
             <Text
               style={[
                 styles.label,
-                { color: isSelected ? "#fff" : colors.text },
+                { color: isSelected ? cat.color : colors.text },
               ]}
+              numberOfLines={1}
             >
               {cat.nameAr}
             </Text>
-          </TouchableOpacity>
+          </View>
         );
       })}
     </ScrollView>
