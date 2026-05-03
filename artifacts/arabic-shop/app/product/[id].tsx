@@ -17,8 +17,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { useReviews } from "@/context/ReviewsContext";
 import RatingStars from "@/components/RatingStars";
-import { PRODUCTS, REVIEWS } from "@/data/mockData";
+import ReviewModal from "@/components/ReviewModal";
+import { PRODUCTS } from "@/data/mockData";
 
 const { width, height } = Dimensions.get("window");
 const IMAGE_HEIGHT = height * 0.48;
@@ -34,7 +36,10 @@ export default function ProductDetailScreen() {
   const [selectedColor, setSelectedColor] = useState<string | undefined>(undefined);
   const [quantity, setQuantity] = useState(1);
   const [showFullDesc, setShowFullDesc] = useState(false);
+  const [reviewModalVisible, setReviewModalVisible] = useState(false);
+  const [showAllReviews, setShowAllReviews] = useState(false);
   const addBtnScale = useRef(new Animated.Value(1)).current;
+  const { getReviews, addReview, markHelpful, hasReviewed } = useReviews();
 
   const product = PRODUCTS.find((p) => p.id === id);
 
@@ -50,6 +55,17 @@ export default function ProductDetailScreen() {
   }
 
   const wishlisted = isWishlisted(product.id);
+  const reviews = getReviews(product.id);
+  const avgRating = reviews.length
+    ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
+    : product.rating;
+  const displayRating = parseFloat(avgRating.toFixed(1));
+  const starCounts = [5, 4, 3, 2, 1].map(
+    (s) => reviews.filter((r) => r.rating === s).length
+  );
+  const maxStarCount = Math.max(...starCounts, 1);
+  const visibleReviews = showAllReviews ? reviews : reviews.slice(0, 3);
+  const alreadyReviewed = hasReviewed(product.id);
 
   const handleAddToCart = () => {
     Animated.sequence([
@@ -315,7 +331,86 @@ export default function ProductDetailScreen() {
       flexDirection: "row-reverse",
       justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: 14,
+      marginBottom: 12,
+    },
+    ratingSummary: {
+      flexDirection: "row-reverse",
+      alignItems: "center",
+      backgroundColor: colors.secondary,
+      borderRadius: 16,
+      padding: 16,
+      marginBottom: 16,
+      gap: 16,
+    },
+    ratingBigNumber: {
+      fontSize: 42,
+      fontFamily: "Cairo_800ExtraBold",
+      color: colors.text,
+      lineHeight: 50,
+    },
+    ratingBigLabel: {
+      fontSize: 11,
+      fontFamily: "Cairo_400Regular",
+      color: colors.mutedForeground,
+      textAlign: "center",
+    },
+    barsContainer: {
+      flex: 1,
+      gap: 5,
+    },
+    barRow: {
+      flexDirection: "row-reverse",
+      alignItems: "center",
+      gap: 8,
+    },
+    barLabel: {
+      fontSize: 11,
+      fontFamily: "Cairo_400Regular",
+      color: colors.mutedForeground,
+      width: 14,
+      textAlign: "center",
+    },
+    barTrack: {
+      flex: 1,
+      height: 6,
+      backgroundColor: colors.border,
+      borderRadius: 3,
+      overflow: "hidden",
+    },
+    barFill: {
+      height: "100%",
+      borderRadius: 3,
+    },
+    writeReviewBtn: {
+      flexDirection: "row-reverse",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      borderWidth: 1.5,
+      borderColor: colors.primary,
+      borderRadius: 14,
+      paddingVertical: 12,
+      marginBottom: 16,
+    },
+    writeReviewText: {
+      fontSize: 14,
+      fontFamily: "Cairo_600SemiBold",
+      color: colors.primary,
+    },
+    reviewedBadge: {
+      flexDirection: "row-reverse",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 6,
+      backgroundColor: "#F0FDF4",
+      borderRadius: 14,
+      paddingVertical: 10,
+      marginBottom: 16,
+    },
+    reviewedText: {
+      fontSize: 13,
+      fontFamily: "Cairo_600SemiBold",
+      color: "#16A34A",
     },
     reviewCard: {
       backgroundColor: colors.secondary,
@@ -350,12 +445,33 @@ export default function ProductDetailScreen() {
       flexDirection: "row-reverse",
       alignItems: "center",
       gap: 6,
-      marginTop: 8,
+      marginTop: 10,
+    },
+    helpfulBtn: {
+      flexDirection: "row-reverse",
+      alignItems: "center",
+      gap: 5,
+      backgroundColor: colors.background,
+      borderRadius: 8,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderWidth: 1,
+      borderColor: colors.border,
     },
     helpfulText: {
       fontSize: 12,
       fontFamily: "Cairo_400Regular",
       color: colors.mutedForeground,
+    },
+    showAllBtn: {
+      alignItems: "center",
+      paddingVertical: 12,
+      marginTop: 4,
+    },
+    showAllText: {
+      fontSize: 13,
+      fontFamily: "Cairo_600SemiBold",
+      color: colors.primary,
     },
     bottomBar: {
       backgroundColor: colors.card,
@@ -612,34 +728,118 @@ export default function ProductDetailScreen() {
 
           {/* Reviews */}
           <View style={styles.reviewHeader}>
-            <Text style={styles.sectionLabel}>تقييمات المشترين</Text>
-            <TouchableOpacity>
-              <Text
-                style={{ color: colors.primary, fontSize: 13, fontFamily: "Cairo_600SemiBold" }}
-              >
-                عرض الكل
-              </Text>
-            </TouchableOpacity>
+            <Text style={styles.sectionLabel}>
+              تقييمات المشترين ({reviews.length})
+            </Text>
           </View>
 
-          {REVIEWS.slice(0, 2).map((review) => (
+          {/* Rating breakdown */}
+          <View style={styles.ratingSummary}>
+            <View style={{ alignItems: "center" }}>
+              <Text style={styles.ratingBigNumber}>{displayRating}</Text>
+              <RatingStars rating={displayRating} size={13} />
+              <Text style={styles.ratingBigLabel}>من ٥</Text>
+            </View>
+            <View style={styles.barsContainer}>
+              {[5, 4, 3, 2, 1].map((star, i) => {
+                const pct = starCounts[i] / maxStarCount;
+                const fillColor = pct > 0.6 ? "#22C55E" : pct > 0.3 ? "#F5A623" : "#E63946";
+                return (
+                  <View key={star} style={styles.barRow}>
+                    <Text style={styles.barLabel}>{star}</Text>
+                    <View style={styles.barTrack}>
+                      <View
+                        style={[
+                          styles.barFill,
+                          { width: pct * 200, backgroundColor: fillColor },
+                        ]}
+                      />
+                    </View>
+                    <Text style={[styles.barLabel, { width: 20 }]}>{starCounts[i]}</Text>
+                  </View>
+                );
+              })}
+            </View>
+          </View>
+
+          {/* Write Review / Already Reviewed */}
+          {alreadyReviewed ? (
+            <View style={styles.reviewedBadge}>
+              <Ionicons name="checkmark-circle" size={16} color="#16A34A" />
+              <Text style={styles.reviewedText}>لقد قيّمت هذا المنتج</Text>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={styles.writeReviewBtn}
+              onPress={() => setReviewModalVisible(true)}
+            >
+              <Ionicons name="create-outline" size={18} color={colors.primary} />
+              <Text style={styles.writeReviewText}>اكتب تقييمك</Text>
+            </TouchableOpacity>
+          )}
+
+          {/* Review cards */}
+          {visibleReviews.map((review) => (
             <View key={review.id} style={styles.reviewCard}>
               <View style={styles.reviewTop}>
-                <Text style={styles.reviewerName}>{review.userName}</Text>
+                <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
+                  <View
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 16,
+                      backgroundColor: colors.primaryLight,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text style={{ fontSize: 14, fontFamily: "Cairo_700Bold", color: colors.primary }}>
+                      {review.userName.charAt(0)}
+                    </Text>
+                  </View>
+                  <Text style={styles.reviewerName}>{review.userName}</Text>
+                </View>
                 <Text style={styles.reviewDate}>{review.date}</Text>
               </View>
-              <RatingStars rating={review.rating} size={12} />
-              <Text style={[styles.reviewComment, { marginTop: 6 }]}>
+              <RatingStars rating={review.rating} size={13} />
+              <Text style={[styles.reviewComment, { marginTop: 8 }]}>
                 {review.commentAr}
               </Text>
               <View style={styles.helpfulRow}>
-                <Ionicons name="thumbs-up-outline" size={12} color={colors.mutedForeground} />
-                <Text style={styles.helpfulText}>مفيد ({review.helpful})</Text>
+                <TouchableOpacity
+                  style={styles.helpfulBtn}
+                  onPress={() => markHelpful(product.id, review.id)}
+                >
+                  <Text style={styles.helpfulText}>مفيد ({review.helpful})</Text>
+                  <Ionicons name="thumbs-up-outline" size={12} color={colors.mutedForeground} />
+                </TouchableOpacity>
               </View>
             </View>
           ))}
+
+          {reviews.length > 3 && (
+            <TouchableOpacity
+              style={styles.showAllBtn}
+              onPress={() => setShowAllReviews(!showAllReviews)}
+            >
+              <Text style={styles.showAllText}>
+                {showAllReviews ? "عرض أقل" : `عرض جميع التقييمات (${reviews.length})`}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
+
+      {/* Review Modal */}
+      <ReviewModal
+        visible={reviewModalVisible}
+        productName={product.nameAr}
+        onSubmit={(rating, comment, userName) => {
+          addReview(product.id, { rating, commentAr: comment, userName });
+          setReviewModalVisible(false);
+        }}
+        onClose={() => setReviewModalVisible(false)}
+      />
 
       {/* Bottom Bar */}
       <Animated.View

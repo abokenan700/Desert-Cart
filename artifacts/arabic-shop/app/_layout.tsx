@@ -17,6 +17,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
+import { ReviewsProvider } from "@/context/ReviewsContext";
 
 I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
@@ -72,11 +73,13 @@ export default function RootLayout() {
         <QueryClientProvider client={queryClient}>
           <CartProvider>
             <WishlistProvider>
-              <GestureHandlerRootView>
-                <KeyboardProvider>
-                  <RootLayoutNav />
-                </KeyboardProvider>
-              </GestureHandlerRootView>
+              <ReviewsProvider>
+                <GestureHandlerRootView>
+                  <KeyboardProvider>
+                    <RootLayoutNav />
+                  </KeyboardProvider>
+                </GestureHandlerRootView>
+              </ReviewsProvider>
             </WishlistProvider>
           </CartProvider>
         </QueryClientProvider>
