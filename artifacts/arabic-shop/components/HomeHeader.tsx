@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
+  Image,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -42,25 +43,17 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
       alignItems: "center",
       gap: 8,
     },
-    logoIcon: {
-      width: 36,
-      height: 36,
-      borderRadius: 10,
-      backgroundColor: colors.primary,
-      alignItems: "center",
-      justifyContent: "center",
+    logoImage: {
+      width: 42,
+      height: 42,
+      resizeMode: "contain",
     },
     storeName: {
-      fontSize: 20,
+      fontSize: 18,
       fontFamily: "Cairo_800ExtraBold",
-      color: colors.primary,
+      color: colors.text,
       writingDirection: "rtl",
-    },
-    storeTagline: {
-      fontSize: 11,
-      fontFamily: "Cairo_400Regular",
-      color: colors.mutedForeground,
-      writingDirection: "rtl",
+      marginTop: 2,
     },
     actions: {
       flexDirection: "row-reverse",
@@ -100,13 +93,11 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
   return (
     <View style={styles.header}>
       <View style={styles.logoSection}>
-        <View style={styles.logoIcon}>
-          <Ionicons name="bag" size={20} color="#fff" />
-        </View>
-        <View>
-          <Text style={styles.storeName}>سوق</Text>
-          <Text style={styles.storeTagline}>تسوق بذكاء</Text>
-        </View>
+        <Image
+          source={require("@/assets/logo.png")}
+          style={styles.logoImage}
+        />
+        <Text style={styles.storeName}>سوق</Text>
       </View>
 
       <View style={styles.actions}>
