@@ -1,4 +1,4 @@
-modules = ["nodejs-24"]
+modules = ["nodejs-20", "web", "bash"]
 
 [deployment]
 router = "application"
@@ -49,7 +49,7 @@ waitForPort = 8080
 outputType = "console"
 
 [agent]
-stack = "PNPM_WORKSPACE"
+stack = "BEST_EFFORT_FALLBACK"
 expertMode = true
 
 [postMerge]
@@ -71,3 +71,6 @@ externalPort = 80
 [[ports]]
 localPort = 20427
 externalPort = 3001
+
+[nix]
+channel = "stable-25_05"
