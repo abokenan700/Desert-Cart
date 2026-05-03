@@ -78,7 +78,7 @@ export default function HomeScreen() {
       textAlign: "right",
       writingDirection: "rtl",
     },
-    section: { marginTop: 8 },
+    section: { marginTop: 0 },
     horizontalList: { paddingHorizontal: 16, gap: 12 },
     horizontalCard: { width: width * 0.42 },
     productGrid: {
@@ -191,7 +191,7 @@ export default function HomeScreen() {
           <Ionicons name="search-outline" size={18} color={colors.mutedForeground} />
         </View>
 
-        <View style={[styles.section, { paddingBottom: 4 }]}>
+        <View style={[styles.section, { paddingBottom: 12 }]}>
           <SectionHeader title="" showSeeAll={false} />
           <CategoryRow
             categories={CATEGORIES}
