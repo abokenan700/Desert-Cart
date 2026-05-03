@@ -16,6 +16,7 @@ import { useColors } from "@/hooks/useColors";
 import { useTheme } from "@/context/ThemeContext";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { ACTIVE_ORDER } from "@/data/mockOrders";
 
 interface MenuItem {
   id: string;
@@ -264,7 +265,7 @@ export default function ProfileScreen() {
       case "track":
         router.push({
           pathname: "/order-tracking",
-          params: { orderNumber: "SAQ-829341" },
+          params: { orderNumber: ACTIVE_ORDER?.number ?? "" },
         } as any);
         break;
       case "coupons":
@@ -389,7 +390,7 @@ export default function ProfileScreen() {
                     style={[
                       styles.menuIconBox,
                       item.color === colors.destructive && {
-                        backgroundColor: "#FEF2F2",
+                        backgroundColor: colors.destructiveLight,
                       },
                     ]}
                   >

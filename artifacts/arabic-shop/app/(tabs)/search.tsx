@@ -505,7 +505,7 @@ export default function SearchScreen() {
           width: 18,
           height: 18,
           borderRadius: 9,
-          backgroundColor: "#F5A623",
+          backgroundColor: colors.gold,
           alignItems: "center",
           justifyContent: "center",
           borderWidth: 1.5,

@@ -150,7 +150,7 @@ export default function OrderTrackingScreen() {
     mapCard: {
       marginHorizontal: 16,
       marginBottom: 16,
-      backgroundColor: "#E8F4FD",
+      backgroundColor: colors.primaryLight,
       borderRadius: 18,
       height: 120,
       alignItems: "center",
@@ -162,7 +162,7 @@ export default function OrderTrackingScreen() {
     mapText: {
       fontSize: 13,
       fontFamily: "Cairo_600SemiBold",
-      color: "#3B82F6",
+      color: colors.primary,
       marginTop: 8,
     },
     stepsSection: {
@@ -273,7 +273,7 @@ export default function OrderTrackingScreen() {
       width: 44,
       height: 44,
       borderRadius: 22,
-      backgroundColor: "#EFF6FF",
+      backgroundColor: colors.primaryLight,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -317,7 +317,7 @@ export default function OrderTrackingScreen() {
         </View>
 
         <View style={styles.mapCard}>
-          <Ionicons name="map-outline" size={36} color="#3B82F6" />
+          <Ionicons name="map-outline" size={36} color={colors.primary} />
           <Text style={styles.mapText}>خريطة التتبع المباشر</Text>
         </View>
 
@@ -330,7 +330,7 @@ export default function OrderTrackingScreen() {
             <Text style={styles.driverRole}>مندوب التوصيل</Text>
           </View>
           <TouchableOpacity style={styles.chatBtn}>
-            <Ionicons name="chatbubble-outline" size={20} color="#3B82F6" />
+            <Ionicons name="chatbubble-outline" size={20} color={colors.primary} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.callBtn}>
             <Ionicons name="call-outline" size={20} color={colors.success} />

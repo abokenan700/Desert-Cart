@@ -335,7 +335,7 @@ export default function ProductDetailScreen() {
         ratingValue: {
           fontSize: 14,
           fontFamily: "Cairo_700Bold",
-          color: "#F5A623",
+          color: colors.gold,
         },
         reviewCount: {
           fontSize: 13,
@@ -626,7 +626,7 @@ export default function ProductDetailScreen() {
           alignItems: "center",
           justifyContent: "center",
           gap: 6,
-          backgroundColor: "#F0FDF4",
+          backgroundColor: colors.successLight,
           borderRadius: 14,
           paddingVertical: 10,
           marginBottom: 16,
@@ -634,7 +634,7 @@ export default function ProductDetailScreen() {
         reviewedText: {
           fontSize: 13,
           fontFamily: "Cairo_600SemiBold",
-          color: "#16A34A",
+          color: colors.success,
         },
         reviewCard: {
           backgroundColor: colors.secondary,
@@ -1152,10 +1152,10 @@ export default function ProductDetailScreen() {
                 const pct = starCounts[i] / maxStarCount;
                 const fillColor =
                   pct > 0.6
-                    ? "#22C55E"
+                    ? colors.success
                     : pct > 0.3
-                    ? "#F5A623"
-                    : "#E63946";
+                    ? colors.gold
+                    : colors.primary;
                 return (
                   <View key={star} style={styles.barRow}>
                     <Text style={styles.barLabel}>{star}</Text>
@@ -1178,7 +1178,7 @@ export default function ProductDetailScreen() {
 
           {alreadyReviewed ? (
             <View style={styles.reviewedBadge}>
-              <Ionicons name="checkmark-circle" size={16} color="#16A34A" />
+              <Ionicons name="checkmark-circle" size={16} color={colors.success} />
               <Text style={styles.reviewedText}>لقد قيّمت هذا المنتج</Text>
             </View>
           ) : (

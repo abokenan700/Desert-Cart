@@ -66,14 +66,14 @@ export default function MyCouponsScreen() {
           alignItems: "center",
           gap: 8,
           margin: 16,
-          backgroundColor: "#EFF6FF",
+          backgroundColor: colors.navyLight,
           borderRadius: 12,
           padding: 12,
         },
         infoText: {
           fontSize: 12,
           fontFamily: "Cairo_400Regular",
-          color: "#3B82F6",
+          color: colors.navy,
           textAlign: "right",
           flex: 1,
         },
@@ -186,7 +186,7 @@ export default function MyCouponsScreen() {
           <Ionicons
             name="information-circle-outline"
             size={18}
-            color="#3B82F6"
+            color={colors.navy}
           />
           <Text style={styles.infoText}>
             انسخ الكود وأدخله في خطوة الدفع عند الشراء للحصول على الخصم
@@ -199,8 +199,8 @@ export default function MyCouponsScreen() {
           return (
             <View key={coupon.code} style={styles.couponCard}>
               <View style={styles.couponTop}>
-                <View style={[styles.iconBox, { backgroundColor: "#F3E8FF" }]}>
-                  <Ionicons name="pricetag-outline" size={22} color="#7C3AED" />
+                <View style={[styles.iconBox, { backgroundColor: colors.purpleLight }]}>
+                  <Ionicons name="pricetag-outline" size={22} color={colors.purple} />
                 </View>
                 <View style={styles.couponInfo}>
                   <Text style={styles.couponDesc}>{coupon.descAr}</Text>
@@ -212,7 +212,7 @@ export default function MyCouponsScreen() {
                   </Text>
                 </View>
                 <View
-                  style={[styles.discountBadge, { backgroundColor: "#7C3AED" }]}
+                  style={[styles.discountBadge, { backgroundColor: colors.purple }]}
                 >
                   <Text style={styles.discountText}>{coupon.discountLabel}</Text>
                 </View>

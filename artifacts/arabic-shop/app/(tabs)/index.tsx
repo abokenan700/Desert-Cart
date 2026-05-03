@@ -382,7 +382,7 @@ export default function HomeScreen() {
 
         <View style={styles.promoRow}>
           <TouchableOpacity
-            style={[styles.promoCard, { backgroundColor: "#7C3AED" }]}
+            style={[styles.promoCard, { backgroundColor: colors.purple }]}
             activeOpacity={0.85}
           >
             <Ionicons name="flash" size={24} color="rgba(255,255,255,0.7)" />

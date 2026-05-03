@@ -725,7 +725,7 @@ export default function CartScreen() {
 
         {items.map((item) => (
           <SwipeableCartItem
-            key={item.product.id}
+            key={`${item.product.id}-${item.selectedSize ?? ""}-${item.selectedColor ?? ""}`}
             item={item}
             onUpdate={updateQuantity}
             onRemove={handleRemove}
