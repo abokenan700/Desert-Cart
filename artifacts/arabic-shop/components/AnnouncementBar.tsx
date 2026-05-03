@@ -39,7 +39,7 @@ export default function AnnouncementBar() {
   const styles = useMemo(() => StyleSheet.create({
     container: {
       backgroundColor: colors.primary,
-      height: 32,
+      height: 24,
       overflow: "hidden",
       justifyContent: "center",
     },
