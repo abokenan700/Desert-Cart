@@ -1,0 +1,121 @@
+import React from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useColors } from "@/hooks/useColors";
+import { useCart } from "@/context/CartContext";
+
+export default function HomeHeader() {
+  const colors = useColors();
+  const insets = useSafeAreaInsets();
+  const { totalCount } = useCart();
+
+  const topPad = Platform.OS === "web" ? 67 : insets.top;
+
+  const styles = StyleSheet.create({
+    header: {
+      backgroundColor: colors.card,
+      paddingTop: topPad + 10,
+      paddingBottom: 12,
+      paddingHorizontal: 16,
+      flexDirection: "row-reverse",
+      alignItems: "center",
+      justifyContent: "space-between",
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    logoSection: {
+      flexDirection: "row-reverse",
+      alignItems: "center",
+      gap: 8,
+    },
+    logoIcon: {
+      width: 36,
+      height: 36,
+      borderRadius: 10,
+      backgroundColor: colors.primary,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    storeName: {
+      fontSize: 20,
+      fontFamily: "Cairo_800ExtraBold",
+      color: colors.primary,
+      writingDirection: "rtl",
+    },
+    storeTagline: {
+      fontSize: 11,
+      fontFamily: "Cairo_400Regular",
+      color: colors.mutedForeground,
+      writingDirection: "rtl",
+    },
+    actions: {
+      flexDirection: "row-reverse",
+      alignItems: "center",
+      gap: 6,
+    },
+    iconBtn: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: colors.secondary,
+      alignItems: "center",
+      justifyContent: "center",
+      position: "relative",
+    },
+    badge: {
+      position: "absolute",
+      top: 4,
+      left: 4,
+      width: 16,
+      height: 16,
+      borderRadius: 8,
+      backgroundColor: colors.primary,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    badgeText: {
+      color: "#fff",
+      fontSize: 9,
+      fontFamily: "Cairo_700Bold",
+    },
+  });
+
+  return (
+    <View style={styles.header}>
+      <View style={styles.logoSection}>
+        <View style={styles.logoIcon}>
+          <Ionicons name="bag" size={20} color="#fff" />
+        </View>
+        <View>
+          <Text style={styles.storeName}>سوق</Text>
+          <Text style={styles.storeTagline}>تسوق بذكاء</Text>
+        </View>
+      </View>
+
+      <View style={styles.actions}>
+        <TouchableOpacity style={styles.iconBtn}>
+          <Ionicons name="notifications-outline" size={20} color={colors.text} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.iconBtn}
+          onPress={() => router.push("/(tabs)/cart" as any)}
+        >
+          <Ionicons name="bag-outline" size={20} color={colors.text} />
+          {totalCount > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{totalCount > 9 ? "9+" : totalCount}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}

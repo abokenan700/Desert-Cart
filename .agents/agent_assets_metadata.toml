@@ -1,0 +1,62 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "1RaxsgQwmx6D8UlkS8eqg"
+uri = "file://artifacts/arabic-shop/assets/images/icon.png"
+type = "image"
+title = "app-icon"
+
+[[generated]]
+id = "uo4VYUCeqaw41bs9vHct4"
+uri = "file://artifacts/arabic-shop/assets/images/banner1.png"
+type = "image"
+title = "summer-sale-banner"
+
+[[generated]]
+id = "HpBWdxWDhN_P7EaFAGWD6"
+uri = "file://artifacts/arabic-shop/assets/images/banner2.png"
+type = "image"
+title = "new-arrivals-banner"
+
+[[generated]]
+id = "Q6QQJ6Km9P507D4Lplntd"
+uri = "file://artifacts/arabic-shop/assets/images/banner3.png"
+type = "image"
+title = "flash-sale-banner"
+
+[[generated]]
+id = "7byMRe-ijj5VOuS7R1oAs"
+uri = "file://artifacts/arabic-shop/assets/images/product1.png"
+type = "image"
+title = "pink-satin-dress"
+
+[[generated]]
+id = "grUkxwb4ETC8ThhhjWqRp"
+uri = "file://artifacts/arabic-shop/assets/images/product2.png"
+type = "image"
+title = "white-blouse"
+
+[[generated]]
+id = "dzhvzhF8xoLhm1LE99ANu"
+uri = "file://artifacts/arabic-shop/assets/images/product3.png"
+type = "image"
+title = "red-evening-gown"
+
+[[generated]]
+id = "nUhqPC8ZV1lGdav2pV3yY"
+uri = "file://artifacts/arabic-shop/assets/images/product4.png"
+type = "image"
+title = "luxury-leather-bag"
+
+[[generated]]
+id = "23GUr-4MlCgyRvgncFjQP"
+uri = "file://artifacts/arabic-shop/assets/images/product5.png"
+type = "image"
+title = "smart-watch"
+
+[[generated]]
+id = "zJzDDZ-CBPRm1kTBt2GZH"
+uri = "file://artifacts/arabic-shop/assets/images/product6.png"
+type = "image"
+title = "wireless-headphones"
