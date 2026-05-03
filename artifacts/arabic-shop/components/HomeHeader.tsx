@@ -28,7 +28,7 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
   const styles = useMemo(() => StyleSheet.create({
     header: {
       backgroundColor: colors.card,
-      paddingTop: topPad + 10,
+      paddingTop: 10,
       paddingBottom: 12,
       paddingHorizontal: 16,
       flexDirection: "row-reverse",
