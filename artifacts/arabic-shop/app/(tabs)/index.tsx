@@ -168,6 +168,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <AnnouncementBar />
+      <View style={{ height: 1, backgroundColor: `${colors.border}30` }} />
       <HomeHeader onPressNotifications={() => setNotificationsVisible(true)} />
 
       <ScrollView
