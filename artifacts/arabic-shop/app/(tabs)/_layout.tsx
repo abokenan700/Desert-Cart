@@ -89,7 +89,6 @@ export default function TabLayout() {
           height: isWeb ? 84 : 68,
           paddingBottom: isWeb ? 16 : 10,
           paddingTop: 6,
-          flexDirection: "row-reverse",
         },
         tabBarLabelStyle: {
           fontFamily: "Cairo_600SemiBold",
@@ -108,12 +107,26 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="profile"
         options={{
-          title: "الرئيسية",
+          title: "حسابي",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "home" : "home-outline"} size={22} color={color} />
+            <Ionicons name={focused ? "person" : "person-outline"} size={22} color={color} />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="wishlist"
+        options={{
+          title: "المفضلة",
+          tabBarIcon: (props) => <WishlistTabIcon {...props} />,
+        }}
+      />
+      <Tabs.Screen
+        name="cart"
+        options={{
+          title: "سلتي",
+          tabBarIcon: (props) => <CartTabIcon {...props} />,
         }}
       />
       <Tabs.Screen
@@ -126,25 +139,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="cart"
+        name="index"
         options={{
-          title: "سلتي",
-          tabBarIcon: (props) => <CartTabIcon {...props} />,
-        }}
-      />
-      <Tabs.Screen
-        name="wishlist"
-        options={{
-          title: "المفضلة",
-          tabBarIcon: (props) => <WishlistTabIcon {...props} />,
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "حسابي",
+          title: "الرئيسية",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "person" : "person-outline"} size={22} color={color} />
+            <Ionicons name={focused ? "home" : "home-outline"} size={22} color={color} />
           ),
         }}
       />
