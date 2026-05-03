@@ -17,15 +17,21 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
-    AsyncStorage.getItem(THEME_KEY).then((val) => {
-      if (val === "dark") setIsDark(true);
-    }).catch(() => {});
+    AsyncStorage.getItem(THEME_KEY)
+      .then((val) => {
+        if (val === "dark") setIsDark(true);
+      })
+      .catch((err) => {
+        console.warn("[ThemeContext] Failed to read theme from storage:", err);
+      });
   }, []);
 
   const toggleTheme = useCallback(() => {
     setIsDark((prev) => {
       const next = !prev;
-      AsyncStorage.setItem(THEME_KEY, next ? "dark" : "light").catch(() => {});
+      AsyncStorage.setItem(THEME_KEY, next ? "dark" : "light").catch((err) => {
+        console.warn("[ThemeContext] Failed to persist theme:", err);
+      });
       return next;
     });
   }, []);

@@ -32,6 +32,34 @@ SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
+function AppProviders({ children }: { children: React.ReactNode }) {
+  return (
+    <SafeAreaProvider>
+      <ErrorBoundary>
+        <ThemeProvider>
+          <AppToastProvider>
+            <QueryClientProvider client={queryClient}>
+              <CartProvider>
+                <WishlistProvider>
+                  <ReviewsProvider>
+                    <NotificationsProvider>
+                      <RecentlyViewedProvider>
+                        <GestureHandlerRootView>
+                          <KeyboardProvider>{children}</KeyboardProvider>
+                        </GestureHandlerRootView>
+                      </RecentlyViewedProvider>
+                    </NotificationsProvider>
+                  </ReviewsProvider>
+                </WishlistProvider>
+              </CartProvider>
+            </QueryClientProvider>
+          </AppToastProvider>
+        </ThemeProvider>
+      </ErrorBoundary>
+    </SafeAreaProvider>
+  );
+}
+
 function RootLayoutNav() {
   return (
     <View style={{ flex: 1 }}>
@@ -90,30 +118,8 @@ export default function RootLayout() {
   if (!fontsLoaded && !fontError) return null;
 
   return (
-    <SafeAreaProvider>
-      <ErrorBoundary>
-        <ThemeProvider>
-          <AppToastProvider>
-            <QueryClientProvider client={queryClient}>
-              <CartProvider>
-                <WishlistProvider>
-                  <ReviewsProvider>
-                    <NotificationsProvider>
-                      <RecentlyViewedProvider>
-                        <GestureHandlerRootView>
-                          <KeyboardProvider>
-                            <RootLayoutNav />
-                          </KeyboardProvider>
-                        </GestureHandlerRootView>
-                      </RecentlyViewedProvider>
-                    </NotificationsProvider>
-                  </ReviewsProvider>
-                </WishlistProvider>
-              </CartProvider>
-            </QueryClientProvider>
-          </AppToastProvider>
-        </ThemeProvider>
-      </ErrorBoundary>
-    </SafeAreaProvider>
+    <AppProviders>
+      <RootLayoutNav />
+    </AppProviders>
   );
 }

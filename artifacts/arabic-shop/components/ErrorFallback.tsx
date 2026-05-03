@@ -35,9 +35,9 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
   };
 
   const formatErrorDetails = (): string => {
-    let details = `Error: ${error.message}\n\n`;
+    let details = `خطأ: ${error.message}\n\n`;
     if (error.stack) {
-      details += `Stack Trace:\n${error.stack}`;
+      details += `تتبع الخطأ:\n${error.stack}`;
     }
     return details;
   };
@@ -53,7 +53,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
       {__DEV__ ? (
         <Pressable
           onPress={() => setIsModalVisible(true)}
-          accessibilityLabel="View error details"
+          accessibilityLabel="عرض تفاصيل الخطأ"
           accessibilityRole="button"
           style={({ pressed }) => [
             styles.topButton,
@@ -70,11 +70,11 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
 
       <View style={styles.content}>
         <Text style={[styles.title, { color: colors.foreground }]}>
-          Something went wrong
+          حدث خطأ غير متوقع
         </Text>
 
         <Text style={[styles.message, { color: colors.mutedForeground }]}>
-          Please reload the app to continue.
+          يرجى إعادة تشغيل التطبيق للمتابعة.
         </Text>
 
         <Pressable
@@ -94,7 +94,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
               { color: colors.primaryForeground },
             ]}
           >
-            Try Again
+            إعادة المحاولة
           </Text>
         </Pressable>
       </View>
@@ -120,11 +120,11 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
                 ]}
               >
                 <Text style={[styles.modalTitle, { color: colors.foreground }]}>
-                  Error Details
+                  تفاصيل الخطأ
                 </Text>
                 <Pressable
                   onPress={() => setIsModalVisible(false)}
-                  accessibilityLabel="Close error details"
+                  accessibilityLabel="إغلاق تفاصيل الخطأ"
                   accessibilityRole="button"
                   style={({ pressed }) => [
                     styles.closeButton,
@@ -192,11 +192,13 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     textAlign: "center",
     lineHeight: 40,
+    fontFamily: "Cairo_700Bold",
   },
   message: {
     fontSize: 16,
     textAlign: "center",
     lineHeight: 24,
+    fontFamily: "Cairo_400Regular",
   },
   topButton: {
     position: "absolute",
@@ -215,10 +217,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     minWidth: 200,
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
@@ -227,6 +226,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     textAlign: "center",
     fontSize: 16,
+    fontFamily: "Cairo_600SemiBold",
   },
   modalOverlay: {
     flex: 1,
@@ -251,6 +251,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: "600",
+    fontFamily: "Cairo_600SemiBold",
   },
   closeButton: {
     width: 44,

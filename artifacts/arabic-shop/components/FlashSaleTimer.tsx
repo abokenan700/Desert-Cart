@@ -10,17 +10,23 @@ function getTimeLeft(target: Date) {
   return { h, m, s };
 }
 
-const TARGET = new Date(Date.now() + 6 * 3600 * 1000 + 23 * 60 * 1000 + 41 * 1000);
-
 export default function FlashSaleTimer() {
   const colors = useColors();
-  const [time, setTime] = useState(getTimeLeft(TARGET));
+  const targetRef = useRef<Date | null>(null);
+  if (!targetRef.current) {
+    targetRef.current = new Date(
+      Date.now() + 6 * 3600 * 1000 + 23 * 60 * 1000 + 41 * 1000
+    );
+  }
+  const target = targetRef.current;
+
+  const [time, setTime] = useState(() => getTimeLeft(target));
   const glowAnim = useRef(new Animated.Value(0.4)).current;
 
   useEffect(() => {
-    const id = setInterval(() => setTime(getTimeLeft(TARGET)), 1000);
+    const id = setInterval(() => setTime(getTimeLeft(target)), 1000);
     return () => clearInterval(id);
-  }, []);
+  }, [target]);
 
   useEffect(() => {
     const pulse = Animated.loop(
@@ -39,7 +45,7 @@ export default function FlashSaleTimer() {
     );
     pulse.start();
     return () => pulse.stop();
-  }, []);
+  }, [glowAnim]);
 
   const pad = (n: number) => String(n).padStart(2, "0");
 

@@ -286,7 +286,7 @@ export default function HomeScreen() {
           fontFamily: "Cairo_700Bold",
         },
       }),
-    [colors, bottomPad, topPad]
+    [colors]
   );
 
   const stickyTop = Platform.OS === "web" ? 67 + 30 + 60 : insets.top + 30 + 60;

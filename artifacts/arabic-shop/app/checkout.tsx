@@ -19,6 +19,7 @@ import * as Haptics from "expo-haptics";
 import { useColors } from "@/hooks/useColors";
 import { useCart } from "@/context/CartContext";
 import { useNotifications } from "@/context/NotificationsContext";
+import { COUPON_MAP, QUICK_COUPON_CODES } from "@/data/coupons";
 
 const STEPS = ["العنوان", "الدفع", "المراجعة"];
 
@@ -28,15 +29,6 @@ const PAYMENT_METHODS = [
   { id: "cash", label: "الدفع عند الاستلام", icon: "cash-outline", sub: "ادفع حين يصلك الطلب" },
   { id: "wallet", label: "المحفظة", icon: "wallet-outline", sub: "رصيدك: ٢٥٠ ر.س" },
 ];
-
-const VALID_COUPONS: Record<string, { discount: number; label: string }> = {
-  "SAUDI30": { discount: 0.30, label: "خصم ٣٠٪" },
-  "WELCOME10": { discount: 0.10, label: "خصم ١٠٪ - أهلاً بك" },
-  "FLASH50": { discount: 0.50, label: "خصم ٥٠٪ - عرض محدود" },
-  "VIP20": { discount: 0.20, label: "خصم ٢٠٪ - عميل مميز" },
-};
-
-const QUICK_COUPONS = ["SAUDI30", "WELCOME10"];
 
 const SAVED_ADDRESSES = [
   { id: "a1", label: "المنزل", city: "الرياض", district: "العليا" },
@@ -58,6 +50,12 @@ export default function CheckoutScreen() {
   const [couponError, setCouponError] = useState("");
   const [selectedAddress, setSelectedAddress] = useState("a1");
   const [placing, setPlacing] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [city, setCity] = useState("");
+  const [district, setDistrict] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [addressDetail, setAddressDetail] = useState("");
   const couponShake = useRef(new Animated.Value(0)).current;
   const placeBtnScale = useRef(new Animated.Value(1)).current;
 
@@ -71,7 +69,7 @@ export default function CheckoutScreen() {
 
   const applyCoupon = useCallback(
     (code: string) => {
-      const found = VALID_COUPONS[code.trim().toUpperCase()];
+      const found = COUPON_MAP[code.trim().toUpperCase()];
       if (found) {
         setAppliedCoupon(found);
         setCouponError("");
@@ -544,6 +542,8 @@ export default function CheckoutScreen() {
               placeholder="سارة العمري"
               placeholderTextColor={colors.mutedForeground}
               textAlign="right"
+              value={fullName}
+              onChangeText={setFullName}
             />
             <Text style={styles.inputLabel}>رقم الجوال</Text>
             <TextInput
@@ -552,6 +552,8 @@ export default function CheckoutScreen() {
               placeholderTextColor={colors.mutedForeground}
               keyboardType="phone-pad"
               textAlign="right"
+              value={phone}
+              onChangeText={setPhone}
             />
             <Text style={styles.inputLabel}>المدينة</Text>
             <TextInput
@@ -559,6 +561,8 @@ export default function CheckoutScreen() {
               placeholder="الرياض"
               placeholderTextColor={colors.mutedForeground}
               textAlign="right"
+              value={city}
+              onChangeText={setCity}
             />
             <View style={styles.row2}>
               <View style={styles.inputHalf}>
@@ -568,6 +572,8 @@ export default function CheckoutScreen() {
                   placeholder="العليا"
                   placeholderTextColor={colors.mutedForeground}
                   textAlign="right"
+                  value={district}
+                  onChangeText={setDistrict}
                 />
               </View>
               <View style={styles.inputHalf}>
@@ -578,6 +584,8 @@ export default function CheckoutScreen() {
                   placeholderTextColor={colors.mutedForeground}
                   keyboardType="numeric"
                   textAlign="right"
+                  value={postalCode}
+                  onChangeText={setPostalCode}
                 />
               </View>
             </View>
@@ -591,6 +599,8 @@ export default function CheckoutScreen() {
               placeholderTextColor={colors.mutedForeground}
               multiline
               textAlign="right"
+              value={addressDetail}
+              onChangeText={setAddressDetail}
             />
           </View>
 
@@ -711,7 +721,7 @@ export default function CheckoutScreen() {
             ) : (
               <>
                 <View style={styles.couponChipsRow}>
-                  {QUICK_COUPONS.map((code) => (
+                  {QUICK_COUPON_CODES.map((code) => (
                     <TouchableOpacity
                       key={code}
                       style={styles.couponChip}

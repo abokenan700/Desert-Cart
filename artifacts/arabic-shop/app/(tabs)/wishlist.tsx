@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   FlatList,
   Platform,
-  Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -14,6 +13,7 @@ import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
+import { useAppToast } from "@/context/AppToastContext";
 import ProductCard from "@/components/ProductCard";
 
 export default function WishlistScreen() {
@@ -21,100 +21,98 @@ export default function WishlistScreen() {
   const insets = useSafeAreaInsets();
   const { items, count } = useWishlist();
   const { addToCart } = useCart();
+  const { showToast } = useAppToast();
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
   const addAllToCart = () => {
     items.forEach((product) => addToCart(product));
-    Alert.alert("تمت الإضافة", "تمت إضافة جميع المنتجات إلى السلة");
+    showToast("تمت إضافة جميع المنتجات إلى السلة", "success");
   };
 
-  const styles = useMemo(() => StyleSheet.create({
-    container: { flex: 1, backgroundColor: colors.background },
-    header: {
-      backgroundColor: colors.card,
-      paddingTop: topPad + 8,
-      paddingBottom: 14,
-      paddingHorizontal: 16,
-      flexDirection: "row-reverse",
-      alignItems: "center",
-      justifyContent: "space-between",
-      borderBottomWidth: 1,
-      borderBottomColor: colors.border,
-    },
-    headerLeft: {
-      flexDirection: "row-reverse",
-      alignItems: "center",
-      gap: 8,
-    },
-    headerTitle: {
-      fontSize: 20,
-      fontFamily: "Cairo_800ExtraBold",
-      color: colors.text,
-    },
-    headerCount: {
-      backgroundColor: colors.primary,
-      borderRadius: 12,
-      paddingHorizontal: 8,
-      paddingVertical: 2,
-    },
-    headerCountText: {
-      color: "#fff",
-      fontSize: 12,
-      fontFamily: "Cairo_700Bold",
-    },
-    addAllBtn: {
-      flexDirection: "row-reverse",
-      alignItems: "center",
-      gap: 5,
-      backgroundColor: colors.primary,
-      borderRadius: 12,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-    },
-    addAllText: {
-      color: "#fff",
-      fontSize: 13,
-      fontFamily: "Cairo_600SemiBold",
-    },
-    grid: {
-      flexDirection: "row-reverse",
-      flexWrap: "wrap",
-      paddingHorizontal: 12,
-      paddingTop: 12,
-      justifyContent: "space-between",
-    },
-    gridItem: { paddingHorizontal: 4 },
-    emptyContainer: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-      gap: 14,
-    },
-    emptyTitle: {
-      fontSize: 20,
-      fontFamily: "Cairo_700Bold",
-      color: colors.text,
-    },
-    emptyText: {
-      fontSize: 14,
-      fontFamily: "Cairo_400Regular",
-      color: colors.mutedForeground,
-    },
-    shopBtn: {
-      backgroundColor: colors.primary,
-      borderRadius: 14,
-      paddingHorizontal: 30,
-      paddingVertical: 14,
-      marginTop: 8,
-    },
-    shopBtnText: {
-      color: "#fff",
-      fontSize: 15,
-      fontFamily: "Cairo_700Bold",
-    },
-  }), [colors, topPad, bottomPad]);
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: { flex: 1, backgroundColor: colors.background },
+        header: {
+          backgroundColor: colors.card,
+          paddingTop: topPad + 8,
+          paddingBottom: 14,
+          paddingHorizontal: 16,
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          justifyContent: "space-between",
+          borderBottomWidth: 1,
+          borderBottomColor: colors.border,
+        },
+        headerLeft: {
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          gap: 8,
+        },
+        headerTitle: {
+          fontSize: 20,
+          fontFamily: "Cairo_800ExtraBold",
+          color: colors.text,
+        },
+        headerCount: {
+          backgroundColor: colors.primary,
+          borderRadius: 12,
+          paddingHorizontal: 8,
+          paddingVertical: 2,
+        },
+        headerCountText: {
+          color: "#fff",
+          fontSize: 12,
+          fontFamily: "Cairo_700Bold",
+        },
+        addAllBtn: {
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          gap: 5,
+          backgroundColor: colors.primary,
+          borderRadius: 12,
+          paddingHorizontal: 12,
+          paddingVertical: 8,
+        },
+        addAllText: {
+          color: "#fff",
+          fontSize: 13,
+          fontFamily: "Cairo_600SemiBold",
+        },
+        gridItem: { paddingHorizontal: 4 },
+        emptyContainer: {
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 14,
+        },
+        emptyTitle: {
+          fontSize: 20,
+          fontFamily: "Cairo_700Bold",
+          color: colors.text,
+        },
+        emptyText: {
+          fontSize: 14,
+          fontFamily: "Cairo_400Regular",
+          color: colors.mutedForeground,
+        },
+        shopBtn: {
+          backgroundColor: colors.primary,
+          borderRadius: 14,
+          paddingHorizontal: 30,
+          paddingVertical: 14,
+          marginTop: 8,
+        },
+        shopBtnText: {
+          color: "#fff",
+          fontSize: 15,
+          fontFamily: "Cairo_700Bold",
+        },
+      }),
+    [colors, topPad]
+  );
 
   if (items.length === 0) {
     return (
@@ -125,7 +123,9 @@ export default function WishlistScreen() {
         <View style={styles.emptyContainer}>
           <Ionicons name="heart-outline" size={72} color={colors.border} />
           <Text style={styles.emptyTitle}>قائمتك فارغة</Text>
-          <Text style={styles.emptyText}>أضف المنتجات التي تعجبك إلى المفضلة</Text>
+          <Text style={styles.emptyText}>
+            أضف المنتجات التي تعجبك إلى المفضلة
+          </Text>
           <TouchableOpacity
             style={styles.shopBtn}
             onPress={() => router.push("/(tabs)/")}
@@ -156,14 +156,16 @@ export default function WishlistScreen() {
         data={items}
         keyExtractor={(item) => item.id}
         numColumns={2}
-        inverted={false}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingHorizontal: 12,
           paddingTop: 12,
           paddingBottom: 80 + bottomPad,
         }}
-        columnWrapperStyle={{ flexDirection: "row-reverse", justifyContent: "space-between" }}
+        columnWrapperStyle={{
+          flexDirection: "row-reverse",
+          justifyContent: "space-between",
+        }}
         renderItem={({ item }) => (
           <View style={styles.gridItem}>
             <ProductCard product={item} />

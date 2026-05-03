@@ -1,10 +1,8 @@
 import React from "react";
-import { View, StyleSheet, Dimensions, Platform } from "react-native";
+import { View, StyleSheet, Platform } from "react-native";
 import { useColors } from "@/hooks/useColors";
 import SkeletonBox from "@/components/SkeletonBox";
-
-const { width } = Dimensions.get("window");
-const CARD_WIDTH = (width - 48) / 2;
+import { CARD_WIDTH } from "@/components/ProductCard";
 
 export default function ProductCardSkeleton() {
   const colors = useColors();

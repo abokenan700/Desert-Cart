@@ -1,4 +1,4 @@
-import React, { useRef, useMemo } from "react";
+import React, { useRef, useMemo, useCallback } from "react";
 import {
   View,
   Text,
@@ -17,183 +17,198 @@ import { useWishlist } from "@/context/WishlistContext";
 import { Product } from "@/data/mockData";
 
 const { width } = Dimensions.get("window");
-const CARD_WIDTH = (width - 48) / 2;
+export const CARD_WIDTH = (width - 48) / 2;
 
 interface ProductCardProps {
   product: Product;
   style?: object;
 }
 
-const ProductCard = React.memo(function ProductCard({ product, style }: ProductCardProps) {
+const ProductCard = React.memo(function ProductCard({
+  product,
+  style,
+}: ProductCardProps) {
   const colors = useColors();
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const wishlisted = isWishlisted(product.id);
 
-  const handlePressIn = () => {
+  const handlePressIn = useCallback(() => {
     Animated.spring(scaleAnim, {
       toValue: 0.96,
       useNativeDriver: true,
       speed: 50,
     }).start();
-  };
+  }, [scaleAnim]);
 
-  const handlePressOut = () => {
+  const handlePressOut = useCallback(() => {
     Animated.spring(scaleAnim, {
       toValue: 1,
       useNativeDriver: true,
       speed: 30,
     }).start();
-  };
+  }, [scaleAnim]);
 
-  const handlePress = () => {
+  const handlePress = useCallback(() => {
     router.push(`/product/${product.id}` as any);
-  };
+  }, [product.id]);
 
-  const styles = useMemo(() => StyleSheet.create({
-    card: {
-      width: CARD_WIDTH,
-      backgroundColor: colors.card,
-      borderRadius: 20,
-      overflow: "hidden",
-      marginBottom: 16,
-      ...Platform.select({
-        ios: {
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.12,
-          shadowRadius: 12,
+  const handleAddToCart = useCallback(() => {
+    addToCart(product);
+  }, [addToCart, product]);
+
+  const handleToggleWishlist = useCallback(() => {
+    toggleWishlist(product);
+  }, [toggleWishlist, product]);
+
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        card: {
+          width: CARD_WIDTH,
+          backgroundColor: colors.card,
+          borderRadius: 20,
+          overflow: "hidden",
+          marginBottom: 16,
+          ...Platform.select({
+            ios: {
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.12,
+              shadowRadius: 12,
+            },
+            android: { elevation: 5 },
+            web: { boxShadow: "0 4px 12px rgba(0,0,0,0.12)" } as any,
+          }),
         },
-        android: { elevation: 5 },
-        web: { boxShadow: "0 4px 12px rgba(0,0,0,0.12)" } as any,
+        imageContainer: {
+          position: "relative",
+          width: "100%",
+          aspectRatio: 3 / 4,
+          backgroundColor: colors.secondary,
+        },
+        image: {
+          width: "100%",
+          height: "100%",
+        },
+        wishlistBtn: {
+          position: "absolute",
+          top: 10,
+          left: 10,
+          width: 36,
+          height: 36,
+          borderRadius: 18,
+          backgroundColor: "rgba(255,255,255,0.95)",
+          alignItems: "center",
+          justifyContent: "center",
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.15,
+          shadowRadius: 4,
+          elevation: 4,
+        },
+        discountBadge: {
+          position: "absolute",
+          top: 10,
+          right: 10,
+          backgroundColor: colors.primary,
+          borderRadius: 12,
+          paddingHorizontal: 8,
+          paddingVertical: 4,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.15,
+          shadowRadius: 4,
+          elevation: 3,
+        },
+        discountText: {
+          color: "#fff",
+          fontSize: 10,
+          fontFamily: "Cairo_700Bold",
+        },
+        newBadge: {
+          position: "absolute",
+          bottom: 10,
+          right: 10,
+          backgroundColor: colors.success,
+          borderRadius: 12,
+          paddingHorizontal: 8,
+          paddingVertical: 4,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.15,
+          shadowRadius: 4,
+          elevation: 3,
+        },
+        newText: {
+          color: "#fff",
+          fontSize: 10,
+          fontFamily: "Cairo_700Bold",
+        },
+        info: {
+          padding: 12,
+        },
+        brand: {
+          fontSize: 10,
+          color: colors.mutedForeground,
+          fontFamily: "Cairo_400Regular",
+          textAlign: "right",
+          writingDirection: "rtl",
+        },
+        name: {
+          fontSize: 13,
+          color: colors.text,
+          fontFamily: "Cairo_600SemiBold",
+          textAlign: "right",
+          writingDirection: "rtl",
+          lineHeight: 19,
+          marginTop: 2,
+        },
+        ratingRow: {
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          marginTop: 4,
+          gap: 4,
+        },
+        ratingText: {
+          fontSize: 11,
+          color: colors.mutedForeground,
+          fontFamily: "Cairo_400Regular",
+        },
+        priceRow: {
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          marginTop: 6,
+          gap: 6,
+        },
+        price: {
+          fontSize: 15,
+          color: colors.primary,
+          fontFamily: "Cairo_700Bold",
+        },
+        originalPrice: {
+          fontSize: 11,
+          color: colors.mutedForeground,
+          fontFamily: "Cairo_400Regular",
+          textDecorationLine: "line-through",
+        },
+        addBtn: {
+          marginTop: 8,
+          backgroundColor: colors.primary,
+          borderRadius: 10,
+          paddingVertical: 8,
+          alignItems: "center",
+          justifyContent: "center",
+        },
+        addBtnText: {
+          color: "#fff",
+          fontSize: 12,
+          fontFamily: "Cairo_600SemiBold",
+        },
       }),
-    },
-    imageContainer: {
-      position: "relative",
-      width: "100%",
-      aspectRatio: 3 / 4,
-      backgroundColor: colors.secondary,
-    },
-    image: {
-      width: "100%",
-      height: "100%",
-    },
-    wishlistBtn: {
-      position: "absolute",
-      top: 10,
-      left: 10,
-      width: 36,
-      height: 36,
-      borderRadius: 18,
-      backgroundColor: "rgba(255,255,255,0.95)",
-      alignItems: "center",
-      justifyContent: "center",
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.15,
-      shadowRadius: 4,
-      elevation: 4,
-    },
-    discountBadge: {
-      position: "absolute",
-      top: 10,
-      right: 10,
-      backgroundColor: colors.primary,
-      borderRadius: 12,
-      paddingHorizontal: 8,
-      paddingVertical: 4,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.15,
-      shadowRadius: 4,
-      elevation: 3,
-    },
-    discountText: {
-      color: "#fff",
-      fontSize: 10,
-      fontFamily: "Cairo_700Bold",
-    },
-    newBadge: {
-      position: "absolute",
-      bottom: 10,
-      right: 10,
-      backgroundColor: colors.success,
-      borderRadius: 12,
-      paddingHorizontal: 8,
-      paddingVertical: 4,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.15,
-      shadowRadius: 4,
-      elevation: 3,
-    },
-    newText: {
-      color: "#fff",
-      fontSize: 10,
-      fontFamily: "Cairo_700Bold",
-    },
-    info: {
-      padding: 12,
-    },
-    brand: {
-      fontSize: 10,
-      color: colors.mutedForeground,
-      fontFamily: "Cairo_400Regular",
-      textAlign: "right",
-      writingDirection: "rtl",
-    },
-    name: {
-      fontSize: 13,
-      color: colors.text,
-      fontFamily: "Cairo_600SemiBold",
-      textAlign: "right",
-      writingDirection: "rtl",
-      lineHeight: 19,
-      marginTop: 2,
-    },
-    ratingRow: {
-      flexDirection: "row-reverse",
-      alignItems: "center",
-      marginTop: 4,
-      gap: 4,
-    },
-    ratingText: {
-      fontSize: 11,
-      color: colors.mutedForeground,
-      fontFamily: "Cairo_400Regular",
-    },
-    priceRow: {
-      flexDirection: "row-reverse",
-      alignItems: "center",
-      marginTop: 6,
-      gap: 6,
-    },
-    price: {
-      fontSize: 15,
-      color: colors.primary,
-      fontFamily: "Cairo_700Bold",
-    },
-    originalPrice: {
-      fontSize: 11,
-      color: colors.mutedForeground,
-      fontFamily: "Cairo_400Regular",
-      textDecorationLine: "line-through",
-    },
-    addBtn: {
-      marginTop: 8,
-      backgroundColor: colors.primary,
-      borderRadius: 10,
-      paddingVertical: 8,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    addBtnText: {
-      color: "#fff",
-      fontSize: 12,
-      fontFamily: "Cairo_600SemiBold",
-    },
-  }), [colors]);
+    [colors]
+  );
 
   return (
     <Animated.View style={[{ transform: [{ scale: scaleAnim }] }, style]}>
@@ -214,9 +229,11 @@ const ProductCard = React.memo(function ProductCard({ product, style }: ProductC
           />
           <TouchableOpacity
             style={styles.wishlistBtn}
-            onPress={() => toggleWishlist(product)}
+            onPress={handleToggleWishlist}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            accessibilityLabel={wishlisted ? "إزالة من المفضلة" : "إضافة للمفضلة"}
+            accessibilityLabel={
+              wishlisted ? "إزالة من المفضلة" : "إضافة للمفضلة"
+            }
           >
             <Ionicons
               name={wishlisted ? "heart" : "heart-outline"}
@@ -242,9 +259,16 @@ const ProductCard = React.memo(function ProductCard({ product, style }: ProductC
             {product.nameAr}
           </Text>
           <View style={styles.ratingRow}>
-            <Text style={styles.ratingText}>({product.reviewCount.toLocaleString("ar-SA")})</Text>
+            <Text style={styles.ratingText}>
+              ({product.reviewCount.toLocaleString("ar-SA")})
+            </Text>
             <Ionicons name="star" size={11} color="#F5A623" />
-            <Text style={[styles.ratingText, { color: "#F5A623", fontFamily: "Cairo_600SemiBold" }]}>
+            <Text
+              style={[
+                styles.ratingText,
+                { color: "#F5A623", fontFamily: "Cairo_600SemiBold" },
+              ]}
+            >
               {product.rating}
             </Text>
           </View>
@@ -254,11 +278,13 @@ const ProductCard = React.memo(function ProductCard({ product, style }: ProductC
                 {product.originalPrice.toLocaleString("ar-SA")} ر.س
               </Text>
             )}
-            <Text style={styles.price}>{product.price.toLocaleString("ar-SA")} ر.س</Text>
+            <Text style={styles.price}>
+              {product.price.toLocaleString("ar-SA")} ر.س
+            </Text>
           </View>
           <TouchableOpacity
             style={styles.addBtn}
-            onPress={() => addToCart(product)}
+            onPress={handleAddToCart}
             accessibilityLabel={`أضف ${product.nameAr} إلى السلة`}
           >
             <Text style={styles.addBtnText}>أضف إلى السلة</Text>

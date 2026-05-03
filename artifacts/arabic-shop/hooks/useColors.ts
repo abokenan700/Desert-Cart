@@ -1,16 +1,19 @@
+import { useMemo } from "react";
 import { useTheme } from "@/context/ThemeContext";
 import colors from "@/constants/colors";
 
 /**
  * Returns the design tokens for the current color scheme.
- * Reads from ThemeContext (user-controlled dark mode toggle)
- * with AsyncStorage persistence across sessions.
+ * The returned object is stable (same reference) as long as `isDark` doesn't change,
+ * so useMemo deps in components that depend on `colors` work correctly.
  */
 export function useColors() {
   const { isDark } = useTheme();
-  const palette =
-    isDark && "dark" in colors
-      ? (colors as Record<string, typeof colors.light>).dark
-      : colors.light;
-  return { ...palette, radius: colors.radius };
+  return useMemo(
+    () => ({
+      ...(isDark ? colors.dark : colors.light),
+      radius: colors.radius,
+    }),
+    [isDark]
+  );
 }
