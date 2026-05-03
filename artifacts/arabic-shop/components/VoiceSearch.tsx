@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import {
   View,
   Text,
@@ -196,7 +196,7 @@ export default function VoiceSearch({ onResult, onClose, visible }: VoiceSearchP
     }
   };
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     overlay: {
       flex: 1,
       backgroundColor: "rgba(0,0,0,0.72)",
@@ -280,7 +280,7 @@ export default function VoiceSearch({ onResult, onClose, visible }: VoiceSearchP
       textAlign: "center",
     },
     statusRow: {
-      flexDirection: "row",
+      flexDirection: "row-reverse",
       alignItems: "center",
       gap: 6,
       marginBottom: 20,
@@ -305,7 +305,7 @@ export default function VoiceSearch({ onResult, onClose, visible }: VoiceSearchP
       fontFamily: "Cairo_600SemiBold",
       color: colors.text,
     },
-  });
+  }), [colors]);
 
   const statusLabel =
     status === "idle"
@@ -317,20 +317,27 @@ export default function VoiceSearch({ onResult, onClose, visible }: VoiceSearchP
       : "تم!";
 
   const statusColor =
-    status === "done" ? colors.success : status === "listening" ? colors.primary : colors.mutedForeground;
+    status === "done"
+      ? colors.success
+      : status === "listening"
+      ? colors.primary
+      : colors.mutedForeground;
 
   return (
     <Modal transparent visible={visible} animationType="fade" statusBarTranslucent>
       <Animated.View style={[styles.overlay, { opacity: fadeAnim }]}>
         <View style={styles.sheet}>
-          <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
+          <TouchableOpacity
+            style={styles.closeBtn}
+            onPress={onClose}
+            accessibilityLabel="إغلاق"
+          >
             <Ionicons name="close" size={18} color={colors.mutedForeground} />
           </TouchableOpacity>
 
           <Text style={styles.title}>البحث الصوتي</Text>
           <Text style={styles.subtitle}>قل ما تبحث عنه بالعربية</Text>
 
-          {/* Animated mic with waves */}
           <View style={styles.waveContainer}>
             {status === "listening" && (
               <>
@@ -365,7 +372,6 @@ export default function VoiceSearch({ onResult, onClose, visible }: VoiceSearchP
             </Animated.View>
           </View>
 
-          {/* Status */}
           <View style={styles.statusRow}>
             <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
             <Text style={[styles.statusText, { color: statusColor }]}>
@@ -373,7 +379,6 @@ export default function VoiceSearch({ onResult, onClose, visible }: VoiceSearchP
             </Text>
           </View>
 
-          {/* Transcript */}
           <View style={styles.transcriptBox}>
             {transcript ? (
               <Text style={styles.transcript}>{transcript}</Text>

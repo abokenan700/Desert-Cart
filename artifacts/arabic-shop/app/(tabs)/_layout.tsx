@@ -9,6 +9,7 @@ import { useWishlist } from "@/context/WishlistContext";
 
 function CartTabIcon({ color, focused }: { color: string; focused: boolean }) {
   const { totalCount } = useCart();
+  const colors = useColors();
   return (
     <View style={{ position: "relative", width: 28, height: 28, alignItems: "center", justifyContent: "center" }}>
       <Ionicons name={focused ? "bag" : "bag-outline"} size={22} color={color} />
@@ -21,7 +22,7 @@ function CartTabIcon({ color, focused }: { color: string; focused: boolean }) {
             width: 16,
             height: 16,
             borderRadius: 8,
-            backgroundColor: "#E63946",
+            backgroundColor: colors.primary,
             alignItems: "center",
             justifyContent: "center",
             borderWidth: 1.5,
@@ -39,6 +40,7 @@ function CartTabIcon({ color, focused }: { color: string; focused: boolean }) {
 
 function WishlistTabIcon({ color, focused }: { color: string; focused: boolean }) {
   const { count } = useWishlist();
+  const colors = useColors();
   return (
     <View style={{ position: "relative", width: 28, height: 28, alignItems: "center", justifyContent: "center" }}>
       <Ionicons name={focused ? "heart" : "heart-outline"} size={22} color={color} />
@@ -51,7 +53,7 @@ function WishlistTabIcon({ color, focused }: { color: string; focused: boolean }
             width: 16,
             height: 16,
             borderRadius: 8,
-            backgroundColor: "#E63946",
+            backgroundColor: colors.primary,
             alignItems: "center",
             justifyContent: "center",
             borderWidth: 1.5,
@@ -59,7 +61,7 @@ function WishlistTabIcon({ color, focused }: { color: string; focused: boolean }
           }}
         >
           <Text style={{ color: "#fff", fontSize: 8, fontFamily: "Cairo_700Bold" }}>
-            {count}
+            {count > 9 ? "9+" : count}
           </Text>
         </View>
       )}

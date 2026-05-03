@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   View,
   Text,
@@ -16,14 +16,14 @@ interface CategoryRowProps {
   onSelect: (id: string) => void;
 }
 
-export default function CategoryRow({
+const CategoryRow = React.memo(function CategoryRow({
   categories,
   selected,
   onSelect,
 }: CategoryRowProps) {
   const colors = useColors();
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     scroll: {},
     contentContainer: {
       paddingHorizontal: 16,
@@ -43,7 +43,7 @@ export default function CategoryRow({
       fontSize: 13,
       fontFamily: "Cairo_600SemiBold",
     },
-  });
+  }), [colors]);
 
   return (
     <ScrollView
@@ -66,6 +66,9 @@ export default function CategoryRow({
             ]}
             onPress={() => onSelect(cat.id)}
             activeOpacity={0.75}
+            accessibilityLabel={cat.nameAr}
+            accessibilityRole="button"
+            accessibilityState={{ selected: isSelected }}
           >
             <Text
               style={[
@@ -85,4 +88,6 @@ export default function CategoryRow({
       })}
     </ScrollView>
   );
-}
+});
+
+export default CategoryRow;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   View,
   Text,
@@ -25,7 +25,7 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     header: {
       backgroundColor: colors.card,
       paddingTop: topPad + 10,
@@ -78,8 +78,8 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
     },
     badge: {
       position: "absolute",
-      top: 4,
-      left: 4,
+      top: -4,
+      right: -4,
       minWidth: 16,
       height: 16,
       borderRadius: 8,
@@ -87,13 +87,15 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
       alignItems: "center",
       justifyContent: "center",
       paddingHorizontal: 3,
+      borderWidth: 1.5,
+      borderColor: colors.card,
     },
     badgeText: {
       color: "#fff",
       fontSize: 9,
       fontFamily: "Cairo_700Bold",
     },
-  });
+  }), [colors, topPad]);
 
   return (
     <View style={styles.header}>
@@ -108,7 +110,12 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
       </View>
 
       <View style={styles.actions}>
-        <TouchableOpacity style={styles.iconBtn} onPress={onPressNotifications}>
+        <TouchableOpacity
+          style={styles.iconBtn}
+          onPress={onPressNotifications}
+          accessibilityLabel="الإشعارات"
+          accessibilityRole="button"
+        >
           <Ionicons name="notifications-outline" size={20} color={colors.text} />
           {unreadCount > 0 && (
             <View style={styles.badge}>
@@ -119,6 +126,8 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
         <TouchableOpacity
           style={styles.iconBtn}
           onPress={() => router.push("/(tabs)/cart" as any)}
+          accessibilityLabel="سلة التسوق"
+          accessibilityRole="button"
         >
           <Ionicons name="bag-outline" size={20} color={colors.text} />
           {totalCount > 0 && (

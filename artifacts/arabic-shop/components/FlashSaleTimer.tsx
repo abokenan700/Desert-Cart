@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { useColors } from "@/hooks/useColors";
 
@@ -23,7 +23,7 @@ export default function FlashSaleTimer() {
 
   const pad = (n: number) => String(n).padStart(2, "0");
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     row: {
       flexDirection: "row-reverse",
       alignItems: "center",
@@ -54,7 +54,7 @@ export default function FlashSaleTimer() {
       color: colors.mutedForeground,
       marginRight: 4,
     },
-  });
+  }), [colors]);
 
   return (
     <View style={styles.row}>

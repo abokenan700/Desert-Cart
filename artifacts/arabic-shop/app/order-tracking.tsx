@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useMemo } from "react";
 import {
   View,
   Text,
@@ -81,7 +81,7 @@ export default function OrderTrackingScreen() {
     Animated.stagger(150, animations).start();
   }, []);
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
     header: {
       backgroundColor: colors.card,
@@ -293,7 +293,7 @@ export default function OrderTrackingScreen() {
       fontSize: 16,
       fontFamily: "Cairo_700Bold",
     },
-  });
+  }), [colors, topPad, bottomPad]);
 
   return (
     <View style={styles.container}>

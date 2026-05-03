@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useMemo } from "react";
 import {
   View,
   Text,
@@ -24,7 +24,7 @@ interface ProductCardProps {
   style?: object;
 }
 
-export default function ProductCard({ product, style }: ProductCardProps) {
+const ProductCard = React.memo(function ProductCard({ product, style }: ProductCardProps) {
   const colors = useColors();
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
@@ -51,7 +51,7 @@ export default function ProductCard({ product, style }: ProductCardProps) {
     router.push(`/product/${product.id}` as any);
   };
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     card: {
       width: CARD_WIDTH,
       backgroundColor: colors.card,
@@ -73,7 +73,7 @@ export default function ProductCard({ product, style }: ProductCardProps) {
       position: "relative",
       width: "100%",
       aspectRatio: 3 / 4,
-      backgroundColor: "#F8F0F5",
+      backgroundColor: colors.secondary,
     },
     image: {
       width: "100%",
@@ -178,7 +178,7 @@ export default function ProductCard({ product, style }: ProductCardProps) {
       fontSize: 12,
       fontFamily: "Cairo_600SemiBold",
     },
-  });
+  }), [colors]);
 
   return (
     <Animated.View style={[{ transform: [{ scale: scaleAnim }] }, style]}>
@@ -188,6 +188,8 @@ export default function ProductCard({ product, style }: ProductCardProps) {
         onPressOut={handlePressOut}
         onPress={handlePress}
         style={styles.card}
+        accessibilityLabel={product.nameAr}
+        accessibilityRole="button"
       >
         <View style={styles.imageContainer}>
           <Image
@@ -199,6 +201,7 @@ export default function ProductCard({ product, style }: ProductCardProps) {
             style={styles.wishlistBtn}
             onPress={() => toggleWishlist(product)}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            accessibilityLabel={wishlisted ? "إزالة من المفضلة" : "إضافة للمفضلة"}
           >
             <Ionicons
               name={wishlisted ? "heart" : "heart-outline"}
@@ -232,13 +235,16 @@ export default function ProductCard({ product, style }: ProductCardProps) {
           </View>
           <View style={styles.priceRow}>
             {product.originalPrice && (
-              <Text style={styles.originalPrice}>{product.originalPrice} ر.س</Text>
+              <Text style={styles.originalPrice}>
+                {product.originalPrice.toLocaleString("ar-SA")} ر.س
+              </Text>
             )}
-            <Text style={styles.price}>{product.price} ر.س</Text>
+            <Text style={styles.price}>{product.price.toLocaleString("ar-SA")} ر.س</Text>
           </View>
           <TouchableOpacity
             style={styles.addBtn}
             onPress={() => addToCart(product)}
+            accessibilityLabel={`أضف ${product.nameAr} إلى السلة`}
           >
             <Text style={styles.addBtnText}>أضف إلى السلة</Text>
           </TouchableOpacity>
@@ -246,4 +252,6 @@ export default function ProductCard({ product, style }: ProductCardProps) {
       </TouchableOpacity>
     </Animated.View>
   );
-}
+});
+
+export default ProductCard;

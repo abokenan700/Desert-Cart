@@ -6,7 +6,6 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  FlatList,
   Modal,
   Animated,
   Dimensions,
@@ -32,6 +31,14 @@ const SORT_OPTIONS = [
 ];
 
 const POPULAR_SEARCHES = ["فستان", "حقيبة", "ساعة ذكية", "سماعات", "عطر", "كريم"];
+
+const PRICE_RANGES: { label: string; range: [number, number] }[] = [
+  { label: "جميع الأسعار", range: [0, 2000] },
+  { label: "أقل من ٢٠٠", range: [0, 200] },
+  { label: "٢٠٠ - ٥٠٠", range: [200, 500] },
+  { label: "٥٠٠ - ١٠٠٠", range: [500, 1000] },
+  { label: "أكثر من ١٠٠٠", range: [1000, 2000] },
+];
 
 export default function SearchScreen() {
   const colors = useColors();
@@ -102,7 +109,7 @@ export default function SearchScreen() {
     }
   }, [query, selectedCategory, sortBy, priceRange]);
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
     header: {
       backgroundColor: colors.card,
@@ -244,7 +251,7 @@ export default function SearchScreen() {
       borderTopRightRadius: 24,
       padding: 20,
       paddingBottom: 40,
-      maxHeight: height * 0.75,
+      maxHeight: height * 0.82,
     },
     filterHandle: {
       width: 40,
@@ -282,6 +289,29 @@ export default function SearchScreen() {
       color: colors.text,
       textAlign: "right",
     },
+    priceRangeRow: {
+      flexDirection: "row-reverse",
+      flexWrap: "wrap",
+      gap: 8,
+      marginBottom: 8,
+    },
+    priceRangePill: {
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+      borderRadius: 20,
+      backgroundColor: colors.secondary,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+    },
+    priceRangePillActive: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
+    priceRangePillText: {
+      fontSize: 12,
+      fontFamily: "Cairo_600SemiBold",
+      color: colors.text,
+    },
     applyBtn: {
       backgroundColor: colors.primary,
       borderRadius: 14,
@@ -294,17 +324,16 @@ export default function SearchScreen() {
       fontSize: 16,
       fontFamily: "Cairo_700Bold",
     },
-  });
+  }), [colors, topPad, bottomPad]);
 
   const showPopular = query.trim() === "";
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>اكتشف</Text>
         <View style={styles.searchRow}>
-          <TouchableOpacity style={styles.filterBtn} onPress={openFilter}>
+          <TouchableOpacity style={styles.filterBtn} onPress={openFilter} accessibilityLabel="الفلاتر">
             <Ionicons name="options" size={20} color="#fff" />
           </TouchableOpacity>
           <View style={styles.searchInput}>
@@ -318,11 +347,11 @@ export default function SearchScreen() {
               textAlign="right"
             />
             {query.length > 0 ? (
-              <TouchableOpacity onPress={() => setQuery("")}>
+              <TouchableOpacity onPress={() => setQuery("")} accessibilityLabel="مسح البحث">
                 <Ionicons name="close-circle" size={18} color={colors.mutedForeground} />
               </TouchableOpacity>
             ) : (
-              <TouchableOpacity onPress={() => setVoiceVisible(true)}>
+              <TouchableOpacity onPress={() => setVoiceVisible(true)} accessibilityLabel="البحث الصوتي">
                 <Ionicons name="mic" size={19} color={colors.primary} />
               </TouchableOpacity>
             )}
@@ -330,7 +359,6 @@ export default function SearchScreen() {
         </View>
       </View>
 
-      {/* Categories */}
       <View style={[styles.categorySection, { backgroundColor: colors.card }]}>
         <CategoryRow
           categories={CATEGORIES}
@@ -339,7 +367,6 @@ export default function SearchScreen() {
         />
       </View>
 
-      {/* Sort Bar */}
       {!showPopular && (
         <View style={styles.sortBar}>
           <Text style={styles.resultsCount}>{filteredProducts.length} نتيجة</Text>
@@ -399,14 +426,12 @@ export default function SearchScreen() {
         )}
       </ScrollView>
 
-      {/* Voice Search */}
       <VoiceSearch
         visible={voiceVisible}
         onResult={(text) => setQuery(text)}
         onClose={() => setVoiceVisible(false)}
       />
 
-      {/* Filter Sheet Modal */}
       <Modal transparent visible={filterVisible} animationType="none" statusBarTranslucent>
         <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={closeFilter}>
           <Animated.View
@@ -415,6 +440,7 @@ export default function SearchScreen() {
             <TouchableOpacity activeOpacity={1}>
               <View style={styles.filterHandle} />
               <Text style={styles.filterTitle}>فرز وتصفية</Text>
+
               <Text style={styles.filterLabel}>ترتيب حسب</Text>
               {SORT_OPTIONS.map((option) => (
                 <TouchableOpacity
@@ -437,6 +463,35 @@ export default function SearchScreen() {
                   </Text>
                 </TouchableOpacity>
               ))}
+
+              <View style={{ height: 20 }} />
+              <Text style={styles.filterLabel}>نطاق السعر</Text>
+              <View style={styles.priceRangeRow}>
+                {PRICE_RANGES.map((item) => {
+                  const isSelected =
+                    priceRange[0] === item.range[0] && priceRange[1] === item.range[1];
+                  return (
+                    <TouchableOpacity
+                      key={item.label}
+                      style={[
+                        styles.priceRangePill,
+                        isSelected && styles.priceRangePillActive,
+                      ]}
+                      onPress={() => setPriceRange(item.range)}
+                    >
+                      <Text
+                        style={[
+                          styles.priceRangePillText,
+                          isSelected && { color: "#fff" },
+                        ]}
+                      >
+                        {item.label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
               <TouchableOpacity style={styles.applyBtn} onPress={closeFilter}>
                 <Text style={styles.applyBtnText}>تطبيق الفلاتر</Text>
               </TouchableOpacity>

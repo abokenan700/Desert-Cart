@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import {
   View,
   Text,
@@ -76,14 +76,19 @@ export default function ReviewModal({
     if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     onSubmit(rating, comment.trim(), userName.trim() || DEFAULT_NAME);
     setSubmitted(true);
-    Animated.spring(successScale, { toValue: 1, useNativeDriver: true, tension: 60, friction: 8 }).start();
+    Animated.spring(successScale, {
+      toValue: 1,
+      useNativeDriver: true,
+      tension: 60,
+      friction: 8,
+    }).start();
     setTimeout(() => {
       successScale.setValue(0);
       onClose();
     }, 1800);
   };
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     overlay: {
       flex: 1,
       backgroundColor: "rgba(0,0,0,0.5)",
@@ -211,7 +216,7 @@ export default function ReviewModal({
       fontFamily: "Cairo_400Regular",
       color: colors.mutedForeground,
     },
-  });
+  }), [colors]);
 
   const isValid = rating > 0 && comment.trim().length >= 5;
 
@@ -232,7 +237,6 @@ export default function ReviewModal({
             <Text style={styles.title}>اكتب تقييمك</Text>
             <Text style={styles.productTitle} numberOfLines={1}>{productName}</Text>
 
-            {/* Stars */}
             <View style={styles.starsRow}>
               {[5, 4, 3, 2, 1].map((star) => (
                 <TouchableOpacity key={star} onPress={() => handleStarPress(star)}>
@@ -244,11 +248,15 @@ export default function ReviewModal({
                 </TouchableOpacity>
               ))}
             </View>
-            <Text style={[styles.ratingLabel, { color: rating > 0 ? "#F5A623" : colors.mutedForeground }]}>
+            <Text
+              style={[
+                styles.ratingLabel,
+                { color: rating > 0 ? "#F5A623" : colors.mutedForeground },
+              ]}
+            >
               {rating > 0 ? RATING_LABELS[rating] : "اختر تقييمك"}
             </Text>
 
-            {/* Name */}
             <Text style={styles.label}>اسمك</Text>
             <TextInput
               style={styles.nameInput}
@@ -259,7 +267,6 @@ export default function ReviewModal({
               textAlign="right"
             />
 
-            {/* Comment */}
             <Text style={styles.label}>تعليقك على المنتج</Text>
             <TextInput
               style={styles.commentInput}
@@ -280,9 +287,10 @@ export default function ReviewModal({
             </TouchableOpacity>
           </ScrollView>
 
-          {/* Success overlay */}
           {submitted && (
-            <Animated.View style={[styles.successOverlay, { transform: [{ scale: successScale }] }]}>
+            <Animated.View
+              style={[styles.successOverlay, { transform: [{ scale: successScale }] }]}
+            >
               <Ionicons name="checkmark-circle" size={64} color="#22C55E" />
               <Text style={styles.successTitle}>شكراً على تقييمك!</Text>
               <Text style={styles.successSub}>تقييمك يساعد المتسوقين الآخرين</Text>

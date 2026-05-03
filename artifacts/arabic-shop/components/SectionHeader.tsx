@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useColors } from "@/hooks/useColors";
 
@@ -9,7 +9,7 @@ interface SectionHeaderProps {
   badge?: string;
 }
 
-export default function SectionHeader({
+const SectionHeader = React.memo(function SectionHeader({
   title,
   onSeeAll,
   showSeeAll = true,
@@ -17,7 +17,7 @@ export default function SectionHeader({
 }: SectionHeaderProps) {
   const colors = useColors();
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     row: {
       flexDirection: "row-reverse",
       alignItems: "center",
@@ -53,7 +53,7 @@ export default function SectionHeader({
       fontFamily: "Cairo_600SemiBold",
       color: colors.primary,
     },
-  });
+  }), [colors]);
 
   return (
     <View style={styles.row}>
@@ -66,10 +66,12 @@ export default function SectionHeader({
         )}
       </View>
       {showSeeAll && onSeeAll && (
-        <TouchableOpacity onPress={onSeeAll}>
+        <TouchableOpacity onPress={onSeeAll} accessibilityLabel="عرض الكل">
           <Text style={styles.seeAll}>عرض الكل</Text>
         </TouchableOpacity>
       )}
     </View>
   );
-}
+});
+
+export default SectionHeader;

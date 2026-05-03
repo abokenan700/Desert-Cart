@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -47,7 +47,7 @@ export default function MyCouponsScreen() {
     }
   };
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
     header: {
       backgroundColor: colors.card,
@@ -177,7 +177,7 @@ export default function MyCouponsScreen() {
       fontSize: 13,
       fontFamily: "Cairo_600SemiBold",
     },
-  });
+  }), [colors, topPad, bottomPad]);
 
   return (
     <View style={styles.container}>
@@ -206,7 +206,7 @@ export default function MyCouponsScreen() {
                 <View style={styles.couponInfo}>
                   <Text style={styles.couponDesc}>{coupon.descAr}</Text>
                   <Text style={styles.couponMeta}>
-                    {coupon.minOrder ? `الحد الأدنى للطلب: ${coupon.minOrder} ر.س · ` : ""}
+                    {coupon.minOrder ? `الحد الأدنى للطلب: ${coupon.minOrder.toLocaleString("ar-SA")} ر.س · ` : ""}
                     ينتهي {coupon.expiry}
                   </Text>
                 </View>

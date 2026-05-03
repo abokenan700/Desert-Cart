@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   View,
   Text,
@@ -30,7 +30,7 @@ export default function WishlistScreen() {
     Alert.alert("تمت الإضافة", "تمت إضافة جميع المنتجات إلى السلة");
   };
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
     header: {
       backgroundColor: colors.card,
@@ -114,7 +114,7 @@ export default function WishlistScreen() {
       fontSize: 15,
       fontFamily: "Cairo_700Bold",
     },
-  });
+  }), [colors, topPad, bottomPad]);
 
   if (items.length === 0) {
     return (

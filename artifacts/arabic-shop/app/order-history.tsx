@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -103,7 +103,7 @@ export default function OrderHistoryScreen() {
       ? MOCK_ORDERS
       : MOCK_ORDERS.filter((o) => o.status === activeTab);
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
     header: {
       backgroundColor: colors.card,
@@ -239,7 +239,7 @@ export default function OrderHistoryScreen() {
       color: colors.mutedForeground,
       textAlign: "center",
     },
-  });
+  }), [colors, topPad, bottomPad]);
 
   return (
     <View style={styles.container}>
@@ -342,7 +342,7 @@ export default function OrderHistoryScreen() {
                       </TouchableOpacity>
                     )}
                   </View>
-                  <Text style={styles.total}>{order.total} ر.س</Text>
+                  <Text style={styles.total}>{order.total.toLocaleString("ar-SA")} ر.س</Text>
                 </View>
               </View>
             );

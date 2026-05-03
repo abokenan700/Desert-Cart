@@ -8,19 +8,19 @@ interface RatingStarsProps {
   color?: string;
 }
 
-export default function RatingStars({
+const styles = StyleSheet.create({
+  row: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 2,
+  },
+});
+
+const RatingStars = React.memo(function RatingStars({
   rating,
   size = 14,
   color = "#F5A623",
 }: RatingStarsProps) {
-  const styles = StyleSheet.create({
-    row: {
-      flexDirection: "row-reverse",
-      alignItems: "center",
-      gap: 2,
-    },
-  });
-
   return (
     <View style={styles.row}>
       {[1, 2, 3, 4, 5].map((star) => {
@@ -37,4 +37,6 @@ export default function RatingStars({
       })}
     </View>
   );
-}
+});
+
+export default RatingStars;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   View,
   Text,
@@ -24,7 +24,7 @@ export default function CartScreen() {
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
     header: {
       backgroundColor: colors.card,
@@ -259,7 +259,7 @@ export default function CartScreen() {
       fontSize: 15,
       fontFamily: "Cairo_700Bold",
     },
-  });
+  }), [colors, topPad, bottomPad]);
 
   if (items.length === 0) {
     return (
@@ -355,7 +355,6 @@ export default function CartScreen() {
           </View>
         ))}
 
-        {/* Summary */}
         <View style={styles.summaryCard}>
           <Text style={styles.summaryTitle}>ملخص الطلب</Text>
           <View style={styles.summaryRow}>
@@ -365,7 +364,7 @@ export default function CartScreen() {
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>رسوم التوصيل</Text>
             <Text style={delivery === 0 ? styles.discountValue : styles.summaryValue}>
-              {delivery === 0 ? "مجاني" : `${delivery} ر.س`}
+              {delivery === 0 ? "مجاني" : `${delivery.toLocaleString("ar-SA")} ر.س`}
             </Text>
           </View>
           <View style={styles.summaryRow}>

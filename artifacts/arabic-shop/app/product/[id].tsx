@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import {
   View,
   Text,
@@ -92,12 +92,12 @@ export default function ProductDetailScreen() {
     router.push("/checkout");
   };
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
     imageContainer: {
       width,
       height: IMAGE_HEIGHT,
-      backgroundColor: "#F5EEF5",
+      backgroundColor: colors.secondary,
       position: "relative",
     },
     mainImage: { width: "100%", height: "100%" },
@@ -517,7 +517,7 @@ export default function ProductDetailScreen() {
       fontSize: 16,
       fontFamily: "Cairo_700Bold",
     },
-  });
+  }), [colors, topPad, bottomPad, width, height]);
 
   return (
     <View style={styles.container}>

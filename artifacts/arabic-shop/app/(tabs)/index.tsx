@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -43,14 +43,17 @@ export default function HomeScreen() {
   const { notifications, markAllRead } = useNotifications();
   const { recentlyViewed } = useRecentlyViewed();
 
-  const filteredProducts =
-    selectedCategory === "all"
-      ? PRODUCTS
-      : PRODUCTS.filter((p) => p.categoryId === selectedCategory);
+  const filteredProducts = useMemo(
+    () =>
+      selectedCategory === "all"
+        ? PRODUCTS
+        : PRODUCTS.filter((p) => p.categoryId === selectedCategory),
+    [selectedCategory]
+  );
 
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
     scroll: { flex: 1 },
     searchBar: {
@@ -159,7 +162,7 @@ export default function HomeScreen() {
       fontFamily: "Cairo_600SemiBold",
       color: colors.primary,
     },
-  });
+  }), [colors, bottomPad]);
 
   return (
     <View style={styles.container}>
@@ -172,8 +175,8 @@ export default function HomeScreen() {
       >
         <View style={{ height: 16 }} />
         <View style={styles.searchBar}>
-          <TouchableOpacity onPress={() => setVoiceVisible(true)}>
-            <Ionicons name="mic" size={20} color="#E63946" />
+          <TouchableOpacity onPress={() => setVoiceVisible(true)} accessibilityLabel="البحث الصوتي">
+            <Ionicons name="mic" size={20} color={colors.primary} />
           </TouchableOpacity>
           <TouchableOpacity
             style={{ flex: 1 }}
@@ -198,7 +201,6 @@ export default function HomeScreen() {
 
         <View style={styles.sectionDivider} />
 
-        {/* Flash Sale with countdown timer */}
         <View style={styles.section}>
           <View style={styles.flashSaleHeader}>
             <FlashSaleTimer />
@@ -242,7 +244,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.promoCard, { backgroundColor: "#E63946" }]}
+              style={[styles.promoCard, { backgroundColor: colors.primary }]}
               activeOpacity={0.85}
             >
               <Ionicons name="gift" size={22} color="rgba(255,255,255,0.7)" />

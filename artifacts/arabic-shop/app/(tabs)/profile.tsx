@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 
 interface MenuItem {
   id: string;
@@ -28,12 +29,13 @@ export default function ProfileScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { totalCount } = useCart();
+  const { count: wishlistCount } = useWishlist();
   const [notifications, setNotifications] = useState(true);
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
-  const menuSections: { title: string; items: MenuItem[] }[] = [
+  const menuSections: { title: string; items: MenuItem[] }[] = useMemo(() => [
     {
       title: "طلباتي",
       items: [
@@ -60,9 +62,9 @@ export default function ProfileScreen() {
         { id: "logout", icon: "log-out-outline", label: "تسجيل الخروج", color: colors.destructive },
       ],
     },
-  ];
+  ], [colors]);
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
     header: {
       backgroundColor: colors.primary,
@@ -240,7 +242,7 @@ export default function ProfileScreen() {
       marginTop: 16,
       marginBottom: 8,
     },
-  });
+  }), [colors, topPad, bottomPad]);
 
   const handleMenuPress = (id: string) => {
     switch (id) {
@@ -267,6 +269,10 @@ export default function ProfileScreen() {
     }
   };
 
+  const wishlistStatValue = wishlistCount > 0
+    ? wishlistCount.toLocaleString("ar-SA")
+    : "٠";
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -289,7 +295,6 @@ export default function ProfileScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 90 + bottomPad }}
       >
-        {/* Stats */}
         <View style={styles.statsCard}>
           <View style={styles.statItem}>
             <Text style={styles.statValue}>١٢</Text>
@@ -297,7 +302,7 @@ export default function ProfileScreen() {
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>٥</Text>
+            <Text style={styles.statValue}>{wishlistStatValue}</Text>
             <Text style={styles.statLabel}>مفضلة</Text>
           </View>
           <View style={styles.statDivider} />
@@ -312,7 +317,6 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        {/* Notifications toggle */}
         <View style={[styles.notifCard, { marginTop: 16 }]}>
           <View style={styles.notifLeft}>
             <View style={styles.notifIconBox}>
@@ -328,7 +332,6 @@ export default function ProfileScreen() {
           />
         </View>
 
-        {/* Menu Sections */}
         {menuSections.map((section) => (
           <View key={section.title}>
             <Text style={styles.sectionTitle}>{section.title}</Text>

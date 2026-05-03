@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useCallback } from "react";
+import React, { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import {
   View,
   Text,
@@ -15,6 +15,7 @@ import { useColors } from "@/hooks/useColors";
 const { width } = Dimensions.get("window");
 const BANNER_HEIGHT = 180;
 const BANNER_WIDTH = width - 32;
+const AUTO_PLAY_INTERVAL = 3500;
 
 interface BannerCarouselProps {
   banners: Banner[];
@@ -40,17 +41,8 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
     [banners, dotScale]
   );
 
-  const scrollToIndex = useCallback(
-    (index: number) => {
-      const safeIndex = ((index % banners.length) + banners.length) % banners.length;
-      scrollRef.current?.scrollTo({ x: safeIndex * BANNER_WIDTH, animated: true });
-      setActiveIndex(safeIndex);
-      animateDot(safeIndex);
-    },
-    [banners.length, animateDot]
-  );
-
-  useEffect(() => {
+  const startTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setActiveIndex((prev) => {
         const next = (prev + 1) % banners.length;
@@ -58,22 +50,30 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
         animateDot(next);
         return next;
       });
-    }, 3500);
+    }, AUTO_PLAY_INTERVAL);
+  }, [banners.length, animateDot]);
+
+  useEffect(() => {
+    startTimer();
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [banners.length, animateDot]);
+  }, [startTimer]);
 
-  const handleScroll = (e: any) => {
-    const x = e.nativeEvent.contentOffset.x;
-    const index = Math.round(x / BANNER_WIDTH);
-    if (index !== activeIndex && index >= 0 && index < banners.length) {
-      setActiveIndex(index);
-      animateDot(index);
-    }
-  };
+  const handleScroll = useCallback(
+    (e: any) => {
+      const x = e.nativeEvent.contentOffset.x;
+      const index = Math.round(x / BANNER_WIDTH);
+      if (index !== activeIndex && index >= 0 && index < banners.length) {
+        setActiveIndex(index);
+        animateDot(index);
+        startTimer();
+      }
+    },
+    [activeIndex, banners.length, animateDot, startTimer]
+  );
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     container: { marginHorizontal: 16 },
     scroll: { borderRadius: 18, overflow: "hidden" },
     slide: {
@@ -136,7 +136,7 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
       borderRadius: 3,
       backgroundColor: colors.primary,
     },
-  });
+  }), [colors]);
 
   return (
     <View style={styles.container}>

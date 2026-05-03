@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import {
   View,
   Text,
@@ -45,7 +45,7 @@ export default function CheckoutScreen() {
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
     header: {
       backgroundColor: colors.card,
@@ -273,7 +273,10 @@ export default function CheckoutScreen() {
       fontSize: 14,
       fontFamily: "Cairo_600SemiBold",
     },
-  });
+  }), [colors, topPad, bottomPad]);
+
+  const couponSavings = appliedCoupon ? Math.floor(subtotal * appliedCoupon.discount) : 0;
+  const finalTotal = Math.max(0, total - couponSavings);
 
   const renderStep = () => {
     if (step === 0) {
@@ -515,7 +518,7 @@ export default function CheckoutScreen() {
           {items.map((item) => (
             <View key={item.product.id} style={styles.productReviewItem}>
               <Text style={styles.productReviewPrice}>
-                {(item.product.price * item.quantity)} ر.س
+                {(item.product.price * item.quantity).toLocaleString("ar-SA")} ر.س
               </Text>
               <Text style={styles.productReviewName} numberOfLines={1}>
                 {item.product.nameAr} × {item.quantity}
@@ -529,17 +532,19 @@ export default function CheckoutScreen() {
           <Text style={styles.sectionTitle}>ملخص الدفع</Text>
           <View style={styles.orderRow}>
             <Text style={styles.orderLabel}>المجموع الجزئي</Text>
-            <Text style={styles.orderValue}>{subtotal} ر.س</Text>
+            <Text style={styles.orderValue}>{subtotal.toLocaleString("ar-SA")} ر.س</Text>
           </View>
           <View style={styles.orderRow}>
             <Text style={styles.orderLabel}>التوصيل</Text>
             <Text style={[styles.orderValue, { color: colors.success }]}>
-              {delivery === 0 ? "مجاني" : `${delivery} ر.س`}
+              {delivery === 0 ? "مجاني" : `${delivery.toLocaleString("ar-SA")} ر.س`}
             </Text>
           </View>
           <View style={styles.orderRow}>
             <Text style={styles.orderLabel}>خصم العضوية</Text>
-            <Text style={[styles.orderValue, { color: colors.success }]}>-{discount} ر.س</Text>
+            <Text style={[styles.orderValue, { color: colors.success }]}>
+              -{discount.toLocaleString("ar-SA")} ر.س
+            </Text>
           </View>
           {appliedCoupon && (
             <View style={styles.orderRow}>
@@ -547,17 +552,14 @@ export default function CheckoutScreen() {
                 كوبون ({appliedCoupon.label})
               </Text>
               <Text style={[styles.orderValue, { color: colors.success }]}>
-                -{Math.floor(subtotal * appliedCoupon.discount)} ر.س
+                -{couponSavings.toLocaleString("ar-SA")} ر.س
               </Text>
             </View>
           )}
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>الإجمالي</Text>
             <Text style={styles.totalValue}>
-              {Math.max(
-                0,
-                total - (appliedCoupon ? Math.floor(subtotal * appliedCoupon.discount) : 0)
-              )} ر.س
+              {finalTotal.toLocaleString("ar-SA")} ر.س
             </Text>
           </View>
         </View>
@@ -574,12 +576,7 @@ export default function CheckoutScreen() {
           }}
         >
           <Text style={styles.placeOrderText}>
-            تأكيد الطلب —{" "}
-            {Math.max(
-              0,
-              total - (appliedCoupon ? Math.floor(subtotal * appliedCoupon.discount) : 0)
-            )}{" "}
-            ر.س
+            تأكيد الطلب — {finalTotal.toLocaleString("ar-SA")} ر.س
           </Text>
           <Ionicons name="checkmark-circle" size={22} color="#fff" />
         </TouchableOpacity>
@@ -596,7 +593,6 @@ export default function CheckoutScreen() {
         <Text style={styles.headerTitle}>إتمام الشراء</Text>
       </View>
 
-      {/* Step Indicator */}
       <View style={styles.stepBar}>
         {STEPS.map((stepLabel, idx) => (
           <React.Fragment key={idx}>
