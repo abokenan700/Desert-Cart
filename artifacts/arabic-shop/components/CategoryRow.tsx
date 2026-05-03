@@ -24,24 +24,26 @@ const CategoryRow = React.memo(function CategoryRow({
   const colors = useColors();
 
   const styles = useMemo(() => StyleSheet.create({
-    scroll: {},
+    scroll: { paddingVertical: 12 },
     contentContainer: {
       paddingHorizontal: 16,
       flexDirection: "row-reverse",
-      gap: 10,
+      gap: 12,
     },
     pill: {
-      flexDirection: "row-reverse",
+      width: 70,
       alignItems: "center",
-      paddingHorizontal: 14,
-      paddingVertical: 9,
-      borderRadius: 24,
+      justifyContent: "center",
+      borderRadius: 35,
       gap: 6,
       borderWidth: 1.5,
+      paddingVertical: 10,
     },
     label: {
-      fontSize: 13,
+      fontSize: 11,
       fontFamily: "Cairo_600SemiBold",
+      textAlign: "center",
+      marginHorizontal: 4,
     },
   }), [colors]);
 
@@ -70,6 +72,11 @@ const CategoryRow = React.memo(function CategoryRow({
             accessibilityRole="button"
             accessibilityState={{ selected: isSelected }}
           >
+            <Ionicons
+              name={cat.icon as any}
+              size={18}
+              color={isSelected ? "#fff" : cat.color}
+            />
             <Text
               style={[
                 styles.label,
@@ -78,11 +85,6 @@ const CategoryRow = React.memo(function CategoryRow({
             >
               {cat.nameAr}
             </Text>
-            <Ionicons
-              name={cat.icon as any}
-              size={15}
-              color={isSelected ? "#fff" : cat.color}
-            />
           </TouchableOpacity>
         );
       })}
