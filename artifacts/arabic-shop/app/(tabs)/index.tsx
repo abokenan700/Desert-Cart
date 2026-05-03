@@ -191,8 +191,6 @@ export default function HomeScreen() {
           <Ionicons name="search-outline" size={18} color={colors.mutedForeground} />
         </View>
 
-        <BannerCarousel banners={BANNERS} />
-
         <View style={[styles.section, { paddingBottom: 4 }]}>
           <SectionHeader title="التصنيفات" showSeeAll={false} />
           <CategoryRow
@@ -201,6 +199,8 @@ export default function HomeScreen() {
             onSelect={setSelectedCategory}
           />
         </View>
+
+        <BannerCarousel banners={BANNERS} />
 
         <View style={styles.sectionDivider} />
 
