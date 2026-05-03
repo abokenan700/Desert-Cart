@@ -198,7 +198,6 @@ export default function HomeScreen() {
         </View>
 
         <View style={[styles.section, { paddingBottom: 12 }]}>
-          <SectionHeader title="" showSeeAll={false} />
           <CategoryRow
             categories={CATEGORIES}
             selected={selectedCategory}
