@@ -20,7 +20,9 @@ import SectionHeader from "@/components/SectionHeader";
 import HomeHeader from "@/components/HomeHeader";
 import VoiceSearch from "@/components/VoiceSearch";
 import NotificationDrawer from "@/components/NotificationDrawer";
+import FlashSaleTimer from "@/components/FlashSaleTimer";
 import { useNotifications } from "@/context/NotificationsContext";
+import { useRecentlyViewed } from "@/context/RecentlyViewedContext";
 import {
   BANNERS,
   CATEGORIES,
@@ -39,6 +41,7 @@ export default function HomeScreen() {
   const [voiceVisible, setVoiceVisible] = useState(false);
   const [notificationsVisible, setNotificationsVisible] = useState(false);
   const { notifications, markAllRead } = useNotifications();
+  const { recentlyViewed } = useRecentlyViewed();
 
   const filteredProducts =
     selectedCategory === "all"
@@ -48,10 +51,7 @@ export default function HomeScreen() {
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
   const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
+    container: { flex: 1, backgroundColor: colors.background },
     scroll: { flex: 1 },
     searchBar: {
       marginHorizontal: 16,
@@ -82,7 +82,6 @@ export default function HomeScreen() {
       flexWrap: "wrap",
       paddingHorizontal: 12,
       justifyContent: "space-between",
-      gap: 0,
     },
     gridItem: { paddingHorizontal: 4 },
     promoRow: {
@@ -127,6 +126,39 @@ export default function HomeScreen() {
       backgroundColor: colors.secondary,
       marginVertical: 4,
     },
+    flashSaleHeader: {
+      flexDirection: "row-reverse",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 16,
+      marginBottom: 12,
+    },
+    flashSaleLeft: {
+      flexDirection: "row-reverse",
+      alignItems: "center",
+      gap: 8,
+    },
+    flashTitle: {
+      fontSize: 17,
+      fontFamily: "Cairo_700Bold",
+      color: colors.text,
+    },
+    flashBadge: {
+      backgroundColor: colors.primary,
+      borderRadius: 10,
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+    },
+    flashBadgeText: {
+      color: "#fff",
+      fontSize: 11,
+      fontFamily: "Cairo_700Bold",
+    },
+    seeAllText: {
+      fontSize: 13,
+      fontFamily: "Cairo_600SemiBold",
+      color: colors.primary,
+    },
   });
 
   return (
@@ -166,8 +198,17 @@ export default function HomeScreen() {
 
         <View style={styles.sectionDivider} />
 
+        {/* Flash Sale with countdown timer */}
         <View style={styles.section}>
-          <SectionHeader title="عروض اليوم" badge="يومي" onSeeAll={() => router.push("/(tabs)/search")} />
+          <View style={styles.flashSaleHeader}>
+            <FlashSaleTimer />
+            <View style={styles.flashSaleLeft}>
+              <Text style={styles.flashTitle}>عروض اليوم</Text>
+              <View style={styles.flashBadge}>
+                <Text style={styles.flashBadgeText}>يومي</Text>
+              </View>
+            </View>
+          </View>
           <FlatList
             data={FLASH_SALE_PRODUCTS}
             horizontal
@@ -175,7 +216,9 @@ export default function HomeScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalList}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => <ProductCard product={item} style={styles.horizontalCard} />}
+            renderItem={({ item }) => (
+              <ProductCard product={item} style={styles.horizontalCard} />
+            )}
             scrollEnabled={FLASH_SALE_PRODUCTS.length > 0}
           />
         </View>
@@ -184,26 +227,32 @@ export default function HomeScreen() {
 
         <View style={[styles.section, { marginBottom: 0 }]}>
           <View style={styles.promoRow}>
-            <TouchableOpacity style={[styles.promoCard, { backgroundColor: "#7C3AED" }]} activeOpacity={0.85}>
+            <TouchableOpacity
+              style={[styles.promoCard, { backgroundColor: "#7C3AED" }]}
+              activeOpacity={0.85}
+            >
               <Ionicons name="flash" size={22} color="rgba(255,255,255,0.7)" />
               <View>
                 <Text style={styles.promoTitle}>شحن مجاني</Text>
                 <Text style={styles.promoSub}>على طلبات +500 ر.س</Text>
               </View>
-              <TouchableOpacity style={styles.promoBtn}>
+              <View style={styles.promoBtn}>
                 <Text style={styles.promoBtnText}>تسوق</Text>
-              </TouchableOpacity>
+              </View>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.promoCard, { backgroundColor: "#E63946" }]} activeOpacity={0.85}>
+            <TouchableOpacity
+              style={[styles.promoCard, { backgroundColor: "#E63946" }]}
+              activeOpacity={0.85}
+            >
               <Ionicons name="gift" size={22} color="rgba(255,255,255,0.7)" />
               <View>
                 <Text style={styles.promoTitle}>عروض حصرية</Text>
                 <Text style={styles.promoSub}>خصم ٣٠٪ للأعضاء</Text>
               </View>
-              <TouchableOpacity style={styles.promoBtn}>
+              <View style={styles.promoBtn}>
                 <Text style={styles.promoBtnText}>انضم</Text>
-              </TouchableOpacity>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
@@ -211,7 +260,10 @@ export default function HomeScreen() {
         <View style={styles.sectionDivider} />
 
         <View style={styles.section}>
-          <SectionHeader title="وصل حديثاً" onSeeAll={() => router.push("/(tabs)/search")} />
+          <SectionHeader
+            title="وصل حديثاً"
+            onSeeAll={() => router.push("/(tabs)/search")}
+          />
           <FlatList
             data={NEW_ARRIVALS}
             horizontal
@@ -219,21 +271,48 @@ export default function HomeScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalList}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => <ProductCard product={item} style={styles.horizontalCard} />}
+            renderItem={({ item }) => (
+              <ProductCard product={item} style={styles.horizontalCard} />
+            )}
             scrollEnabled={NEW_ARRIVALS.length > 0}
           />
         </View>
 
         <View style={styles.sectionDivider} />
 
+        {recentlyViewed.length > 0 && (
+          <>
+            <View style={styles.section}>
+              <SectionHeader title="شاهدته مؤخراً" showSeeAll={false} />
+              <FlatList
+                data={recentlyViewed}
+                horizontal
+                inverted
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.horizontalList}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <ProductCard product={item} style={styles.horizontalCard} />
+                )}
+              />
+            </View>
+            <View style={styles.sectionDivider} />
+          </>
+        )}
+
         <View style={styles.section}>
-          <SectionHeader title="الأكثر مبيعاً" onSeeAll={() => router.push("/(tabs)/search")} />
+          <SectionHeader
+            title="الأكثر مبيعاً"
+            onSeeAll={() => router.push("/(tabs)/search")}
+          />
           <View style={styles.productGrid}>
-            {(selectedCategory === "all" ? FEATURED_PRODUCTS : filteredProducts).map((product) => (
-              <View key={product.id} style={styles.gridItem}>
-                <ProductCard product={product} />
-              </View>
-            ))}
+            {(selectedCategory === "all" ? FEATURED_PRODUCTS : filteredProducts).map(
+              (product) => (
+                <View key={product.id} style={styles.gridItem}>
+                  <ProductCard product={product} />
+                </View>
+              )
+            )}
           </View>
         </View>
       </ScrollView>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   ScrollView,
   TextInput,
   Platform,
+  Animated,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -23,12 +24,23 @@ const PAYMENT_METHODS = [
   { id: "wallet", label: "المحفظة (٢٥٠ ر.س)", icon: "wallet-outline" },
 ];
 
+const VALID_COUPONS: Record<string, { discount: number; label: string }> = {
+  "SAUDI30": { discount: 0.30, label: "خصم ٣٠٪" },
+  "WELCOME10": { discount: 0.10, label: "خصم ١٠٪ - أهلاً بك" },
+  "FLASH50": { discount: 0.50, label: "خصم ٥٠٪ - عرض محدود" },
+  "VIP20": { discount: 0.20, label: "خصم ٢٠٪ - عميل مميز" },
+};
+
 export default function CheckoutScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { items, total, delivery, discount, subtotal, clearCart } = useCart();
   const [step, setStep] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState("card");
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{ discount: number; label: string } | null>(null);
+  const [couponError, setCouponError] = useState("");
+  const couponShake = useRef(new Animated.Value(0)).current;
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
@@ -388,17 +400,105 @@ export default function CheckoutScreen() {
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>كوبون الخصم</Text>
-            <View style={styles.couponRow}>
-              <TextInput
-                style={styles.couponInput}
-                placeholder="أدخل كود الخصم"
-                placeholderTextColor={colors.mutedForeground}
-                textAlign="right"
-              />
-              <TouchableOpacity style={styles.couponBtn}>
-                <Text style={styles.couponBtnText}>تطبيق</Text>
-              </TouchableOpacity>
-            </View>
+            {appliedCoupon ? (
+              <View
+                style={{
+                  flexDirection: "row-reverse",
+                  alignItems: "center",
+                  backgroundColor: colors.successLight,
+                  borderRadius: 12,
+                  padding: 12,
+                  gap: 8,
+                }}
+              >
+                <Ionicons name="checkmark-circle" size={20} color={colors.success} />
+                <Text
+                  style={{
+                    flex: 1,
+                    fontFamily: "Cairo_600SemiBold",
+                    fontSize: 13,
+                    color: colors.success,
+                    textAlign: "right",
+                  }}
+                >
+                  {appliedCoupon.label}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    setAppliedCoupon(null);
+                    setCouponCode("");
+                    setCouponError("");
+                  }}
+                >
+                  <Ionicons name="close-circle" size={20} color={colors.success} />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <>
+                <Animated.View
+                  style={[
+                    styles.couponRow,
+                    {
+                      transform: [
+                        {
+                          translateX: couponShake.interpolate({
+                            inputRange: [0, 0.2, 0.4, 0.6, 0.8, 1],
+                            outputRange: [0, -8, 8, -8, 8, 0],
+                          }),
+                        },
+                      ],
+                    },
+                  ]}
+                >
+                  <TextInput
+                    style={[
+                      styles.couponInput,
+                      couponError ? { borderColor: colors.destructive } : {},
+                    ]}
+                    placeholder="أدخل كود الخصم (مثال: SAUDI30)"
+                    placeholderTextColor={colors.mutedForeground}
+                    textAlign="right"
+                    value={couponCode}
+                    onChangeText={(t) => {
+                      setCouponCode(t.toUpperCase());
+                      setCouponError("");
+                    }}
+                    autoCapitalize="characters"
+                  />
+                  <TouchableOpacity
+                    style={styles.couponBtn}
+                    onPress={() => {
+                      const found = VALID_COUPONS[couponCode.trim()];
+                      if (found) {
+                        setAppliedCoupon(found);
+                        setCouponError("");
+                      } else {
+                        setCouponError("كود الخصم غير صحيح");
+                        Animated.sequence([
+                          Animated.timing(couponShake, { toValue: 1, duration: 400, useNativeDriver: true }),
+                          Animated.timing(couponShake, { toValue: 0, duration: 0, useNativeDriver: true }),
+                        ]).start();
+                      }
+                    }}
+                  >
+                    <Text style={styles.couponBtnText}>تطبيق</Text>
+                  </TouchableOpacity>
+                </Animated.View>
+                {couponError ? (
+                  <Text
+                    style={{
+                      color: colors.destructive,
+                      fontFamily: "Cairo_400Regular",
+                      fontSize: 12,
+                      textAlign: "right",
+                      marginTop: 6,
+                    }}
+                  >
+                    {couponError}
+                  </Text>
+                ) : null}
+              </>
+            )}
           </View>
 
           <TouchableOpacity style={styles.nextBtn} onPress={() => setStep(2)}>
@@ -438,24 +538,48 @@ export default function CheckoutScreen() {
             </Text>
           </View>
           <View style={styles.orderRow}>
-            <Text style={styles.orderLabel}>الخصم</Text>
+            <Text style={styles.orderLabel}>خصم العضوية</Text>
             <Text style={[styles.orderValue, { color: colors.success }]}>-{discount} ر.س</Text>
           </View>
+          {appliedCoupon && (
+            <View style={styles.orderRow}>
+              <Text style={[styles.orderLabel, { color: colors.success }]}>
+                كوبون ({appliedCoupon.label})
+              </Text>
+              <Text style={[styles.orderValue, { color: colors.success }]}>
+                -{Math.floor(subtotal * appliedCoupon.discount)} ر.س
+              </Text>
+            </View>
+          )}
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>الإجمالي</Text>
-            <Text style={styles.totalValue}>{total} ر.س</Text>
+            <Text style={styles.totalValue}>
+              {Math.max(
+                0,
+                total - (appliedCoupon ? Math.floor(subtotal * appliedCoupon.discount) : 0)
+              )} ر.س
+            </Text>
           </View>
         </View>
 
         <TouchableOpacity
           style={styles.placeOrderBtn}
           onPress={() => {
+            const orderNum = `SAQ-${Date.now().toString().slice(-6)}`;
             clearCart();
-            router.replace("/order-success");
+            router.replace({
+              pathname: "/order-success",
+              params: { orderNumber: orderNum },
+            } as any);
           }}
         >
           <Text style={styles.placeOrderText}>
-            تأكيد الطلب — {total} ر.س
+            تأكيد الطلب —{" "}
+            {Math.max(
+              0,
+              total - (appliedCoupon ? Math.floor(subtotal * appliedCoupon.discount) : 0)
+            )}{" "}
+            ر.س
           </Text>
           <Ionicons name="checkmark-circle" size={22} color="#fff" />
         </TouchableOpacity>

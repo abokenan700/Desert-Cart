@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useCart } from "@/context/CartContext";
 
@@ -242,11 +243,27 @@ export default function ProfileScreen() {
   });
 
   const handleMenuPress = (id: string) => {
-    if (id === "logout") {
-      Alert.alert("تسجيل الخروج", "هل تريد تسجيل الخروج من حسابك؟", [
-        { text: "إلغاء", style: "cancel" },
-        { text: "خروج", style: "destructive", onPress: () => {} },
-      ]);
+    switch (id) {
+      case "orders":
+        router.push("/order-history" as any);
+        break;
+      case "track":
+        router.push({
+          pathname: "/order-tracking",
+          params: { orderNumber: "SAQ-829341" },
+        } as any);
+        break;
+      case "coupons":
+        router.push("/my-coupons" as any);
+        break;
+      case "logout":
+        Alert.alert("تسجيل الخروج", "هل تريد تسجيل الخروج من حسابك؟", [
+          { text: "إلغاء", style: "cancel" },
+          { text: "خروج", style: "destructive", onPress: () => {} },
+        ]);
+        break;
+      default:
+        break;
     }
   };
 

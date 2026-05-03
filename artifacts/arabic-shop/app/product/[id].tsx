@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -18,6 +18,7 @@ import { useColors } from "@/hooks/useColors";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useReviews } from "@/context/ReviewsContext";
+import { useRecentlyViewed } from "@/context/RecentlyViewedContext";
 import RatingStars from "@/components/RatingStars";
 import ReviewModal from "@/components/ReviewModal";
 import { PRODUCTS } from "@/data/mockData";
@@ -31,6 +32,7 @@ export default function ProductDetailScreen() {
   const insets = useSafeAreaInsets();
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
+  const { addToRecentlyViewed } = useRecentlyViewed();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState<string | undefined>(undefined);
   const [selectedColor, setSelectedColor] = useState<string | undefined>(undefined);
@@ -42,6 +44,12 @@ export default function ProductDetailScreen() {
   const { getReviews, addReview, markHelpful, hasReviewed } = useReviews();
 
   const product = PRODUCTS.find((p) => p.id === id);
+
+  useEffect(() => {
+    if (product) {
+      addToRecentlyViewed(product);
+    }
+  }, [product?.id]);
 
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
   const topPad = Platform.OS === "web" ? 67 : insets.top;

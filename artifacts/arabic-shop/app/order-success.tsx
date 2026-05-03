@@ -9,18 +9,21 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 
 export default function OrderSuccessScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const { orderNumber: passedOrderNumber } = useLocalSearchParams<{ orderNumber?: string }>();
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(40)).current;
 
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
   const topPad = Platform.OS === "web" ? 67 : insets.top;
+
+  const orderNumber = passedOrderNumber ?? `SAQ-${Date.now().toString().slice(-6)}`;
 
   useEffect(() => {
     Animated.sequence([
@@ -47,8 +50,6 @@ export default function OrderSuccessScreen() {
     ]).start();
   }, []);
 
-  const orderNumber = `SAQ-${Date.now().toString().slice(-6)}`;
-
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -59,15 +60,6 @@ export default function OrderSuccessScreen() {
       paddingTop: topPad,
       paddingBottom: bottomPad,
     },
-    successCircle: {
-      width: 120,
-      height: 120,
-      borderRadius: 60,
-      backgroundColor: colors.success,
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: 28,
-    },
     outerRing: {
       width: 148,
       height: 148,
@@ -76,6 +68,14 @@ export default function OrderSuccessScreen() {
       alignItems: "center",
       justifyContent: "center",
       marginBottom: 28,
+    },
+    successCircle: {
+      width: 120,
+      height: 120,
+      borderRadius: 60,
+      backgroundColor: colors.success,
+      alignItems: "center",
+      justifyContent: "center",
     },
     title: {
       fontSize: 28,
@@ -109,7 +109,7 @@ export default function OrderSuccessScreen() {
       color: colors.mutedForeground,
       marginBottom: 6,
     },
-    orderNumber: {
+    orderNum: {
       fontSize: 22,
       fontFamily: "Cairo_800ExtraBold",
       color: colors.primary,
@@ -130,6 +130,32 @@ export default function OrderSuccessScreen() {
       fontFamily: "Cairo_600SemiBold",
       color: colors.success,
       textAlign: "right",
+    },
+    stepsRow: {
+      flexDirection: "row-reverse",
+      justifyContent: "space-around",
+      width: "100%",
+      marginBottom: 28,
+    },
+    stepItem: { alignItems: "center", gap: 6 },
+    stepIcon: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: colors.primary,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    stepText: {
+      fontSize: 11,
+      fontFamily: "Cairo_400Regular",
+      color: colors.mutedForeground,
+    },
+    stepConnector: {
+      width: 30,
+      height: 2,
+      backgroundColor: colors.border,
+      marginTop: 21,
     },
     trackBtn: {
       backgroundColor: colors.navy,
@@ -162,37 +188,10 @@ export default function OrderSuccessScreen() {
       fontSize: 16,
       fontFamily: "Cairo_700Bold",
     },
-    stepsRow: {
-      flexDirection: "row-reverse",
-      justifyContent: "space-around",
-      width: "100%",
-      marginBottom: 28,
-    },
-    stepItem: { alignItems: "center", gap: 6 },
-    stepIcon: {
-      width: 44,
-      height: 44,
-      borderRadius: 22,
-      backgroundColor: colors.primary,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    stepText: {
-      fontSize: 11,
-      fontFamily: "Cairo_400Regular",
-      color: colors.mutedForeground,
-    },
-    stepConnector: {
-      width: 30,
-      height: 2,
-      backgroundColor: colors.border,
-      marginTop: 21,
-    },
   });
 
   return (
     <Animated.View style={[styles.container, { opacity: opacityAnim }]}>
-      {/* Success Icon */}
       <Animated.View style={[styles.outerRing, { transform: [{ scale: scaleAnim }] }]}>
         <View style={styles.successCircle}>
           <Ionicons name="checkmark" size={56} color="#fff" />
@@ -211,17 +210,15 @@ export default function OrderSuccessScreen() {
           شكراً لك على طلبك. سيتم توصيل طلبك في أقرب وقت ممكن.
         </Text>
 
-        {/* Order Number */}
         <View style={styles.orderCard}>
           <Text style={styles.orderLabel}>رقم الطلب</Text>
-          <Text style={styles.orderNumber}>{orderNumber}</Text>
+          <Text style={styles.orderNum}>{orderNumber}</Text>
           <View style={styles.infoRow}>
             <Ionicons name="flash" size={16} color={colors.success} />
             <Text style={styles.infoText}>التوصيل المتوقع: خلال ٢-٣ أيام عمل</Text>
           </View>
         </View>
 
-        {/* Steps */}
         <View style={styles.stepsRow}>
           {[
             { icon: "checkmark-circle", label: "تأكيد الطلب" },
@@ -250,7 +247,15 @@ export default function OrderSuccessScreen() {
           ))}
         </View>
 
-        <TouchableOpacity style={styles.trackBtn}>
+        <TouchableOpacity
+          style={styles.trackBtn}
+          onPress={() =>
+            router.push({
+              pathname: "/order-tracking",
+              params: { orderNumber },
+            } as any)
+          }
+        >
           <Text style={styles.trackBtnText}>تتبع الطلب</Text>
           <Ionicons name="locate-outline" size={20} color="#fff" />
         </TouchableOpacity>

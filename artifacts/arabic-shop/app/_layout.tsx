@@ -19,6 +19,7 @@ import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { ReviewsProvider } from "@/context/ReviewsContext";
 import { NotificationsProvider } from "@/context/NotificationsContext";
+import { RecentlyViewedProvider } from "@/context/RecentlyViewedContext";
 
 I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
@@ -48,6 +49,18 @@ function RootLayoutNav() {
         name="order-success"
         options={{ headerShown: false, presentation: "fullScreenModal" }}
       />
+      <Stack.Screen
+        name="order-tracking"
+        options={{ headerShown: false, presentation: "card" }}
+      />
+      <Stack.Screen
+        name="order-history"
+        options={{ headerShown: false, presentation: "card" }}
+      />
+      <Stack.Screen
+        name="my-coupons"
+        options={{ headerShown: false, presentation: "card" }}
+      />
     </Stack>
   );
 }
@@ -76,11 +89,13 @@ export default function RootLayout() {
             <WishlistProvider>
               <ReviewsProvider>
                 <NotificationsProvider>
-                  <GestureHandlerRootView>
-                    <KeyboardProvider>
-                      <RootLayoutNav />
-                    </KeyboardProvider>
-                  </GestureHandlerRootView>
+                  <RecentlyViewedProvider>
+                    <GestureHandlerRootView>
+                      <KeyboardProvider>
+                        <RootLayoutNav />
+                      </KeyboardProvider>
+                    </GestureHandlerRootView>
+                  </RecentlyViewedProvider>
                 </NotificationsProvider>
               </ReviewsProvider>
             </WishlistProvider>
