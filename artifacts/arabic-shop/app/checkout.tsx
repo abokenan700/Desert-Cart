@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useCart } from "@/context/CartContext";
+import { useNotifications } from "@/context/NotificationsContext";
 
 const STEPS = ["العنوان", "الدفع", "المراجعة"];
 
@@ -35,6 +36,7 @@ export default function CheckoutScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { items, total, delivery, discount, subtotal, clearCart } = useCart();
+  const { scheduleOrderNotifications } = useNotifications();
   const [step, setStep] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [couponCode, setCouponCode] = useState("");
@@ -569,6 +571,7 @@ export default function CheckoutScreen() {
           onPress={() => {
             const orderNum = `SAQ-${Date.now().toString().slice(-6)}`;
             clearCart();
+            scheduleOrderNotifications(orderNum);
             router.replace({
               pathname: "/order-success",
               params: { orderNumber: orderNum },

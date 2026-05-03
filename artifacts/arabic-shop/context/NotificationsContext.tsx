@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, useState } from "react";
+import React, { createContext, useContext, useMemo, useState, useCallback, useRef } from "react";
 
 export interface NotificationItem {
   id: string;
@@ -12,7 +12,11 @@ export interface NotificationItem {
 interface NotificationsContextType {
   notifications: NotificationItem[];
   unreadCount: number;
+  latestToast: NotificationItem | null;
   markAllRead: () => void;
+  addNotification: (n: Omit<NotificationItem, "id" | "unread">) => void;
+  dismissToast: () => void;
+  scheduleOrderNotifications: (orderNumber: string) => void;
 }
 
 const NotificationsContext = createContext<NotificationsContextType | null>(null);
@@ -44,20 +48,95 @@ const INITIAL_NOTIFICATIONS: NotificationItem[] = [
   },
 ];
 
+const ORDER_STAGES: Array<{
+  delay: number;
+  titleAr: (orderNumber: string) => string;
+  bodyAr: (orderNumber: string) => string;
+  type: NotificationItem["type"];
+}> = [
+  {
+    delay: 0,
+    titleAr: (n) => `تم تأكيد طلبك ✅`,
+    bodyAr: (n) => `طلبك رقم ${n} تم استلامه وبدأ فريقنا في معالجته.`,
+    type: "order",
+  },
+  {
+    delay: 8000,
+    titleAr: (n) => `جارٍ تحضير طلبك 📦`,
+    bodyAr: (n) => `طلبك ${n} يُعبَّأ الآن بعناية تمهيداً للشحن.`,
+    type: "order",
+  },
+  {
+    delay: 20000,
+    titleAr: (n) => `طلبك في الطريق إليك 🚗`,
+    bodyAr: (n) => `المندوب انطلق بطلبك ${n}. الوصول المتوقع خلال ٤٥ دقيقة.`,
+    type: "delivery",
+  },
+  {
+    delay: 38000,
+    titleAr: (n) => `تم تسليم طلبك 🎉`,
+    bodyAr: (n) => `وصل طلبك ${n} بنجاح. نتمنى أن تنال إعجابك!`,
+    type: "delivery",
+  },
+];
+
 export function NotificationsProvider({ children }: { children: React.ReactNode }) {
-  const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
+  const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
+  const [latestToast, setLatestToast] = useState<NotificationItem | null>(null);
+  const timerRefs = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const unreadCount = useMemo(
     () => notifications.filter((item) => item.unread).length,
     [notifications]
   );
 
-  const markAllRead = () => {
+  const markAllRead = useCallback(() => {
     setNotifications((current) => current.map((item) => ({ ...item, unread: false })));
-  };
+  }, []);
+
+  const dismissToast = useCallback(() => {
+    setLatestToast(null);
+  }, []);
+
+  const addNotification = useCallback((n: Omit<NotificationItem, "id" | "unread">) => {
+    const newItem: NotificationItem = {
+      ...n,
+      id: `notif-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      unread: true,
+    };
+    setNotifications((current) => [newItem, ...current]);
+    setLatestToast(newItem);
+  }, []);
+
+  const scheduleOrderNotifications = useCallback((orderNumber: string) => {
+    timerRefs.current.forEach(clearTimeout);
+    timerRefs.current = [];
+
+    ORDER_STAGES.forEach((stage) => {
+      const timer = setTimeout(() => {
+        addNotification({
+          titleAr: stage.titleAr(orderNumber),
+          bodyAr: stage.bodyAr(orderNumber),
+          timeAr: "الآن",
+          type: stage.type,
+        });
+      }, stage.delay);
+      timerRefs.current.push(timer);
+    });
+  }, [addNotification]);
 
   return (
-    <NotificationsContext.Provider value={{ notifications, unreadCount, markAllRead }}>
+    <NotificationsContext.Provider
+      value={{
+        notifications,
+        unreadCount,
+        latestToast,
+        markAllRead,
+        addNotification,
+        dismissToast,
+        scheduleOrderNotifications,
+      }}
+    >
       {children}
     </NotificationsContext.Provider>
   );
