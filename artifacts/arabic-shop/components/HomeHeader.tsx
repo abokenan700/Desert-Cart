@@ -11,11 +11,17 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useCart } from "@/context/CartContext";
+import { useNotifications } from "@/context/NotificationsContext";
 
-export default function HomeHeader() {
+interface HomeHeaderProps {
+  onPressNotifications: () => void;
+}
+
+export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { totalCount } = useCart();
+  const { unreadCount } = useNotifications();
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
 
@@ -74,12 +80,13 @@ export default function HomeHeader() {
       position: "absolute",
       top: 4,
       left: 4,
-      width: 16,
+      minWidth: 16,
       height: 16,
       borderRadius: 8,
       backgroundColor: colors.primary,
       alignItems: "center",
       justifyContent: "center",
+      paddingHorizontal: 3,
     },
     badgeText: {
       color: "#fff",
@@ -101,8 +108,13 @@ export default function HomeHeader() {
       </View>
 
       <View style={styles.actions}>
-        <TouchableOpacity style={styles.iconBtn}>
+        <TouchableOpacity style={styles.iconBtn} onPress={onPressNotifications}>
           <Ionicons name="notifications-outline" size={20} color={colors.text} />
+          {unreadCount > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{unreadCount > 9 ? "9+" : unreadCount}</Text>
+            </View>
+          )}
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.iconBtn}

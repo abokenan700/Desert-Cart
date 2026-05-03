@@ -19,6 +19,8 @@ import ProductCard from "@/components/ProductCard";
 import SectionHeader from "@/components/SectionHeader";
 import HomeHeader from "@/components/HomeHeader";
 import VoiceSearch from "@/components/VoiceSearch";
+import NotificationDrawer from "@/components/NotificationDrawer";
+import { useNotifications } from "@/context/NotificationsContext";
 import {
   BANNERS,
   CATEGORIES,
@@ -35,6 +37,8 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [voiceVisible, setVoiceVisible] = useState(false);
+  const [notificationsVisible, setNotificationsVisible] = useState(false);
+  const { notifications, markAllRead } = useNotifications();
 
   const filteredProducts =
     selectedCategory === "all"
@@ -127,14 +131,13 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <HomeHeader />
+      <HomeHeader onPressNotifications={() => setNotificationsVisible(true)} />
 
       <ScrollView
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 80 + bottomPad }}
       >
-        {/* Search Bar */}
         <View style={{ height: 16 }} />
         <View style={styles.searchBar}>
           <TouchableOpacity onPress={() => setVoiceVisible(true)}>
@@ -150,10 +153,8 @@ export default function HomeScreen() {
           <Ionicons name="search-outline" size={18} color={colors.mutedForeground} />
         </View>
 
-        {/* Banner Carousel */}
         <BannerCarousel banners={BANNERS} />
 
-        {/* Categories */}
         <View style={[styles.section, { paddingBottom: 4 }]}>
           <SectionHeader title="التصنيفات" showSeeAll={false} />
           <CategoryRow
@@ -165,13 +166,8 @@ export default function HomeScreen() {
 
         <View style={styles.sectionDivider} />
 
-        {/* Flash Sale */}
         <View style={styles.section}>
-          <SectionHeader
-            title="عروض اليوم"
-            badge="يومي"
-            onSeeAll={() => router.push("/(tabs)/search")}
-          />
+          <SectionHeader title="عروض اليوم" badge="يومي" onSeeAll={() => router.push("/(tabs)/search")} />
           <FlatList
             data={FLASH_SALE_PRODUCTS}
             horizontal
@@ -179,22 +175,16 @@ export default function HomeScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalList}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <ProductCard product={item} style={styles.horizontalCard} />
-            )}
+            renderItem={({ item }) => <ProductCard product={item} style={styles.horizontalCard} />}
             scrollEnabled={FLASH_SALE_PRODUCTS.length > 0}
           />
         </View>
 
         <View style={styles.sectionDivider} />
 
-        {/* Promo Cards */}
         <View style={[styles.section, { marginBottom: 0 }]}>
           <View style={styles.promoRow}>
-            <TouchableOpacity
-              style={[styles.promoCard, { backgroundColor: "#7C3AED" }]}
-              activeOpacity={0.85}
-            >
+            <TouchableOpacity style={[styles.promoCard, { backgroundColor: "#7C3AED" }]} activeOpacity={0.85}>
               <Ionicons name="flash" size={22} color="rgba(255,255,255,0.7)" />
               <View>
                 <Text style={styles.promoTitle}>شحن مجاني</Text>
@@ -205,10 +195,7 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[styles.promoCard, { backgroundColor: "#E63946" }]}
-              activeOpacity={0.85}
-            >
+            <TouchableOpacity style={[styles.promoCard, { backgroundColor: "#E63946" }]} activeOpacity={0.85}>
               <Ionicons name="gift" size={22} color="rgba(255,255,255,0.7)" />
               <View>
                 <Text style={styles.promoTitle}>عروض حصرية</Text>
@@ -223,12 +210,8 @@ export default function HomeScreen() {
 
         <View style={styles.sectionDivider} />
 
-        {/* New Arrivals */}
         <View style={styles.section}>
-          <SectionHeader
-            title="وصل حديثاً"
-            onSeeAll={() => router.push("/(tabs)/search")}
-          />
+          <SectionHeader title="وصل حديثاً" onSeeAll={() => router.push("/(tabs)/search")} />
           <FlatList
             data={NEW_ARRIVALS}
             horizontal
@@ -236,34 +219,25 @@ export default function HomeScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalList}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <ProductCard product={item} style={styles.horizontalCard} />
-            )}
+            renderItem={({ item }) => <ProductCard product={item} style={styles.horizontalCard} />}
             scrollEnabled={NEW_ARRIVALS.length > 0}
           />
         </View>
 
         <View style={styles.sectionDivider} />
 
-        {/* Featured Products Grid */}
         <View style={styles.section}>
-          <SectionHeader
-            title="الأكثر مبيعاً"
-            onSeeAll={() => router.push("/(tabs)/search")}
-          />
+          <SectionHeader title="الأكثر مبيعاً" onSeeAll={() => router.push("/(tabs)/search")} />
           <View style={styles.productGrid}>
-            {(selectedCategory === "all" ? FEATURED_PRODUCTS : filteredProducts).map(
-              (product) => (
-                <View key={product.id} style={styles.gridItem}>
-                  <ProductCard product={product} />
-                </View>
-              )
-            )}
+            {(selectedCategory === "all" ? FEATURED_PRODUCTS : filteredProducts).map((product) => (
+              <View key={product.id} style={styles.gridItem}>
+                <ProductCard product={product} />
+              </View>
+            ))}
           </View>
         </View>
       </ScrollView>
 
-      {/* Voice Search Modal */}
       <VoiceSearch
         visible={voiceVisible}
         onResult={(text) => {
@@ -271,6 +245,13 @@ export default function HomeScreen() {
           router.push({ pathname: "/(tabs)/search", params: { q: text } });
         }}
         onClose={() => setVoiceVisible(false)}
+      />
+
+      <NotificationDrawer
+        visible={notificationsVisible}
+        notifications={notifications}
+        onClose={() => setNotificationsVisible(false)}
+        onMarkAllRead={markAllRead}
       />
     </View>
   );

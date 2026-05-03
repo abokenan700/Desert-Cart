@@ -18,6 +18,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { ReviewsProvider } from "@/context/ReviewsContext";
+import { NotificationsProvider } from "@/context/NotificationsContext";
 
 I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
@@ -74,11 +75,13 @@ export default function RootLayout() {
           <CartProvider>
             <WishlistProvider>
               <ReviewsProvider>
-                <GestureHandlerRootView>
-                  <KeyboardProvider>
-                    <RootLayoutNav />
-                  </KeyboardProvider>
-                </GestureHandlerRootView>
+                <NotificationsProvider>
+                  <GestureHandlerRootView>
+                    <KeyboardProvider>
+                      <RootLayoutNav />
+                    </KeyboardProvider>
+                  </GestureHandlerRootView>
+                </NotificationsProvider>
               </ReviewsProvider>
             </WishlistProvider>
           </CartProvider>
