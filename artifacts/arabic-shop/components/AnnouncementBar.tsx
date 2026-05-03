@@ -4,12 +4,9 @@ import {
   Text,
   StyleSheet,
   Animated,
-  Dimensions,
   Platform,
 } from "react-native";
 import { useColors } from "@/hooks/useColors";
-
-const { width } = Dimensions.get("window");
 
 const ANNOUNCEMENTS = [
   "🎉 شحن مجاني على جميع الطلبات فوق ٥٠٠ ر.س",
@@ -18,23 +15,56 @@ const ANNOUNCEMENTS = [
   "💳 الدفع الآن أسهل مع خدمة التقسيط المتاح",
 ];
 
+const DISPLAY_DURATION = 3000;
+const ANIMATION_DURATION = 500;
+
 export default function AnnouncementBar() {
   const colors = useColors();
-  const scrollX = useRef(new Animated.Value(0)).current;
-  const textWidth = useRef(0);
+  const translateY = useRef(new Animated.Value(24)).current;
+  const opacity = useRef(new Animated.Value(0)).current;
+  const currentIndex = useRef(0);
 
   useEffect(() => {
-    const totalWidth = textWidth.current + width;
-    const animation = Animated.loop(
-      Animated.timing(scrollX, {
-        toValue: -totalWidth,
-        duration: ANNOUNCEMENTS.length * 8000,
-        useNativeDriver: true,
-      })
-    );
-    animation.start();
-    return () => animation.stop();
-  }, [scrollX]);
+    const animateNext = () => {
+      const announcement = ANNOUNCEMENTS[currentIndex.current];
+      
+      Animated.parallel([
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: ANIMATION_DURATION,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: ANIMATION_DURATION,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      const displayTimer = setTimeout(() => {
+        Animated.parallel([
+          Animated.timing(translateY, {
+            toValue: -24,
+            duration: ANIMATION_DURATION,
+            useNativeDriver: true,
+          }),
+          Animated.timing(opacity, {
+            toValue: 0,
+            duration: ANIMATION_DURATION,
+            useNativeDriver: true,
+          }),
+        ]).start(() => {
+          currentIndex.current = (currentIndex.current + 1) % ANNOUNCEMENTS.length;
+          translateY.setValue(24);
+          animateNext();
+        });
+      }, DISPLAY_DURATION);
+
+      return () => clearTimeout(displayTimer);
+    };
+
+    animateNext();
+  }, [translateY, opacity]);
 
   const styles = useMemo(() => StyleSheet.create({
     container: {
@@ -43,45 +73,30 @@ export default function AnnouncementBar() {
       overflow: "hidden",
       justifyContent: "center",
     },
-    scroll: {
-      flexDirection: "row-reverse",
-      alignItems: "center",
-    },
     text: {
       fontSize: 12,
       fontFamily: "Cairo_600SemiBold",
       color: "#fff",
       paddingHorizontal: 16,
+      textAlign: "center",
       writingDirection: "rtl",
-      whiteSpace: "nowrap",
-    },
-    separator: {
-      width: 1,
-      height: 12,
-      backgroundColor: "rgba(255,255,255,0.3)",
     },
   }), [colors]);
 
   return (
     <View style={styles.container}>
-      <Animated.View
+      <Animated.Text
         style={[
-          styles.scroll,
-          { transform: [{ translateX: scrollX }] },
+          styles.text,
+          {
+            transform: [{ translateY }],
+            opacity,
+          },
         ]}
-        onLayout={(e) => {
-          textWidth.current = e.nativeEvent.layout.width;
-        }}
+        numberOfLines={1}
       >
-        {ANNOUNCEMENTS.map((announcement, idx) => (
-          <React.Fragment key={idx}>
-            <Text style={styles.text}>{announcement}</Text>
-            {idx < ANNOUNCEMENTS.length - 1 && (
-              <View style={styles.separator} />
-            )}
-          </React.Fragment>
-        ))}
-      </Animated.View>
+        {ANNOUNCEMENTS[currentIndex.current]}
+      </Animated.Text>
     </View>
   );
 }
