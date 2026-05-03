@@ -155,15 +155,6 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
         {banners.map((banner) => (
           <TouchableOpacity key={banner.id} activeOpacity={0.97} style={styles.slide}>
             <Image source={banner.image} style={styles.image} resizeMode="cover" />
-            <View style={styles.overlay}>
-              <Text style={styles.title}>{banner.titleAr}</Text>
-              <Text style={styles.subtitle}>{banner.subtitleAr}</Text>
-              <TouchableOpacity style={styles.cta}>
-                <Text style={[styles.ctaText, { color: banner.bgGradient[0] }]}>
-                  {banner.ctaAr}
-                </Text>
-              </TouchableOpacity>
-            </View>
           </TouchableOpacity>
         ))}
       </ScrollView>
