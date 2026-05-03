@@ -104,7 +104,7 @@ export default function ProductDetailScreen() {
     backBtn: {
       position: "absolute",
       top: topPad + 8,
-      left: 16,
+      right: 16,
       width: 40,
       height: 40,
       borderRadius: 20,
@@ -115,7 +115,7 @@ export default function ProductDetailScreen() {
     wishBtn: {
       position: "absolute",
       top: topPad + 8,
-      right: 16,
+      left: 16,
       width: 40,
       height: 40,
       borderRadius: 20,
@@ -126,7 +126,7 @@ export default function ProductDetailScreen() {
     shareBtn: {
       position: "absolute",
       top: topPad + 56,
-      right: 16,
+      left: 16,
       width: 40,
       height: 40,
       borderRadius: 20,

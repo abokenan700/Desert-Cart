@@ -89,6 +89,7 @@ export default function TabLayout() {
           height: isWeb ? 84 : 68,
           paddingBottom: isWeb ? 16 : 10,
           paddingTop: 6,
+          flexDirection: "row-reverse",
         },
         tabBarLabelStyle: {
           fontFamily: "Cairo_600SemiBold",

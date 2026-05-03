@@ -135,7 +135,7 @@ export default function CartScreen() {
     deleteBtn: {
       position: "absolute",
       top: 10,
-      left: 10,
+      right: 10,
       width: 28,
       height: 28,
       borderRadius: 14,

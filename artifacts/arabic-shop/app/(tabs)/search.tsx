@@ -371,7 +371,7 @@ export default function SearchScreen() {
         <View style={styles.sortBar}>
           <Text style={styles.resultsCount}>{filteredProducts.length} نتيجة</Text>
           <TouchableOpacity style={styles.sortPicker} onPress={openFilter}>
-            <Ionicons name="chevron-back" size={14} color={colors.primary} />
+            <Ionicons name="chevron-down" size={14} color={colors.primary} />
             <Text style={styles.sortLabel}>
               {SORT_OPTIONS.find((s) => s.id === sortBy)?.label}
             </Text>
