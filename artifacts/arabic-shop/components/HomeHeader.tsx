@@ -53,7 +53,14 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
       fontFamily: "Cairo_800ExtraBold",
       color: colors.text,
       writingDirection: "rtl",
-      marginTop: -6,
+      marginTop: -10,
+    },
+    storeTagline: {
+      fontSize: 10,
+      fontFamily: "Cairo_400Regular",
+      color: colors.mutedForeground,
+      writingDirection: "rtl",
+      marginTop: 1,
     },
     actions: {
       flexDirection: "row-reverse",
@@ -97,7 +104,10 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
           source={require("@/assets/logo.png")}
           style={styles.logoImage}
         />
-        <Text style={styles.storeName}>الاسطورة</Text>
+        <View>
+          <Text style={styles.storeName}>الاسطورة</Text>
+          <Text style={styles.storeTagline}>لخدمات الهواتف والملابس الجاهزة</Text>
+        </View>
       </View>
 
       <View style={styles.actions}>
