@@ -59,7 +59,7 @@ export default function HomeScreen() {
     scroll: { flex: 1 },
     searchBar: {
       marginHorizontal: 16,
-      marginBottom: 16,
+      marginBottom: 0,
       flexDirection: "row-reverse",
       alignItems: "center",
       backgroundColor: colors.card,
