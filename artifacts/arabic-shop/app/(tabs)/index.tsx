@@ -18,6 +18,7 @@ import CategoryRow from "@/components/CategoryRow";
 import ProductCard from "@/components/ProductCard";
 import SectionHeader from "@/components/SectionHeader";
 import HomeHeader from "@/components/HomeHeader";
+import AnnouncementBar from "@/components/AnnouncementBar";
 import VoiceSearch from "@/components/VoiceSearch";
 import NotificationDrawer from "@/components/NotificationDrawer";
 import FlashSaleTimer from "@/components/FlashSaleTimer";
@@ -166,6 +167,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
+      <AnnouncementBar />
       <HomeHeader onPressNotifications={() => setNotificationsVisible(true)} />
 
       <ScrollView
