@@ -7,7 +7,7 @@ import {
   ScrollView,
   Platform,
   Alert,
-  Clipboard,
+  Share,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -78,10 +78,12 @@ export default function MyCouponsScreen() {
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
-  const handleCopy = (code: string) => {
+  const handleCopy = async (code: string) => {
     try {
-      Clipboard.setString(code);
-    } catch {}
+      await Share.share({ message: code });
+    } catch {
+      Alert.alert("نسخ الكود", code);
+    }
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(null), 2000);
   };
