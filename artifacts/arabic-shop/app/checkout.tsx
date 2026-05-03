@@ -56,6 +56,7 @@ export default function CheckoutScreen() {
   const [district, setDistrict] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [addressDetail, setAddressDetail] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const couponShake = useRef(new Animated.Value(0)).current;
   const placeBtnScale = useRef(new Animated.Value(1)).current;
 
@@ -66,6 +67,34 @@ export default function CheckoutScreen() {
     ? Math.floor(subtotal * appliedCoupon.discount)
     : 0;
   const finalTotal = Math.max(0, total - couponSavings);
+
+  const validateAndAdvance = useCallback(() => {
+    if (selectedAddress) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      setStep(1);
+      return;
+    }
+
+    const errors: Record<string, string> = {};
+    if (!fullName.trim()) errors.fullName = "الاسم الكامل مطلوب";
+    if (!phone.trim()) {
+      errors.phone = "رقم الجوال مطلوب";
+    } else if (!/^05\d{8}$/.test(phone.trim())) {
+      errors.phone = "رقم الجوال يجب أن يبدأ بـ 05 ويتكون من 10 أرقام";
+    }
+    if (!city.trim()) errors.city = "المدينة مطلوبة";
+    if (!district.trim()) errors.district = "الحي مطلوب";
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      return;
+    }
+
+    setFieldErrors({});
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setStep(1);
+  }, [selectedAddress, fullName, phone, city, district]);
 
   const applyCoupon = useCallback(
     (code: string) => {
@@ -476,6 +505,18 @@ export default function CheckoutScreen() {
           fontSize: 17,
           fontFamily: "Cairo_700Bold",
         },
+        fieldError: {
+          fontSize: 12,
+          fontFamily: "Cairo_400Regular",
+          color: colors.destructive,
+          textAlign: "right",
+          marginTop: -8,
+          marginBottom: 8,
+        },
+        inputInvalid: {
+          borderColor: colors.destructive,
+          borderWidth: 1.5,
+        },
       }),
     [colors, topPad, bottomPad]
   );
@@ -504,7 +545,10 @@ export default function CheckoutScreen() {
                     ]}
                     onPress={() => {
                       Haptics.selectionAsync();
-                      setSelectedAddress(addr.id);
+                      setSelectedAddress((prev) =>
+                        prev === addr.id ? "" : addr.id
+                      );
+                      setFieldErrors({});
                     }}
                   >
                     <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6 }}>
@@ -538,43 +582,83 @@ export default function CheckoutScreen() {
 
             <Text style={styles.inputLabel}>الاسم الكامل</Text>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                fieldErrors.fullName ? styles.inputInvalid : null,
+              ]}
               placeholder="سارة العمري"
               placeholderTextColor={colors.mutedForeground}
               textAlign="right"
               value={fullName}
-              onChangeText={setFullName}
+              onChangeText={(t) => {
+                setFullName(t);
+                if (fieldErrors.fullName)
+                  setFieldErrors((e) => ({ ...e, fullName: "" }));
+              }}
             />
+            {!!fieldErrors.fullName && (
+              <Text style={styles.fieldError}>✕ {fieldErrors.fullName}</Text>
+            )}
             <Text style={styles.inputLabel}>رقم الجوال</Text>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                fieldErrors.phone ? styles.inputInvalid : null,
+              ]}
               placeholder="05XXXXXXXX"
               placeholderTextColor={colors.mutedForeground}
               keyboardType="phone-pad"
               textAlign="right"
               value={phone}
-              onChangeText={setPhone}
+              onChangeText={(t) => {
+                setPhone(t);
+                if (fieldErrors.phone)
+                  setFieldErrors((e) => ({ ...e, phone: "" }));
+              }}
             />
+            {!!fieldErrors.phone && (
+              <Text style={styles.fieldError}>✕ {fieldErrors.phone}</Text>
+            )}
             <Text style={styles.inputLabel}>المدينة</Text>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                fieldErrors.city ? styles.inputInvalid : null,
+              ]}
               placeholder="الرياض"
               placeholderTextColor={colors.mutedForeground}
               textAlign="right"
               value={city}
-              onChangeText={setCity}
+              onChangeText={(t) => {
+                setCity(t);
+                if (fieldErrors.city)
+                  setFieldErrors((e) => ({ ...e, city: "" }));
+              }}
             />
+            {!!fieldErrors.city && (
+              <Text style={styles.fieldError}>✕ {fieldErrors.city}</Text>
+            )}
             <View style={styles.row2}>
               <View style={styles.inputHalf}>
                 <Text style={styles.inputLabel}>الحي</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[
+                    styles.input,
+                    fieldErrors.district ? styles.inputInvalid : null,
+                  ]}
                   placeholder="العليا"
                   placeholderTextColor={colors.mutedForeground}
                   textAlign="right"
                   value={district}
-                  onChangeText={setDistrict}
+                  onChangeText={(t) => {
+                    setDistrict(t);
+                    if (fieldErrors.district)
+                      setFieldErrors((e) => ({ ...e, district: "" }));
+                  }}
                 />
+                {!!fieldErrors.district && (
+                  <Text style={styles.fieldError}>✕ {fieldErrors.district}</Text>
+                )}
               </View>
               <View style={styles.inputHalf}>
                 <Text style={styles.inputLabel}>الرمز البريدي</Text>
@@ -612,10 +696,7 @@ export default function CheckoutScreen() {
             >
               <TouchableOpacity
                 style={styles.nextBtnGrad}
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  setStep(1);
-                }}
+                onPress={validateAndAdvance}
                 activeOpacity={0.88}
               >
                 <Text style={styles.nextBtnText}>التالي: طريقة الدفع ←</Text>
