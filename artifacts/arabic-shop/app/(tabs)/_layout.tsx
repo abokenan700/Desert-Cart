@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Platform, StyleSheet, View, Text } from "react-native";
 import { useColors } from "@/hooks/useColors";
+import { useTheme } from "@/context/ThemeContext";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 
@@ -71,6 +72,7 @@ function WishlistTabIcon({ color, focused }: { color: string; focused: boolean }
 
 export default function TabLayout() {
   const colors = useColors();
+  const { isDark } = useTheme();
   const isIOS = Platform.OS === "ios";
   const isWeb = Platform.OS === "web";
 
@@ -98,7 +100,7 @@ export default function TabLayout() {
           isIOS ? (
             <BlurView
               intensity={95}
-              tint="light"
+              tint={isDark ? "dark" : "light"}
               style={StyleSheet.absoluteFill}
             />
           ) : (

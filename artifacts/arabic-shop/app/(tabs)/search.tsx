@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from "react";
+import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -10,12 +10,15 @@ import {
   Animated,
   Dimensions,
   Platform,
+  RefreshControl,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { useColors } from "@/hooks/useColors";
+import { useAppToast } from "@/context/AppToastContext";
 import ProductCard from "@/components/ProductCard";
+import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import CategoryRow from "@/components/CategoryRow";
 import VoiceSearch from "@/components/VoiceSearch";
 import { PRODUCTS, CATEGORIES } from "@/data/mockData";
@@ -43,6 +46,7 @@ const PRICE_RANGES: { label: string; range: [number, number] }[] = [
 export default function SearchScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const { showToast } = useAppToast();
   const params = useLocalSearchParams<{ q?: string }>();
   const [query, setQuery] = useState(params.q ?? "");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -50,6 +54,7 @@ export default function SearchScreen() {
   const [filterVisible, setFilterVisible] = useState(false);
   const [voiceVisible, setVoiceVisible] = useState(false);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
+  const [refreshing, setRefreshing] = useState(false);
   const filterAnim = useRef(new Animated.Value(height)).current;
   const inputRef = useRef<TextInput>(null);
 
@@ -59,6 +64,14 @@ export default function SearchScreen() {
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+      showToast("تم تحديث النتائج", "success");
+    }, 900);
+  }, [showToast]);
 
   const openFilter = () => {
     setFilterVisible(true);
@@ -383,8 +396,26 @@ export default function SearchScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 80 + bottomPad }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
+          />
+        }
       >
-        {showPopular ? (
+        {refreshing ? (
+          <View style={styles.popularSection}>
+            <View style={[styles.grid, { paddingHorizontal: 0 }]}>
+              {[1, 2, 3, 4, 5, 6].map((k) => (
+                <View key={k} style={styles.gridItem}>
+                  <ProductCardSkeleton />
+                </View>
+              ))}
+            </View>
+          </View>
+        ) : showPopular ? (
           <View style={styles.popularSection}>
             <Text style={styles.popularTitle}>البحث الشائع</Text>
             <View style={styles.tagsRow}>

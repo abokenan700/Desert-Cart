@@ -11,6 +11,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
+import { useTheme } from "@/context/ThemeContext";
 import { useCart } from "@/context/CartContext";
 import { useNotifications } from "@/context/NotificationsContext";
 
@@ -20,87 +21,100 @@ interface HomeHeaderProps {
 
 export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
   const colors = useColors();
+  const { isDark, toggleTheme } = useTheme();
   const insets = useSafeAreaInsets();
   const { totalCount } = useCart();
   const { unreadCount } = useNotifications();
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
 
-  const styles = useMemo(() => StyleSheet.create({
-    header: {
-      backgroundColor: colors.card,
-      paddingTop: 10,
-      paddingBottom: 12,
-      paddingHorizontal: 16,
-      flexDirection: "row-reverse",
-      alignItems: "center",
-      justifyContent: "space-between",
-      borderBottomWidth: 1,
-      borderBottomColor: `${colors.border}50`,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.06,
-      shadowRadius: 3,
-      elevation: 2,
-    },
-    logoSection: {
-      flexDirection: "row-reverse",
-      alignItems: "center",
-      gap: 8,
-    },
-    logoImage: {
-      width: 42,
-      height: 42,
-      resizeMode: "contain",
-    },
-    storeName: {
-      fontSize: 18,
-      fontFamily: "Cairo_800ExtraBold",
-      color: colors.gold,
-      writingDirection: "rtl",
-      marginTop: -10,
-    },
-    storeTagline: {
-      fontSize: 10,
-      fontFamily: "Cairo_400Regular",
-      color: colors.mutedForeground,
-      writingDirection: "rtl",
-      marginTop: -2,
-    },
-    actions: {
-      flexDirection: "row-reverse",
-      alignItems: "center",
-      gap: 6,
-    },
-    iconBtn: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      backgroundColor: colors.secondary,
-      alignItems: "center",
-      justifyContent: "center",
-      position: "relative",
-    },
-    badge: {
-      position: "absolute",
-      top: -4,
-      right: -4,
-      minWidth: 16,
-      height: 16,
-      borderRadius: 8,
-      backgroundColor: colors.primary,
-      alignItems: "center",
-      justifyContent: "center",
-      paddingHorizontal: 3,
-      borderWidth: 1.5,
-      borderColor: colors.card,
-    },
-    badgeText: {
-      color: "#fff",
-      fontSize: 9,
-      fontFamily: "Cairo_700Bold",
-    },
-  }), [colors, topPad]);
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        header: {
+          backgroundColor: colors.card,
+          paddingTop: 10,
+          paddingBottom: 12,
+          paddingHorizontal: 16,
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          justifyContent: "space-between",
+          borderBottomWidth: 1,
+          borderBottomColor: `${colors.border}50`,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.06,
+          shadowRadius: 3,
+          elevation: 2,
+        },
+        logoSection: {
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          gap: 8,
+        },
+        logoImage: {
+          width: 42,
+          height: 42,
+          resizeMode: "contain",
+        },
+        storeName: {
+          fontSize: 18,
+          fontFamily: "Cairo_800ExtraBold",
+          color: colors.gold,
+          writingDirection: "rtl",
+          marginTop: -10,
+        },
+        storeTagline: {
+          fontSize: 10,
+          fontFamily: "Cairo_400Regular",
+          color: colors.mutedForeground,
+          writingDirection: "rtl",
+          marginTop: -2,
+        },
+        actions: {
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          gap: 6,
+        },
+        iconBtn: {
+          width: 40,
+          height: 40,
+          borderRadius: 20,
+          backgroundColor: colors.secondary,
+          alignItems: "center",
+          justifyContent: "center",
+          position: "relative",
+        },
+        themeBtn: {
+          width: 40,
+          height: 40,
+          borderRadius: 20,
+          backgroundColor: isDark ? colors.primaryLight : colors.goldLight,
+          alignItems: "center",
+          justifyContent: "center",
+        },
+        badge: {
+          position: "absolute",
+          top: -4,
+          right: -4,
+          minWidth: 16,
+          height: 16,
+          borderRadius: 8,
+          backgroundColor: colors.primary,
+          alignItems: "center",
+          justifyContent: "center",
+          paddingHorizontal: 3,
+          borderWidth: 1.5,
+          borderColor: colors.card,
+        },
+        badgeText: {
+          color: "#fff",
+          fontSize: 9,
+          fontFamily: "Cairo_700Bold",
+        },
+      }),
+    [colors, topPad, isDark]
+  );
 
   return (
     <View style={styles.header}>
@@ -116,6 +130,18 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
       </View>
 
       <View style={styles.actions}>
+        <TouchableOpacity
+          style={styles.themeBtn}
+          onPress={toggleTheme}
+          accessibilityLabel={isDark ? "تفعيل الوضع الفاتح" : "تفعيل الوضع الداكن"}
+          accessibilityRole="button"
+        >
+          <Ionicons
+            name={isDark ? "sunny" : "moon"}
+            size={19}
+            color={isDark ? colors.gold : colors.navy}
+          />
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.iconBtn}
           onPress={onPressNotifications}

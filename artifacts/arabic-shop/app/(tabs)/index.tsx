@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import {
   View,
   Text,
@@ -8,14 +8,17 @@ import {
   FlatList,
   Dimensions,
   Platform,
+  RefreshControl,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
+import { useAppToast } from "@/context/AppToastContext";
 import BannerCarousel from "@/components/BannerCarousel";
 import CategoryRow from "@/components/CategoryRow";
 import ProductCard from "@/components/ProductCard";
+import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import SectionHeader from "@/components/SectionHeader";
 import HomeHeader from "@/components/HomeHeader";
 import AnnouncementBar from "@/components/AnnouncementBar";
@@ -38,9 +41,11 @@ const { width } = Dimensions.get("window");
 export default function HomeScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const { showToast } = useAppToast();
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [voiceVisible, setVoiceVisible] = useState(false);
   const [notificationsVisible, setNotificationsVisible] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const { notifications, markAllRead } = useNotifications();
   const { recentlyViewed } = useRecentlyViewed();
 
@@ -53,6 +58,14 @@ export default function HomeScreen() {
   );
 
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+      showToast("تم تحديث المنتجات", "success");
+    }, 900);
+  }, [showToast]);
 
   const styles = useMemo(() => StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
@@ -91,6 +104,13 @@ export default function HomeScreen() {
       flexWrap: "wrap",
       paddingHorizontal: 12,
       justifyContent: "space-between",
+    },
+    skeletonGrid: {
+      flexDirection: "row-reverse",
+      flexWrap: "wrap",
+      paddingHorizontal: 12,
+      justifyContent: "space-between",
+      gap: 0,
     },
     gridItem: { paddingHorizontal: 4 },
     promoRow: {
@@ -181,6 +201,14 @@ export default function HomeScreen() {
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 80 + bottomPad }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
+          />
+        }
       >
         <View style={{ height: 6 }} />
         <View style={styles.searchBar}>
@@ -219,18 +247,26 @@ export default function HomeScreen() {
               </View>
             </View>
           </View>
-          <FlatList
-            data={FLASH_SALE_PRODUCTS}
-            horizontal
-            inverted
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.horizontalList}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <ProductCard product={item} style={styles.horizontalCard} />
-            )}
-            scrollEnabled={FLASH_SALE_PRODUCTS.length > 0}
-          />
+          {refreshing ? (
+            <View style={{ flexDirection: "row-reverse", paddingHorizontal: 16, gap: 12 }}>
+              {[1, 2].map((k) => (
+                <ProductCardSkeleton key={k} />
+              ))}
+            </View>
+          ) : (
+            <FlatList
+              data={FLASH_SALE_PRODUCTS}
+              horizontal
+              inverted
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.horizontalList}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <ProductCard product={item} style={styles.horizontalCard} />
+              )}
+              scrollEnabled={FLASH_SALE_PRODUCTS.length > 0}
+            />
+          )}
         </View>
 
         <View style={styles.sectionDivider} />
@@ -274,18 +310,26 @@ export default function HomeScreen() {
             title="وصل حديثاً"
             onSeeAll={() => router.push("/(tabs)/search")}
           />
-          <FlatList
-            data={NEW_ARRIVALS}
-            horizontal
-            inverted
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.horizontalList}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <ProductCard product={item} style={styles.horizontalCard} />
-            )}
-            scrollEnabled={NEW_ARRIVALS.length > 0}
-          />
+          {refreshing ? (
+            <View style={{ flexDirection: "row-reverse", paddingHorizontal: 16, gap: 12 }}>
+              {[1, 2].map((k) => (
+                <ProductCardSkeleton key={k} />
+              ))}
+            </View>
+          ) : (
+            <FlatList
+              data={NEW_ARRIVALS}
+              horizontal
+              inverted
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.horizontalList}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <ProductCard product={item} style={styles.horizontalCard} />
+              )}
+              scrollEnabled={NEW_ARRIVALS.length > 0}
+            />
+          )}
         </View>
 
         <View style={styles.sectionDivider} />
@@ -315,15 +359,25 @@ export default function HomeScreen() {
             title="الأكثر مبيعاً"
             onSeeAll={() => router.push("/(tabs)/search")}
           />
-          <View style={styles.productGrid}>
-            {(selectedCategory === "all" ? FEATURED_PRODUCTS : filteredProducts).map(
-              (product) => (
-                <View key={product.id} style={styles.gridItem}>
-                  <ProductCard product={product} />
+          {refreshing ? (
+            <View style={styles.skeletonGrid}>
+              {[1, 2, 3, 4].map((k) => (
+                <View key={k} style={styles.gridItem}>
+                  <ProductCardSkeleton />
                 </View>
-              )
-            )}
-          </View>
+              ))}
+            </View>
+          ) : (
+            <View style={styles.productGrid}>
+              {(selectedCategory === "all" ? FEATURED_PRODUCTS : filteredProducts).map(
+                (product) => (
+                  <View key={product.id} style={styles.gridItem}>
+                    <ProductCard product={product} />
+                  </View>
+                )
+              )}
+            </View>
+          )}
         </View>
       </ScrollView>
 

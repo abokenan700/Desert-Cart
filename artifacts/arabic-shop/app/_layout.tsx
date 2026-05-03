@@ -20,7 +20,10 @@ import { WishlistProvider } from "@/context/WishlistContext";
 import { ReviewsProvider } from "@/context/ReviewsContext";
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { RecentlyViewedProvider } from "@/context/RecentlyViewedContext";
+import { ThemeProvider } from "@/context/ThemeContext";
+import { AppToastProvider } from "@/context/AppToastContext";
 import ToastNotification from "@/components/ToastNotification";
+import AppToast from "@/components/AppToast";
 
 I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
@@ -65,6 +68,7 @@ function RootLayoutNav() {
         />
       </Stack>
       <ToastNotification />
+      <AppToast />
     </View>
   );
 }
@@ -88,23 +92,27 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <ErrorBoundary>
-        <QueryClientProvider client={queryClient}>
-          <CartProvider>
-            <WishlistProvider>
-              <ReviewsProvider>
-                <NotificationsProvider>
-                  <RecentlyViewedProvider>
-                    <GestureHandlerRootView>
-                      <KeyboardProvider>
-                        <RootLayoutNav />
-                      </KeyboardProvider>
-                    </GestureHandlerRootView>
-                  </RecentlyViewedProvider>
-                </NotificationsProvider>
-              </ReviewsProvider>
-            </WishlistProvider>
-          </CartProvider>
-        </QueryClientProvider>
+        <ThemeProvider>
+          <AppToastProvider>
+            <QueryClientProvider client={queryClient}>
+              <CartProvider>
+                <WishlistProvider>
+                  <ReviewsProvider>
+                    <NotificationsProvider>
+                      <RecentlyViewedProvider>
+                        <GestureHandlerRootView>
+                          <KeyboardProvider>
+                            <RootLayoutNav />
+                          </KeyboardProvider>
+                        </GestureHandlerRootView>
+                      </RecentlyViewedProvider>
+                    </NotificationsProvider>
+                  </ReviewsProvider>
+                </WishlistProvider>
+              </CartProvider>
+            </QueryClientProvider>
+          </AppToastProvider>
+        </ThemeProvider>
       </ErrorBoundary>
     </SafeAreaProvider>
   );

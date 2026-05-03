@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
+import { useTheme } from "@/context/ThemeContext";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 
@@ -27,6 +28,7 @@ interface MenuItem {
 
 export default function ProfileScreen() {
   const colors = useColors();
+  const { isDark, toggleTheme } = useTheme();
   const insets = useSafeAreaInsets();
   const { totalCount } = useCart();
   const { count: wishlistCount } = useWishlist();
@@ -152,31 +154,42 @@ export default function ProfileScreen() {
       width: 1,
       backgroundColor: colors.border,
     },
-    notifCard: {
+    toggleCard: {
       marginHorizontal: 16,
       marginTop: 16,
       backgroundColor: colors.card,
       borderRadius: 14,
+      overflow: "hidden",
+    },
+    toggleRow: {
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      flexDirection: "row-reverse",
+      alignItems: "center",
+      justifyContent: "space-between",
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    toggleRowLast: {
       paddingHorizontal: 16,
       paddingVertical: 14,
       flexDirection: "row-reverse",
       alignItems: "center",
       justifyContent: "space-between",
     },
-    notifLeft: {
+    toggleLeft: {
       flexDirection: "row-reverse",
       alignItems: "center",
       gap: 12,
     },
-    notifIconBox: {
+    toggleIconBox: {
       width: 40,
       height: 40,
       borderRadius: 12,
-      backgroundColor: colors.goldLight,
       alignItems: "center",
       justifyContent: "center",
     },
-    notifLabel: {
+    toggleLabel: {
       fontSize: 15,
       fontFamily: "Cairo_600SemiBold",
       color: colors.text,
@@ -233,7 +246,6 @@ export default function ProfileScreen() {
       fontSize: 11,
       fontFamily: "Cairo_700Bold",
     },
-    menuArrow: {},
     versionText: {
       textAlign: "center",
       fontSize: 12,
@@ -317,19 +329,46 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        <View style={[styles.notifCard, { marginTop: 16 }]}>
-          <View style={styles.notifLeft}>
-            <View style={styles.notifIconBox}>
-              <Ionicons name="notifications" size={20} color={colors.gold} />
+        <View style={styles.toggleCard}>
+          <View style={styles.toggleRow}>
+            <View style={styles.toggleLeft}>
+              <View style={[styles.toggleIconBox, { backgroundColor: colors.goldLight }]}>
+                <Ionicons name="notifications" size={20} color={colors.gold} />
+              </View>
+              <Text style={styles.toggleLabel}>الإشعارات</Text>
             </View>
-            <Text style={styles.notifLabel}>الإشعارات</Text>
+            <Switch
+              value={notifications}
+              onValueChange={setNotifications}
+              trackColor={{ false: colors.border, true: colors.primary }}
+              thumbColor="#fff"
+            />
           </View>
-          <Switch
-            value={notifications}
-            onValueChange={setNotifications}
-            trackColor={{ false: colors.border, true: colors.primary }}
-            thumbColor="#fff"
-          />
+          <View style={styles.toggleRowLast}>
+            <View style={styles.toggleLeft}>
+              <View
+                style={[
+                  styles.toggleIconBox,
+                  { backgroundColor: isDark ? colors.navyLight : colors.goldLight },
+                ]}
+              >
+                <Ionicons
+                  name={isDark ? "moon" : "sunny"}
+                  size={20}
+                  color={isDark ? colors.navy : colors.gold}
+                />
+              </View>
+              <Text style={styles.toggleLabel}>
+                {isDark ? "الوضع الداكن" : "الوضع الفاتح"}
+              </Text>
+            </View>
+            <Switch
+              value={isDark}
+              onValueChange={toggleTheme}
+              trackColor={{ false: colors.border, true: colors.navy }}
+              thumbColor="#fff"
+            />
+          </View>
         </View>
 
         {menuSections.map((section) => (
