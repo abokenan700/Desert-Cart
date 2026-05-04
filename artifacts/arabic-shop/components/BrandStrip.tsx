@@ -32,7 +32,7 @@ const BRANDS: Brand[] = [
 ];
 
 interface BrandStripProps {
-  onBrandPress?: (brandId: string) => void;
+  onBrandPress?: (brandNameAr: string) => void;
 }
 
 export default function BrandStrip({ onBrandPress }: BrandStripProps) {
@@ -47,7 +47,6 @@ export default function BrandStrip({ onBrandPress }: BrandStripProps) {
           borderBottomWidth: 1,
           borderBottomColor: colors.border,
         },
-        scroll: {},
         contentContainer: {
           paddingHorizontal: 16,
           flexDirection: "row-reverse",
@@ -96,7 +95,6 @@ export default function BrandStrip({ onBrandPress }: BrandStripProps) {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={styles.scroll}
         contentContainerStyle={styles.contentContainer}
       >
         {BRANDS.map((brand) => (
@@ -105,7 +103,7 @@ export default function BrandStrip({ onBrandPress }: BrandStripProps) {
             style={styles.brandItem}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              onBrandPress?.(brand.id);
+              onBrandPress?.(brand.nameAr);
             }}
             activeOpacity={0.8}
             accessibilityLabel={brand.nameAr}

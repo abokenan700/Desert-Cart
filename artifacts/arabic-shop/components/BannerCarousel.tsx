@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
+import { router } from "expo-router";
 import { Banner } from "@/data/mockData";
 import { useColors } from "@/hooks/useColors";
 
@@ -82,6 +83,11 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
     [activeIndex, banners.length, startProgress, startTimer]
   );
 
+  const handleCtaPress = useCallback((banner: Banner) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    router.push("/(tabs)/search");
+  }, []);
+
   const styles = useMemo(
     () =>
       StyleSheet.create({
@@ -104,7 +110,7 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
           left: 0,
           right: 0,
           bottom: 0,
-          height: BANNER_HEIGHT * 0.8,
+          height: BANNER_HEIGHT * 0.82,
           justifyContent: "flex-end",
           paddingHorizontal: 20,
           paddingBottom: 20,
@@ -116,9 +122,9 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
           writingDirection: "rtl",
           lineHeight: 34,
           marginBottom: 4,
-          textShadowColor: "rgba(0,0,0,0.25)",
+          textShadowColor: "rgba(0,0,0,0.35)",
           textShadowOffset: { width: 0, height: 1 },
-          textShadowRadius: 4,
+          textShadowRadius: 6,
         },
         subtitle: {
           fontSize: 13,
@@ -127,9 +133,9 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
           writingDirection: "rtl",
           marginBottom: 14,
           lineHeight: 20,
-          textShadowColor: "rgba(0,0,0,0.2)",
+          textShadowColor: "rgba(0,0,0,0.25)",
           textShadowOffset: { width: 0, height: 1 },
-          textShadowRadius: 3,
+          textShadowRadius: 4,
         },
         ctaBtn: {
           alignSelf: "flex-end",
@@ -174,9 +180,7 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
             key={banner.id}
             activeOpacity={0.97}
             style={styles.slide}
-            onPress={() =>
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
-            }
+            onPress={() => handleCtaPress(banner)}
           >
             <Image source={banner.image} style={styles.image} />
             <LinearGradient
@@ -204,9 +208,7 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
               <TouchableOpacity
                 style={styles.ctaBtn}
                 activeOpacity={0.85}
-                onPress={() =>
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
-                }
+                onPress={() => handleCtaPress(banner)}
               >
                 <Text
                   style={{

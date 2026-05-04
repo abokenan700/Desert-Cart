@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Product } from "@/data/mockData";
 
 interface RecentlyViewedContextType {
@@ -9,9 +10,29 @@ interface RecentlyViewedContextType {
 const RecentlyViewedContext = createContext<RecentlyViewedContextType | null>(null);
 
 const MAX_ITEMS = 10;
+const STORAGE_KEY = "@souq_recently_viewed";
 
 export function RecentlyViewedProvider({ children }: { children: React.ReactNode }) {
   const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    AsyncStorage.getItem(STORAGE_KEY)
+      .then((raw) => {
+        if (raw) {
+          try {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) setRecentlyViewed(parsed.slice(0, MAX_ITEMS));
+          } catch {}
+        }
+      })
+      .finally(() => setHydrated(true));
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(recentlyViewed)).catch(() => {});
+  }, [recentlyViewed, hydrated]);
 
   const addToRecentlyViewed = useCallback((product: Product) => {
     setRecentlyViewed((prev) => {

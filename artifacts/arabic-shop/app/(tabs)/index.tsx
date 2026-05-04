@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useRef } from "react";
+import React, { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -29,6 +29,7 @@ import StoryStrip from "@/components/StoryStrip";
 import VoiceSearch from "@/components/VoiceSearch";
 import NotificationDrawer from "@/components/NotificationDrawer";
 import FlashSaleTimer from "@/components/FlashSaleTimer";
+import SocialProofBar from "@/components/SocialProofBar";
 import { useNotifications } from "@/context/NotificationsContext";
 import { useRecentlyViewed } from "@/context/RecentlyViewedContext";
 import {
@@ -56,6 +57,26 @@ export default function HomeScreen() {
   const { recentlyViewed } = useRecentlyViewed();
 
   const scrollY = useRef(new Animated.Value(0)).current;
+  const liveDotScale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    const anim = Animated.loop(
+      Animated.sequence([
+        Animated.timing(liveDotScale, {
+          toValue: 1.4,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(liveDotScale, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    anim.start();
+    return () => anim.stop();
+  }, [liveDotScale]);
 
   const stickyOpacity = scrollY.interpolate({
     inputRange: [STICKY_THRESHOLD - 20, STICKY_THRESHOLD + 30],
@@ -68,7 +89,37 @@ export default function HomeScreen() {
     extrapolate: "clamp",
   });
 
-  const filteredProducts = useMemo(
+  const filteredFlashSale = useMemo(
+    () =>
+      selectedCategory === "all"
+        ? FLASH_SALE_PRODUCTS
+        : PRODUCTS.filter(
+            (p) => p.isFlashSale && p.categoryId === selectedCategory
+          ),
+    [selectedCategory]
+  );
+
+  const filteredNewArrivals = useMemo(
+    () =>
+      selectedCategory === "all"
+        ? NEW_ARRIVALS
+        : PRODUCTS.filter(
+            (p) => p.isNew && p.categoryId === selectedCategory
+          ),
+    [selectedCategory]
+  );
+
+  const filteredFeatured = useMemo(
+    () =>
+      selectedCategory === "all"
+        ? FEATURED_PRODUCTS
+        : PRODUCTS.filter(
+            (p) => p.isFeatured && p.categoryId === selectedCategory
+          ),
+    [selectedCategory]
+  );
+
+  const filteredBestSellers = useMemo(
     () =>
       selectedCategory === "all"
         ? PRODUCTS
@@ -82,7 +133,6 @@ export default function HomeScreen() {
   );
 
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
-  const topPad = Platform.OS === "web" ? 67 : insets.top;
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -91,6 +141,20 @@ export default function HomeScreen() {
       showToast("تم تحديث المنتجات", "success");
     }, 900);
   }, [showToast]);
+
+  const handleBrandPress = useCallback((brandNameAr: string) => {
+    router.push({
+      pathname: "/(tabs)/search",
+      params: { brand: brandNameAr },
+    } as any);
+  }, []);
+
+  const handleCollectionPress = useCallback((categoryId: string) => {
+    router.push({
+      pathname: "/(tabs)/search",
+      params: { category: categoryId },
+    } as any);
+  }, []);
 
   const styles = useMemo(
     () =>
@@ -127,12 +191,6 @@ export default function HomeScreen() {
           height: 8,
           backgroundColor: colors.secondary,
           marginVertical: 4,
-        },
-        thinDivider: {
-          height: 1,
-          backgroundColor: `${colors.border}40`,
-          marginVertical: 8,
-          marginHorizontal: 16,
         },
         horizontalList: { paddingHorizontal: 16, gap: 12 },
         horizontalCard: { width: width * 0.42 },
@@ -216,6 +274,22 @@ export default function HomeScreen() {
           fontSize: 11,
           fontFamily: "Cairo_700Bold",
         },
+        liveDot: {
+          width: 8,
+          height: 8,
+          borderRadius: 4,
+          backgroundColor: "#E63946",
+        },
+        liveLabel: {
+          fontSize: 10,
+          fontFamily: "Cairo_700Bold",
+          color: "#E63946",
+        },
+        liveRow: {
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          gap: 4,
+        },
         sectionLabel: {
           fontSize: 13,
           fontFamily: "Cairo_600SemiBold",
@@ -285,6 +359,16 @@ export default function HomeScreen() {
           fontSize: 8,
           fontFamily: "Cairo_700Bold",
         },
+        emptySection: {
+          paddingHorizontal: 16,
+          paddingVertical: 12,
+          alignItems: "center",
+        },
+        emptySectionText: {
+          fontSize: 12,
+          fontFamily: "Cairo_400Regular",
+          color: colors.mutedForeground,
+        },
       }),
     [colors]
   );
@@ -341,15 +425,16 @@ export default function HomeScreen() {
         <View style={styles.sectionDivider} />
 
         <Text style={styles.sectionLabel}>تسوق حسب الماركة</Text>
-        <BrandStrip onBrandPress={() => router.push("/(tabs)/search")} />
+        <BrandStrip onBrandPress={handleBrandPress} />
 
         <View style={styles.sectionDivider} />
 
         <SectionHeader title="أبرز المجموعات" showSeeAll={false} />
-        <StoryStrip onCollectionPress={() => router.push("/(tabs)/search")} />
+        <StoryStrip onCollectionPress={handleCollectionPress} />
 
         <View style={styles.sectionDivider} />
 
+        {/* Flash Sale Section */}
         <View style={styles.flashSaleHeader}>
           <FlashSaleTimer />
           <View style={styles.flashSaleLeft}>
@@ -357,26 +442,44 @@ export default function HomeScreen() {
             <View style={styles.flashBadge}>
               <Text style={styles.flashBadgeText}>يومي 🔥</Text>
             </View>
+            <View style={styles.liveRow}>
+              <Animated.View
+                style={[
+                  styles.liveDot,
+                  { transform: [{ scale: liveDotScale }] },
+                ]}
+              />
+              <Text style={styles.liveLabel}>LIVE</Text>
+            </View>
           </View>
         </View>
+
         {refreshing ? (
           <View style={{ flexDirection: "row-reverse", paddingHorizontal: 16, gap: 12 }}>
             {[1, 2].map((k) => <ProductCardSkeleton key={k} />)}
           </View>
+        ) : filteredFlashSale.length === 0 ? (
+          <View style={styles.emptySection}>
+            <Text style={styles.emptySectionText}>لا توجد عروض في هذا القسم</Text>
+          </View>
         ) : (
           <FlatList
-            data={FLASH_SALE_PRODUCTS}
+            data={filteredFlashSale}
             horizontal
-            inverted
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalList}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <ProductCard product={item} style={styles.horizontalCard} />
             )}
-            scrollEnabled={FLASH_SALE_PRODUCTS.length > 0}
+            scrollEnabled={filteredFlashSale.length > 0}
           />
         )}
+
+        <View style={styles.sectionDivider} />
+
+        {/* Social Proof Bar */}
+        <SocialProofBar />
 
         <View style={styles.sectionDivider} />
 
@@ -384,6 +487,11 @@ export default function HomeScreen() {
           <TouchableOpacity
             style={[styles.promoCard, { backgroundColor: colors.purple }]}
             activeOpacity={0.85}
+            onPress={() =>
+              router.push(
+                totalCount > 0 ? ("/(tabs)/cart" as any) : "/(tabs)/search"
+              )
+            }
           >
             <Ionicons name="flash" size={24} color="rgba(255,255,255,0.7)" />
             <View>
@@ -398,6 +506,12 @@ export default function HomeScreen() {
           <TouchableOpacity
             style={[styles.promoCard, { backgroundColor: colors.primary }]}
             activeOpacity={0.85}
+            onPress={() =>
+              router.push({
+                pathname: "/(tabs)/search",
+                params: { sale: "true" },
+              } as any)
+            }
           >
             <Ionicons name="gift" size={24} color="rgba(255,255,255,0.7)" />
             <View>
@@ -412,6 +526,7 @@ export default function HomeScreen() {
 
         <View style={styles.sectionDivider} />
 
+        {/* New Arrivals */}
         <SectionHeader
           title="وصل حديثاً"
           onSeeAll={() => router.push("/(tabs)/search")}
@@ -420,30 +535,33 @@ export default function HomeScreen() {
           <View style={{ flexDirection: "row-reverse", paddingHorizontal: 16, gap: 12 }}>
             {[1, 2].map((k) => <ProductCardSkeleton key={k} />)}
           </View>
+        ) : filteredNewArrivals.length === 0 ? (
+          <View style={styles.emptySection}>
+            <Text style={styles.emptySectionText}>لا توجد منتجات جديدة في هذا القسم</Text>
+          </View>
         ) : (
           <FlatList
-            data={NEW_ARRIVALS}
+            data={filteredNewArrivals}
             horizontal
-            inverted
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalList}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <ProductCard product={item} style={styles.horizontalCard} />
             )}
-            scrollEnabled={NEW_ARRIVALS.length > 0}
+            scrollEnabled={filteredNewArrivals.length > 0}
           />
         )}
 
         <View style={styles.sectionDivider} />
 
+        {/* Recently Viewed */}
         {recentlyViewed.length > 0 && (
           <>
             <SectionHeader title="شاهدته مؤخراً" showSeeAll={false} />
             <FlatList
               data={recentlyViewed}
               horizontal
-              inverted
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.horizontalList}
               keyExtractor={(item) => item.id}
@@ -455,6 +573,7 @@ export default function HomeScreen() {
           </>
         )}
 
+        {/* Today's Picks */}
         <SectionHeader
           title="اختيارات اليوم ✨"
           onSeeAll={() => router.push("/(tabs)/search")}
@@ -479,6 +598,7 @@ export default function HomeScreen() {
 
         <View style={styles.sectionDivider} />
 
+        {/* Best Sellers */}
         <SectionHeader
           title="الأكثر مبيعاً"
           onSeeAll={() => router.push("/(tabs)/search")}
@@ -491,12 +611,13 @@ export default function HomeScreen() {
               </View>
             ))}
           </View>
+        ) : filteredBestSellers.length === 0 ? (
+          <View style={styles.emptySection}>
+            <Text style={styles.emptySectionText}>لا توجد منتجات في هذا القسم</Text>
+          </View>
         ) : (
           <View style={styles.productGrid}>
-            {(selectedCategory === "all"
-              ? FEATURED_PRODUCTS
-              : filteredProducts
-            ).map((product) => (
+            {filteredBestSellers.map((product) => (
               <View key={product.id} style={styles.gridItem}>
                 <ProductCard product={product} />
               </View>
@@ -516,7 +637,7 @@ export default function HomeScreen() {
         ]}
         pointerEvents="box-none"
       >
-        <Text style={styles.stickyTitle}>الأسطورة</Text>
+        <Text style={styles.stickyTitle}>سوق</Text>
         <View style={styles.stickyActions}>
           <TouchableOpacity
             style={styles.stickyBtn}

@@ -253,16 +253,17 @@ export default function SearchScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { showToast } = useAppToast();
-  const params = useLocalSearchParams<{ q?: string }>();
+  const params = useLocalSearchParams<{ q?: string; brand?: string; category?: string; sale?: string }>();
 
   const [query, setQuery] = useState(params.q ?? "");
+  const [brandFilter, setBrandFilter] = useState(params.brand ?? "");
   const [inputFocused, setInputFocused] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState(params.category ?? "all");
   const [sortBy, setSortBy] = useState("popular");
   const [filterVisible, setFilterVisible] = useState(false);
   const [voiceVisible, setVoiceVisible] = useState(false);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
-  const [flashSaleOnly, setFlashSaleOnly] = useState(false);
+  const [flashSaleOnly, setFlashSaleOnly] = useState(params.sale === "true");
   const [inStockOnly, setInStockOnly] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [recentSearches, setRecentSearches] = useState<string[]>([
@@ -278,7 +279,10 @@ export default function SearchScreen() {
 
   useEffect(() => {
     if (params.q) setQuery(params.q);
-  }, [params.q]);
+    if (params.brand) setBrandFilter(params.brand);
+    if (params.category) setSelectedCategory(params.category);
+    if (params.sale === "true") setFlashSaleOnly(true);
+  }, [params.q, params.brand, params.category, params.sale]);
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
@@ -350,6 +354,9 @@ export default function SearchScreen() {
           p.brand.toLowerCase().includes(q) ||
           p.tags.some((t) => t.includes(query))
       );
+    }
+    if (brandFilter.trim()) {
+      products = products.filter((p) => p.brand === brandFilter);
     }
     if (selectedCategory !== "all") {
       products = products.filter((p) => p.categoryId === selectedCategory);
