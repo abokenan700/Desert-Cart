@@ -12,8 +12,8 @@ import { router } from "expo-router";
 import { Banner } from "@/data/mockData";
 
 const { width } = Dimensions.get("window");
-const BANNER_HEIGHT = 210;
-const BANNER_WIDTH = width - 32;
+const BANNER_HEIGHT = 185;
+const BANNER_WIDTH = width - 44;
 const AUTO_PLAY_INTERVAL = 4200;
 
 interface BannerCarouselProps {
@@ -63,7 +63,7 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        container: { marginHorizontal: 16, marginTop: 4, marginBottom: 0 },
+        container: { marginHorizontal: 22, marginTop: 4, marginBottom: 0 },
         scroll: { borderRadius: 22, overflow: "hidden" },
         slide: {
           width: BANNER_WIDTH,
