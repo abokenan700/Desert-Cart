@@ -378,7 +378,6 @@ export default function HomeScreen() {
         {/* Flash Sale Section */}
         <View style={styles.flashSaleContainer}>
           <View style={styles.flashSaleHeader}>
-            <FlashSaleTimer />
             <View style={styles.flashSaleLeft}>
               <Text style={styles.flashTitle}>عروض اليوم</Text>
               <View style={styles.flashBadge}>
@@ -394,6 +393,7 @@ export default function HomeScreen() {
                 <Text style={styles.liveLabel}>LIVE</Text>
               </View>
             </View>
+            <FlashSaleTimer />
           </View>
 
           {refreshing ? (
