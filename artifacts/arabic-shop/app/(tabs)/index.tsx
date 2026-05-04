@@ -234,7 +234,7 @@ export default function HomeScreen() {
           fontFamily: "Cairo_600SemiBold",
         },
         flashSaleContainer: {
-          marginHorizontal: 12,
+          marginHorizontal: 20,
           marginTop: 10,
           marginBottom: 2,
           borderRadius: 18,
@@ -420,7 +420,7 @@ export default function HomeScreen() {
               style={Platform.OS === "web" ? ({ direction: "rtl" } as any) : undefined}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
-                <ProductCard product={item} style={styles.horizontalCard} />
+                <ProductCard product={item} style={styles.horizontalCard} compact />
               )}
               scrollEnabled={filteredFlashSale.length > 0}
             />

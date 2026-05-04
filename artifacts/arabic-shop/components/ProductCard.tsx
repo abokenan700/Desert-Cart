@@ -26,12 +26,14 @@ const pad = (n: number) => String(n).padStart(2, "0");
 interface ProductCardProps {
   product: Product;
   style?: object;
+  compact?: boolean;
   onLongPress?: () => void;
 }
 
 const ProductCard = React.memo(function ProductCard({
   product,
   style,
+  compact = false,
   onLongPress,
 }: ProductCardProps) {
   const colors = useColors();
@@ -145,7 +147,7 @@ const ProductCard = React.memo(function ProductCard({
         imageContainer: {
           position: "relative",
           width: "100%",
-          aspectRatio: 3 / 4,
+          aspectRatio: compact ? 1 : 3 / 4,
           backgroundColor: colors.secondary,
           overflow: "hidden",
         },
@@ -359,7 +361,7 @@ const ProductCard = React.memo(function ProductCard({
           color: colors.mutedForeground,
         },
       }),
-    [colors]
+    [colors, compact]
   );
 
   return (
