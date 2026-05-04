@@ -495,7 +495,7 @@ export default function HomeScreen() {
             style={Platform.OS === "web" ? ({ direction: "rtl" } as any) : undefined}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <ProductCard product={item} style={styles.horizontalCard} />
+              <ProductCard product={item} />
             )}
             scrollEnabled={filteredNewArrivals.length > 0}
           />
@@ -515,7 +515,7 @@ export default function HomeScreen() {
               style={Platform.OS === "web" ? ({ direction: "rtl" } as any) : undefined}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
-                <ProductCard product={item} style={styles.horizontalCard} />
+                <ProductCard product={item} />
               )}
             />
             <View style={styles.sectionDivider} />
