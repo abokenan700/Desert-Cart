@@ -179,8 +179,8 @@ export default function HomeScreen() {
           backgroundColor: colors.secondary,
           marginVertical: 4,
         },
-        horizontalList: { paddingHorizontal: 16, gap: 12 },
-        horizontalCard: { width: width * 0.42 },
+        horizontalList: { paddingHorizontal: 12, gap: 10 },
+        horizontalCard: { width: width * 0.36 },
         productGrid: {
           flexDirection: "row-reverse",
           flexWrap: "wrap",
@@ -232,13 +232,34 @@ export default function HomeScreen() {
           fontSize: 11,
           fontFamily: "Cairo_600SemiBold",
         },
+        flashSaleContainer: {
+          marginHorizontal: 12,
+          marginTop: 10,
+          marginBottom: 2,
+          borderRadius: 18,
+          borderWidth: 1.5,
+          borderColor: `${colors.primary}28`,
+          backgroundColor: colors.card,
+          overflow: "hidden",
+          paddingBottom: 14,
+          ...Platform.select({
+            ios: {
+              shadowColor: colors.primary,
+              shadowOffset: { width: 0, height: 3 },
+              shadowOpacity: 0.1,
+              shadowRadius: 10,
+            },
+            android: { elevation: 4 },
+            web: { boxShadow: `0 3px 12px ${colors.primary}18` } as any,
+          }),
+        },
         flashSaleHeader: {
           flexDirection: "row-reverse",
           alignItems: "center",
           justifyContent: "space-between",
-          paddingHorizontal: 16,
-          marginBottom: 12,
-          marginTop: 4,
+          paddingHorizontal: 14,
+          paddingTop: 12,
+          marginBottom: 10,
         },
         flashSaleLeft: {
           flexDirection: "row-reverse",
@@ -350,57 +371,55 @@ export default function HomeScreen() {
 
         <BrandStrip onBrandPress={handleBrandPress} />
 
+        {/* Flash Sale Section */}
+        <View style={styles.flashSaleContainer}>
+          <View style={styles.flashSaleHeader}>
+            <FlashSaleTimer />
+            <View style={styles.flashSaleLeft}>
+              <Text style={styles.flashTitle}>عروض اليوم</Text>
+              <View style={styles.flashBadge}>
+                <Text style={styles.flashBadgeText}>يومي 🔥</Text>
+              </View>
+              <View style={styles.liveRow}>
+                <Animated.View
+                  style={[
+                    styles.liveDot,
+                    { transform: [{ scale: liveDotScale }] },
+                  ]}
+                />
+                <Text style={styles.liveLabel}>LIVE</Text>
+              </View>
+            </View>
+          </View>
+
+          {refreshing ? (
+            <View style={{ flexDirection: "row-reverse", paddingHorizontal: 12, gap: 10 }}>
+              {[1, 2].map((k) => <ProductCardSkeleton key={k} />)}
+            </View>
+          ) : filteredFlashSale.length === 0 ? (
+            <View style={styles.emptySection}>
+              <Text style={styles.emptySectionText}>لا توجد عروض في هذا القسم</Text>
+            </View>
+          ) : (
+            <FlatList
+              data={filteredFlashSale}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.horizontalList}
+              style={Platform.OS === "web" ? ({ direction: "rtl" } as any) : undefined}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <ProductCard product={item} style={styles.horizontalCard} />
+              )}
+              scrollEnabled={filteredFlashSale.length > 0}
+            />
+          )}
+        </View>
+
         <View style={styles.sectionDivider} />
 
         <SectionHeader title="أبرز المجموعات" showSeeAll={false} />
         <StoryStrip onCollectionPress={handleCollectionPress} />
-
-        <View style={styles.sectionDivider} />
-
-        {/* Flash Sale Section */}
-        <View style={styles.flashSaleHeader}>
-          <FlashSaleTimer />
-          <View style={styles.flashSaleLeft}>
-            <Text style={styles.flashTitle}>عروض اليوم</Text>
-            <View style={styles.flashBadge}>
-              <Text style={styles.flashBadgeText}>يومي 🔥</Text>
-            </View>
-            <View style={styles.liveRow}>
-              <Animated.View
-                style={[
-                  styles.liveDot,
-                  { transform: [{ scale: liveDotScale }] },
-                ]}
-              />
-              <Text style={styles.liveLabel}>LIVE</Text>
-            </View>
-          </View>
-        </View>
-
-        {refreshing ? (
-          <View style={{ flexDirection: "row-reverse", paddingHorizontal: 16, gap: 12 }}>
-            {[1, 2].map((k) => <ProductCardSkeleton key={k} />)}
-          </View>
-        ) : filteredFlashSale.length === 0 ? (
-          <View style={styles.emptySection}>
-            <Text style={styles.emptySectionText}>لا توجد عروض في هذا القسم</Text>
-          </View>
-        ) : (
-          <FlatList
-            data={filteredFlashSale}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.horizontalList}
-            style={Platform.OS === "web" ? ({ direction: "rtl" } as any) : undefined}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <ProductCard product={item} style={styles.horizontalCard} />
-            )}
-            scrollEnabled={filteredFlashSale.length > 0}
-          />
-        )}
-
-        <View style={styles.sectionDivider} />
 
         {/* Social Proof Bar */}
         <SocialProofBar />
