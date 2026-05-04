@@ -33,7 +33,7 @@ const CategoryRow = React.memo(function CategoryRow({
         },
         contentContainer: {
           paddingHorizontal: 16,
-          gap: 8,
+          gap: 4,
         },
         categoryItem: {
           alignItems: "center",
@@ -59,7 +59,7 @@ const CategoryRow = React.memo(function CategoryRow({
           }),
         },
         label: {
-          fontSize: 11,
+          fontSize: 10,
           fontFamily: "Cairo_700Bold",
           textAlign: "center",
           width: 72,
