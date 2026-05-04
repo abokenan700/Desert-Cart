@@ -110,6 +110,7 @@ function buildStyles(colors: ReturnType<typeof import("@/hooks/useColors").useCo
     container: {
       backgroundColor: colors.card,
       paddingVertical: 10,
+      marginTop: 6,
       borderBottomWidth: 1,
       borderBottomColor: colors.border,
     },
