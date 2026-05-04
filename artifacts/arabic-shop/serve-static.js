@@ -43,6 +43,6 @@ const server = http.createServer((req, res) => {
   fs.createReadStream(filePath).pipe(res);
 });
 
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Serving Arabic Shop on http://0.0.0.0:${PORT}`);
+server.listen(PORT, () => {
+  console.log(`Serving Arabic Shop on port ${PORT}`);
 });
