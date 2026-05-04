@@ -76,24 +76,24 @@ function CategoryItem({ cat, isSelected, onSelect, styles, colors }: CategoryIte
 function buildStyles(colors: ReturnType<typeof import("@/hooks/useColors").useColors>) {
   return StyleSheet.create({
     scroll: {
-      paddingVertical: 14,
+      paddingVertical: 4,
       backgroundColor: colors.card,
     },
     contentContainer: {
       paddingHorizontal: 16,
-      gap: 4,
+      gap: 2,
     },
     categoryItem: {
       alignItems: "center",
-      gap: 6,
-      width: 72,
+      gap: 4,
+      width: 60,
     },
     tile: {
-      width: 54,
-      height: 54,
+      width: 44,
+      height: 44,
       alignItems: "center",
       justifyContent: "center",
-      borderRadius: 27,
+      borderRadius: 22,
       borderWidth: 2,
       ...Platform.select({
         ios: {
@@ -107,10 +107,10 @@ function buildStyles(colors: ReturnType<typeof import("@/hooks/useColors").useCo
       }),
     },
     label: {
-      fontSize: 10,
+      fontSize: 9,
       fontFamily: "Cairo_700Bold",
       textAlign: "center",
-      width: 72,
+      width: 60,
     },
   });
 }
