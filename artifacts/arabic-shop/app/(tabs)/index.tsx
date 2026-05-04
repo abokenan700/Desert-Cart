@@ -242,7 +242,7 @@ export default function HomeScreen() {
           borderColor: "#E63946",
           backgroundColor: colors.card,
           overflow: "hidden",
-          paddingBottom: 14,
+          paddingBottom: 6,
           ...Platform.select({
             ios: {
               shadowColor: "#E63946",

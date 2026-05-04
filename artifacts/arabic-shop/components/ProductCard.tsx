@@ -132,7 +132,7 @@ const ProductCard = React.memo(function ProductCard({
           backgroundColor: colors.card,
           borderRadius: 20,
           overflow: "hidden",
-          marginBottom: 16,
+          marginBottom: compact ? 0 : 16,
           ...Platform.select({
             ios: {
               shadowColor: "#000",
@@ -147,7 +147,7 @@ const ProductCard = React.memo(function ProductCard({
         imageContainer: {
           position: "relative",
           width: "100%",
-          aspectRatio: compact ? 1 : 3 / 4,
+          aspectRatio: compact ? 0.85 : 3 / 4,
           backgroundColor: colors.secondary,
           overflow: "hidden",
         },
@@ -513,19 +513,8 @@ const ProductCard = React.memo(function ProductCard({
             </Text>
           ) : null}
 
-          {/* Price row — in compact: price + cart icon side by side */}
+          {/* Price row — in compact: cart icon on right + price on left */}
           <View style={styles.priceRow}>
-            <View>
-              {product.originalPrice && (
-                <Text style={styles.originalPrice}>
-                  {product.originalPrice.toLocaleString("ar-SA")} ر.س
-                </Text>
-              )}
-              <Text style={styles.price}>
-                {product.price.toLocaleString("ar-SA")} ر.س
-              </Text>
-            </View>
-
             {compact && (
               <TouchableOpacity
                 style={[
@@ -537,13 +526,20 @@ const ProductCard = React.memo(function ProductCard({
                 hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
                 accessibilityLabel={`أضف ${product.nameAr} إلى السلة`}
               >
-                <Ionicons
-                  name="cart"
-                  size={15}
-                  color="#fff"
-                />
+                <Ionicons name="cart" size={15} color="#fff" />
               </TouchableOpacity>
             )}
+
+            <View>
+              {product.originalPrice && (
+                <Text style={styles.originalPrice}>
+                  {product.originalPrice.toLocaleString("ar-SA")} ر.س
+                </Text>
+              )}
+              <Text style={styles.price}>
+                {product.price.toLocaleString("ar-SA")} ر.س
+              </Text>
+            </View>
           </View>
 
           {/* Full add-to-cart button — only in normal mode */}
