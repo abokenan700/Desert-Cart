@@ -33,7 +33,6 @@ const CategoryRow = React.memo(function CategoryRow({
         },
         contentContainer: {
           paddingHorizontal: 16,
-          flexDirection: "row-reverse",
           gap: 10,
         },
         categoryItem: {
@@ -72,7 +71,7 @@ const CategoryRow = React.memo(function CategoryRow({
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      style={styles.scroll}
+      style={[styles.scroll, Platform.OS === "web" && ({ direction: "rtl" } as any)]}
       contentContainerStyle={styles.contentContainer}
     >
       {categories.map((cat) => {

@@ -138,6 +138,7 @@ export default function StoryStrip({ onCollectionPress }: StoryStripProps) {
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={contentStyle}
+        style={Platform.OS === "web" ? ({ direction: "rtl" } as any) : undefined}
       >
         {COLLECTIONS.map((col) => (
           <StoryCard
@@ -157,7 +158,6 @@ export default function StoryStrip({ onCollectionPress }: StoryStripProps) {
 const containerStyle = { marginTop: 4, paddingBottom: 4 };
 const contentStyle: any = {
   paddingHorizontal: 16,
-  flexDirection: "row-reverse" as const,
   gap: 14,
   paddingVertical: 6,
 };

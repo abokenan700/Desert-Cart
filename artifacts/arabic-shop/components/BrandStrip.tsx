@@ -49,7 +49,6 @@ export default function BrandStrip({ onBrandPress }: BrandStripProps) {
         },
         contentContainer: {
           paddingHorizontal: 16,
-          flexDirection: "row-reverse",
           gap: 14,
         },
         brandItem: {
@@ -96,6 +95,7 @@ export default function BrandStrip({ onBrandPress }: BrandStripProps) {
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
+        style={Platform.OS === "web" ? ({ direction: "rtl" } as any) : undefined}
       >
         {BRANDS.map((brand) => (
           <TouchableOpacity

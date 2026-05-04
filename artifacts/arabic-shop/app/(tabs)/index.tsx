@@ -468,6 +468,7 @@ export default function HomeScreen() {
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalList}
+            style={Platform.OS === "web" ? ({ direction: "rtl" } as any) : undefined}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <ProductCard product={item} style={styles.horizontalCard} />
@@ -545,6 +546,7 @@ export default function HomeScreen() {
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalList}
+            style={Platform.OS === "web" ? ({ direction: "rtl" } as any) : undefined}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <ProductCard product={item} style={styles.horizontalCard} />
@@ -564,6 +566,7 @@ export default function HomeScreen() {
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.horizontalList}
+              style={Platform.OS === "web" ? ({ direction: "rtl" } as any) : undefined}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
                 <ProductCard product={item} style={styles.horizontalCard} />
