@@ -348,9 +348,6 @@ export default function HomeScreen() {
 
         <BannerCarousel banners={BANNERS} />
 
-        <View style={styles.sectionDivider} />
-
-        <Text style={styles.sectionLabel}>تسوق حسب الماركة</Text>
         <BrandStrip onBrandPress={handleBrandPress} />
 
         <View style={styles.sectionDivider} />
