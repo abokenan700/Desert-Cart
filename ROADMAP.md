@@ -1,628 +1,885 @@
-# 🗺️ سوق — Full Development Roadmap
-### World-Class Arabic E-Commerce App: Visual & UX Transformation Plan
-> **Single source of truth for all development phases. Do not execute any phase without explicit user confirmation.**
+# سوق — Arabic E-Commerce App: Master Development Roadmap
+> **Single source of truth for all development phases.**
+> No phase is executed without explicit user confirmation.
+> After each confirmed phase: execute micro-tasks → deliver summary → update this file.
 
 ---
 
-## 📊 Executive Analysis
+## PART 1 — In-Depth Analysis
 
-### Current State Assessment
+### 1.1 Codebase Snapshot (May 2026)
 
-**Strengths**
-- Solid RTL foundation with `I18nManager.forceRTL` and `writingDirection: rtl` throughout
-- Cairo font system (400/600/700/800 weights) — premium Arabic typography
-- Coherent color palette: primary #E63946 · gold #F5A623 · navy #1D2D50
-- Working contexts: Cart, Wishlist, Reviews, Notifications, RecentlyViewed
-- Flash sale countdown timer, coupon shake animation, voice search
-- Product detail with gallery dots, size/color pickers, review breakdown
-- 3-step checkout with coupon validation
-- Animated order tracking timeline
-- Dark mode color tokens defined (but not yet toggleable)
-
-**Critical Weaknesses & Gaps vs. Temu / Shein / AliExpress**
-
-| Area | Issue |
-|------|-------|
-| Home | Banner overlay ignores `bgGradient` data; banner CTA text hidden |
-| Home | No sticky header on scroll; no "Brands" or "Trending" sections |
-| Home | Category row is icon-only — no visual imagery like competitors |
-| ProductCard | No skeleton loading; no sold-count badge; no per-product countdown |
-| ProductCard | No image swipe gesture on detail; no zoom; no "similar products" |
-| Search | No search history; no image search placeholder; no brand filter |
-| Search | No price range slider (only pills); no rating filter; no list/grid toggle |
-| Cart | Swipe-to-delete not implemented; no "you might also like"; no progress to free shipping bar |
-| Checkout | No form validation; no saved addresses; card fields missing |
-| Profile | All data hardcoded; no edit profile; no actual navigation on most items |
-| Missing | No dark mode toggle in UI; no skeleton screens; no pull-to-refresh |
-| Missing | No "Flash Deals" dedicated page; no Brand Store pages |
-| Missing | No confetti on order success; no haptic feedback; no page transition animations |
-| Missing | No bundle deals, "complete the look", loyalty points, referral UI |
-| Missing | No stock indicator; no delivery date calculator; no size guide modal |
-| Missing | No notify-me-when-back-in-stock; no gift wrap option in checkout |
-| Missing | No review with photos; no "Ask Seller" on product |
-| Missing | No stories/editorial content strip; no AI recommendation UI |
+| Layer | Technology | Status |
+|---|---|---|
+| Mobile App | Expo 53 / React Native 0.81 / Expo Router | ✅ Running |
+| Backend | Express 5 / Drizzle ORM / PostgreSQL | ⚠️ Running (health only) |
+| API Contract | OpenAPI 3.1 + Orval codegen | ⚠️ Scaffold only |
+| State | TanStack Query + 7 React Contexts | ⚠️ All mock data |
+| Typography | Cairo (400/600/700/800) | ✅ Implemented |
+| Animation | RN Animated API + expo-haptics | ✅ Partial |
+| Dark Mode | ThemeContext + AsyncStorage | ✅ Implemented |
+| RTL | I18nManager.forceRTL throughout | ✅ Implemented |
 
 ---
 
-## 🗂️ Phase Overview
+### 1.2 Screen-by-Screen Audit
 
-| Phase | Title | Scope | Impact |
-|-------|-------|-------|--------|
-| 1 | Foundation Polish | Skeleton loaders · dark mode toggle · pull-to-refresh · haptics | High |
-| 2 | Home Screen — Visual Overhaul | Banner gradients · brand strip · trending categories · story row | Highest |
-| 3 | ProductCard 2.0 | Countdown badge · sold count · shimmer · quick-view drawer | High |
-| 4 | Product Detail — Premium | Swipe gallery · zoom · size guide · delivery calc · stock indicator | High |
-| 5 | Search & Discovery — Advanced | Search history · image search placeholder · slider filter · list view · brand chips | High |
-| 6 | Cart — Smart & Animated | Swipe-to-delete · free shipping progress bar · "you might also like" | Medium |
-| 7 | Checkout — Complete Flow | Form validation · saved addresses · card fields · gift wrap | Medium |
-| 8 | Profile — Fully Functional | Edit profile · address book · loyalty points · dark mode switch | Medium |
-| 9 | Flash Deals & Brand Store Pages | Dedicated flash deals screen · brand store template | High |
-| 10 | Order Experience — Delight | Confetti success · live-pulse tracking · map placeholder animated | Medium |
-| 11 | Micro-Interactions & Motion | Page transitions · spring animations · tab bar upgrade · empty states 2.0 | High |
-| 12 | "Complete the Look" & Bundles | Similar products · bundle deals UI · upsell on cart & product | High |
-| 13 | Content & Social Features | Stories strip · review photos · "Ask Seller" · editorial picks | Medium |
-| 14 | Personalization & Gamification | Loyalty points system · streak rewards · referral UI · spin-the-wheel | Medium |
-| 15 | Performance & Accessibility | FlatList virtualization · image caching · a11y labels · font scaling | High |
+#### HOME (`app/(tabs)/index.tsx`) — Score: 7/10
+**What works well:**
+- AnnouncementBar, sticky header on scroll (opacity+translateY interpolation)
+- BannerCarousel, CategoryRow, BrandStrip, StoryStrip, FlashSaleTimer
+- Flash sale horizontal list, dual promo cards, new arrivals, recently viewed, today's picks, best sellers grid
+- Pull-to-refresh with skeleton loading simulation
+- Voice search entry point, notification drawer
 
----
+**Critical weaknesses:**
+- Sticky header brand name reads "الأسطورة" — inconsistency with app identity "سوق"
+- Category selection only filters the "best sellers" bottom grid — does NOT cascade to flash sale, new arrivals, or featured sections
+- Only 6 unique product images recycled across all 12 products — visually stale and repetitive
+- StoryStrip routes all collections to generic search (no collection-specific filtering)
+- BrandStrip routes all brands to generic search (no brand name filter pre-applied)
+- Both promo cards are static (no navigation on tap)
+- Flash sale products hardcoded — no dynamic deal rotation
+- No infinite scroll or "load more" pagination anywhere
+- No personalized greeting tied to user identity
+- No social proof indicators ("٤٢ شخص يشاهدون هذا الآن")
+- `FlatList` with `inverted` prop produces unnatural RTL scroll direction — items load from the wrong side
 
-## 📋 Detailed Phase Specifications
+#### SEARCH (`app/(tabs)/search.tsx`) — Score: 6/10
+**What works well:**
+- 6 sort modes, price range filter (pills), in-stock toggle, on-sale toggle, category row, grid/list toggle, recent/popular searches, voice search, skeleton loaders
 
----
+**Critical weaknesses:**
+- No real-time search — results only update when user finishes typing and taps search
+- No autocomplete / suggestion dropdown while typing
+- No result count label ("١٢ نتيجة لـ «فستان»")
+- No active filter chips displayed on results screen (filters applied in modal disappear from view)
+- Missing: rating filter (stars), brand multi-select, color filter, delivery speed filter
+- No empty-state illustration — blank screen when zero results
+- No "did you mean?" fuzzy correction
+- Popular searches are static text tags with no trend indicators
+- Search result count not announced to user
 
-### PHASE 1 — Foundation Polish
-**Goal:** Eliminate jarring missing UX patterns that every top app has by default.
+#### CART (`app/(tabs)/cart.tsx`) — Score: 7/10
+**What works well:**
+- Swipe-to-delete with haptics, quantity controls (+/−), free-shipping progress bar, coupon hints, order summary, clear-all with confirmation
 
-#### 1.1 — Skeleton Loading Screens
-- Create `SkeletonBox` component: animated shimmer effect using `Animated.loop` + linear gradient shimmer
-- Create `ProductCardSkeleton`: mirrors ProductCard layout with grey pulsing placeholders for image, brand, name, price, button
-- Create `HomeSkeleton`: renders 2 skeleton banners + 6 skeleton product cards on initial load
-- Apply skeleton to: Home (first render), Search (while filtering), Product Detail (on navigate)
-- Shimmer direction: right-to-left (RTL shimmer, matching Arabic reading direction)
+**Critical weaknesses:**
+- Cart items show no variant info (which size/color was selected)
+- No "save for later / move to wishlist" action on cart items
+- Free shipping threshold is a hardcoded constant
+- No delivery date estimate visible until checkout
+- No cross-sell "you might also like" section below cart
+- Empty cart uses plain text link — no illustration or engaging empty state
+- Cart badge and total don't animate when items are added from other screens
 
-#### 1.2 — Dark Mode Toggle
-- Add `ThemeContext` with `isDark: boolean` + `toggleTheme()` + AsyncStorage persistence
-- Wire `useColors` hook to read from ThemeContext instead of hardcoded `"light"`
-- Add moon/sun toggle icon to `HomeHeader` (top-left, RTL position)
-- Add dark mode row in Profile Settings section with animated toggle switch
-- Test all screens in dark mode: fix any hardcoded `#fff` or `"rgba(0,0,0,...)"` values
+#### WISHLIST (`app/(tabs)/wishlist.tsx`) — Score: 5/10
+**What works well:**
+- 2-column grid, bulk "add all to cart" with toast, empty state
 
-#### 1.3 — Pull-to-Refresh
-- Add `RefreshControl` to Home ScrollView with primary color spinner
-- Add `RefreshControl` to Search ScrollView
-- Add `RefreshControl` to Order History ScrollView
-- Simulate refresh with 800ms delay + subtle "تم التحديث" toast
+**Critical weaknesses:**
+- No wishlist folders / collections (major feature in Temu and Shein)
+- No price-drop alert on saved items
+- No "share wishlist" feature
+- No sort or filter on wishlist
+- No "low stock" or "on sale now" badges on wishlist card overlays
+- No "item was added X days ago" timestamp
 
-#### 1.4 — Haptic Feedback
-- Install/use `expo-haptics` (already in dependencies)
-- Add `Haptics.impactAsync(ImpactFeedbackStyle.Light)` on: add-to-cart, wishlist toggle, coupon apply
-- Add `Haptics.notificationAsync(NotificationFeedbackType.Success)` on: order placed, coupon success
-- Add `Haptics.notificationAsync(NotificationFeedbackType.Error)` on: invalid coupon
+#### PROFILE (`app/(tabs)/profile.tsx`) — Score: 4/10
+**What works well:**
+- Stats row (orders/wishlist/cart counts), dark mode toggle, notification toggle, sectioned menu
 
-#### 1.5 — Toast Notification System
-- Upgrade existing `ToastNotification` to support: success / error / info / warning variants
-- Add auto-dismiss with animated slide-down exit
-- Use throughout app: add-to-cart success, wishlist added, coupon applied, copy coupon code
+**Critical weaknesses:**
+- Entirely static — hardcoded name, hardcoded "عضو ذهبي", hardcoded stats
+- Avatar is a static gradient with an icon — no photo upload
+- ALL menu items (Wallet, Addresses, Payment Methods, Returns, Language) either navigate nowhere or show an Alert
+- No loyalty tier progress visualization
+- No referral / "invite a friend" feature
+- Logout Alert fires but does nothing to state
+- No membership tier indicator or points balance display
 
----
+#### PRODUCT DETAIL (`app/product/[id].tsx`) — Score: 8/10
+**What works well:**
+- Horizontal image gallery + thumbnail strip, floating action buttons, brand badge + delivery badge, product name, rating row, price section with savings, stock progress bar, trust badges, color/size selectors, quantity picker, description with expand, rating breakdown bars, write-review modal, related products, sticky buy bar with spring animation
 
-### PHASE 2 — Home Screen Visual Overhaul
-**Goal:** Transform home into an immersive, editorial marketplace experience matching Shein's visual richness.
+**Critical weaknesses:**
+- Share button exists in UI but calls nothing (no `Share.share()` implementation)
+- "دليل المقاسات" link present but tapping it does nothing
+- Image gallery has no pinch-to-zoom
+- Only 2 images per product (same 6 assets reused across all products)
+- No product specification table (material, dimensions, care)
+- Trust badges are hardcoded — not product-category-aware
+- No seller Q&A section
+- Review photos not supported
+- Review authors are randomly generated Arabic names — no real identity
+- Related products only draws from same category — misses cross-category discovery
 
-#### 2.1 — Banner Carousel with True Gradient Overlays
-- Replace flat image overlay with `expo-linear-gradient` using product's `bgGradient` data field
-- Add directional gradient: transparent top → brand color bottom-third
-- Banner CTA button: pill-shaped, white with brand-colored text, `expo-haptics` on press
-- Add banner title and subtitle visible and readable with text shadow + gradient backdrop
-- Auto-play indicator: thin animated progress bar under banner (not just dots)
-- Parallax effect: image scrolls at 0.8x speed vs. text for depth
+#### CHECKOUT (`app/checkout.tsx`) — Score: 7/10
+**What works well:**
+- 3-step stepper, saved address chips, new address form with field validation, 4 payment methods, coupon entry with shake animation, quick coupon chips, animated place-order button, order summary
 
-#### 2.2 — Announcement Bar Upgrade
-- Multi-message rotating bar: 3 messages cycling every 2.5s with fade transition
-- Messages: "شحن مجاني على الطلبات +٥٠٠ ر.س" · "عروض حصرية للأعضاء الذهبيين" · "تسوق الآن وادفع لاحقاً"
-- Add marquee-style continuous scroll option as fallback
-- Background: primary color with subtle diagonal pattern texture
+**Critical weaknesses:**
+- All 4 payment methods are UI-only — no real gateway, no card form fields
+- Saved addresses are hardcoded (not from user's profile addresses)
+- New address entered here is not saved back to the profile
+- No map pin-drop for address
+- Coupon savings not reflected in Step 1 subtotal (only appears in Step 2+)
+- Order placement is a fake 1.6s `setTimeout` — no real API call
+- Step 3 review summary does not show full address or payment method clearly
+- Step progress line is static — does not animate between steps
 
-#### 2.3 — Visual Category Grid (replacing icon row)
-- Replace `CategoryRow` flat list with a visually rich grid of tappable category tiles
-- Each tile: colored background + category emoji/image + category name in Arabic
-- Horizontal scroll with larger tiles (80×90px) and visible color backgrounds
-- "الكل" chip: gradient primary pill, always first (RTL)
-- Active state: scale-up + border highlight + checkmark badge
+#### ORDER TRACKING (`app/order-tracking.tsx`) — Score: 6/10
+**What works well:**
+- Timeline steps (ordered → confirmed → shipped → delivered), driver contact card (call/chat icons), ETA display, animated step indicators
 
-#### 2.4 — Brand Scrollable Strip
-- New section below categories: "أشهر الماركات" / "تسوق حسب الماركة"
-- Horizontal scroll of brand logos (circular, 60px diameter, with brand initial as fallback)
-- Brands: زارا · H&M · مانجو · ماسيمو دوتي · كوتش · سامسونج · سوني · MAC · عربيك عود · أرابيسك
-- Tap on brand → Search screen filtered to that brand
+**Critical weaknesses:**
+- Map section is a static colored box placeholder — no map at all
+- Driver info is hardcoded (same driver, same car always)
+- ETA is static text, not live
+- No real-time step progression
 
-#### 2.5 — Story-Style Editorial Strip
-- "أبرز المجموعات" horizontal scroll with tall portrait cards (120×180px)
-- Cards: gradient background + collection name + product count
-- Collections: "صيف ٢٠٢٦" · "ماركات فاخرة" · "عروض فلاش" · "منزل أنيق" · "جمال وعناية"
-- Tapping → navigates to Search filtered for that collection
+#### ORDER HISTORY (`app/order-history.tsx`) — Score: 5/10
+**What works well:**
+- Tab filter (all/shipping/delivered/cancelled), re-order and invoice action buttons
 
-#### 2.6 — Flash Sale Section Upgrade
-- "عروض اليوم" header: flame emoji + live countdown HH:MM:SS (already exists, enhance visual)
-- Add pulsing red glow behind the timer display
-- Flash sale product cards: show discount %, remaining stock bar ("تبقى ٥ فقط!")
-- Full-width "شاهد كل العروض" button at end of horizontal list
+**Critical weaknesses:**
+- All orders come from `mockOrders.ts` — entirely static
+- Re-order button does nothing
+- Invoice button does nothing
+- No drill-down screen for individual order details
+- No date range filter or search
 
-#### 2.7 — "Today's Picks" Editorial Section
-- New section: "اختيارات اليوم" with a 2-column masonry-style grid
-- First card: full-width featured product card (large format)
-- Remaining: standard grid
+#### MY COUPONS (`app/my-coupons.tsx`) — Score: 6/10
+**What works well:**
+- Coupon cards with code display, click-to-copy with Share sheet fallback
 
-#### 2.8 — Sticky Header on Scroll
-- As user scrolls past search bar, header collapses into a compact sticky bar
-- Compact bar: search icon + cart badge + notification bell — all in primary color header
-- Use `Animated.diffClamp` on scroll position for smooth collapse/expand
+**Critical weaknesses:**
+- Coupon list is entirely static
+- No expiry countdown timers on individual coupons
+- No "earn more coupons" CTA
 
----
+#### ORDER SUCCESS (`app/order-success.tsx`) — Score: 6/10
+**What works well:**
+- Scale/fade entrance animation, order number display, delivery timeline, Track/Shop CTAs
 
-### PHASE 3 — ProductCard 2.0
-**Goal:** Cards that sell — information-rich, visually premium, interaction-delightful.
-
-#### 3.1 — Information Richness
-- Add sold count badge: "١٢٠٠+ مبيعات" below rating row when `soldCount > 500`
-- Add delivery badge: "توصيل غداً" or "توصيل في ٢ أيام" as a small green pill on the card
-- Add stock urgency: "تبقى ٣ فقط" red pill when `soldCount > 80%` of stock threshold
-- Flash sale countdown on card: mini HH:MM:SS timer chip (for `isFlashSale` products only)
-
-#### 3.2 — Visual Upgrades
-- Image: use `expo-image` for better performance and built-in crossfade transition
-- Add image shimmer placeholder while loading (using `SkeletonBox`)
-- "جديد" badge: animated pulse ring around the badge every 3s
-- Wishlist button: heart fill animation with spring bounce on toggle
-
-#### 3.3 — Quick-View Bottom Drawer
-- Long-press on ProductCard → opens `QuickViewDrawer` bottom sheet
-- Sheet shows: main image · name · price · size picker · color picker · "أضف للسلة" button
-- Allows adding to cart without navigating to product detail
-- Smooth spring animation, backdrop blur, drag-to-dismiss
-
-#### 3.4 — Card Variants
-- Horizontal card variant for featured lists: landscape format (full-width × 100px height)
-- Compact card variant for "recently viewed": smaller (120×180px)
-
----
-
-### PHASE 4 — Product Detail — Premium Experience
-**Goal:** Product page that rivals Shein's detail page — immersive, trustworthy, conversion-optimized.
-
-#### 4.1 — Swipe Gallery with Gesture
-- Replace dot-tap navigation with `react-native-gesture-handler` swipe left/right
-- Smooth spring transition between images
-- Pinch-to-zoom using `react-native-gesture-handler` + Animated scale
-- Double-tap to zoom in on image center
-- Image counter: "١ / ٣" pill overlay (RTL: "٣ / ١")
-
-#### 4.2 — Enhanced Product Info
-- Stock indicator: green "متوفر" · orange "كميات محدودة" · red "نفد المخزون"
-- "تبقى ٨ قطع فقط" urgent stock message with pulsing dot
-- Delivery date calculator: "يصل بتاريخ: ٧ مايو" based on `deliveryDays`
-- Trust badges row: shield icon "دفع آمن" · return icon "إرجاع ١٤ يوم" · quality icon "جودة مضمونة"
-
-#### 4.3 — Size Guide Modal
-- "دليل المقاسات" link next to size selector
-- Modal with measurement table: XS/S/M/L/XL vs. bust/waist/hip in cm
-- Animated slide-up sheet, handle at top, close button
-
-#### 4.4 — "Similar Products" Section
-- At bottom of product detail: horizontal scroll of 4 products from same category
-- Section title: "منتجات مشابهة" with "عرض الكل" link
-- Uses existing `PRODUCTS` filtered by `categoryId`
-
-#### 4.5 — "From Same Brand" Section
-- Below similar products: "المزيد من {brand}"
-- 4 products from same brand (filtered from `PRODUCTS`)
-
-#### 4.6 — Ask About Product
-- "اسأل عن المنتج" row with chat bubble icon at bottom of product info
-- Opens simple modal with preset questions: "هل هذا المنتج أصلي؟" · "ما هو وقت التوصيل؟" · "هل يوجد ضمان؟"
-
-#### 4.7 — Notify Me When Back in Stock
-- If `inStock === false`: show "أبلغني عند التوفر" button instead of add-to-cart
-- Button captures intent (stored in AsyncStorage), shows confirmation toast
+**Critical weaknesses:**
+- No confetti or celebration particle animation
+- Delivery timeline dates are static placeholder strings
+- No post-purchase rating prompt
+- No mention of email/SMS confirmation
 
 ---
 
-### PHASE 5 — Search & Discovery — Advanced
-**Goal:** Search experience that matches AliExpress/Temu discovery features.
+### 1.3 Component Audit
 
-#### 5.1 — Search History
-- Store last 8 searches in AsyncStorage
-- Display in "البحث الأخير" section when search is empty (above popular searches)
-- Each item: clock icon + search term + X button to remove
-- "مسح السجل" button to clear all
-
-#### 5.2 — Trending Searches
-- Replace static popular tags with animated trending list
-- Add trend arrows (↑ trending, 🔥 hot) next to popular terms
-- Trending row: numbered list 1–6 with upward trend indicator icons
-
-#### 5.3 — Advanced Filter Sheet
-- Price range: real slider component (custom built or `@miblanchard/react-native-slider`)
-- Drag handles for min/max price with live value display
-- Rating filter: tap star count (5★ · 4★+ · 3★+)
-- Brand filter: searchable multi-select chips
-- Delivery filter: "توصيل سريع (أقل من يومين)" toggle
-- "جديد فقط" toggle · "عروض فقط" toggle
-- Filter count badge on filter button (shows number of active filters)
-- "إعادة تعيين" (reset all) button
-
-#### 5.4 — List / Grid Toggle
-- Toggle button in sort bar: grid icon ⊞ / list icon ☰
-- List view: full-width product rows with larger image left + info right (RTL)
-- Grid view: current 2-column layout
-- Animate transition between views with layout animation
-
-#### 5.5 — Image Search Placeholder
-- Camera icon in search bar → "البحث بالصورة"
-- Opens image picker (expo-image-picker already installed)
-- Shows "قريباً: البحث بالصورة الذكي" modal (placeholder for future AI feature)
-
-#### 5.6 — Category Mega-Menu
-- Long-press on category chips → expands sub-category menu below
-- Sub-categories for "ملابس": فساتين · بلوزات · بناطيل · عباءات · جاكيت
-- Animated expand with spring + fade
+| Component | Quality | Key Issues |
+|---|---|---|
+| `ProductCard` | 7/10 | No sold-out overlay, no flash-sale ribbon, no color swatches preview strip, no sold-count indicator |
+| `BannerCarousel` | 7/10 | Local images only; no CTA deep-links; no parallax on scroll |
+| `CategoryRow` | 7/10 | Visually functional; not connected to real sub-category pages |
+| `StoryStrip` | 7/10 | All stories route to generic search — no collection routing |
+| `BrandStrip` | 6/10 | All brands route to generic search — no brand pre-filter |
+| `FlashSaleTimer` | 8/10 | Works well; could pulse on final 60 seconds |
+| `HomeHeader` | 7/10 | Logo area weak; notification badge works |
+| `NotificationDrawer` | 7/10 | Auto-generated notifications; not user-specific |
+| `ReviewModal` | 7/10 | Random names; no photo upload |
+| `VoiceSearch` | 7/10 | Web uses SpeechRecognition; native simulates |
+| `AnnouncementBar` | 5/10 | Static text; no marquee or rotation |
+| `SkeletonBox` | 8/10 | Good base; no shimmer animation |
+| `AppToast` | 8/10 | Solid; entrance/exit motion could be more spring-like |
 
 ---
 
-### PHASE 6 — Cart — Smart & Animated
-**Goal:** Cart that increases average order value and delights with interactions.
+### 1.4 Backend Audit
 
-#### 6.1 — Swipe-to-Delete
-- Implement `react-native-gesture-handler` `Swipeable` on each cart item
-- Swipe left (RTL: left is the "forward" direction → swipe right in LTR space)
-- Reveal red delete action with trash icon + "حذف" label
-- Spring animation back if not fully swiped; delete if fully released
-
-#### 6.2 — Free Shipping Progress Bar
-- Prominent card above cart items: "أضف X ر.س لتحصل على شحن مجاني"
-- Animated progress bar filling as total increases
-- When threshold reached: green glow + celebration micro-animation + "مبروك! شحن مجاني" message
-
-#### 6.3 — Coupon Code in Cart
-- Move coupon entry to cart (in addition to checkout Step 2)
-- Add collapsible "أضف كود الخصم" row with expand/collapse animation
-- Applied coupon shows as green chip with discount amount and X to remove
-
-#### 6.4 — "You Might Also Like" Section
-- Below order summary: 4 product cards in horizontal scroll
-- Title: "قد يعجبك أيضاً" with sparkle emoji
-- Products: 4 items from most popular categories not in cart
-
-#### 6.5 — Bulk Actions
-- When multiple items in cart: "تحديد الكل" checkbox row
-- Allows deleting multiple items at once
-- Subtle spring animation on check/uncheck
+| Endpoint | Status |
+|---|---|
+| `GET /api/healthz` | ✅ Implemented |
+| `GET /api/products` | ❌ Missing |
+| `GET /api/products/:id` | ❌ Missing |
+| `GET /api/categories` | ❌ Missing |
+| `GET /api/banners` | ❌ Missing |
+| `GET /api/coupons/:code` | ❌ Missing |
+| `POST /api/orders` | ❌ Missing |
+| `GET /api/orders` | ❌ Missing |
+| `GET /api/products/:id/reviews` | ❌ Missing |
+| `POST /api/products/:id/reviews` | ❌ Missing |
+| DB Schema | ❌ Empty (boilerplate only) |
+| OpenAPI spec routes | ❌ Health only |
 
 ---
 
-### PHASE 7 — Checkout — Complete & Trustworthy
-**Goal:** Frictionless, professional checkout that builds trust and reduces abandonment.
+### 1.5 Competitive Gap Analysis — vs. Temu / Shein / AliExpress
 
-#### 7.1 — Form Validation
-- Real-time validation on all fields with red border + error message
-- Phone: must start with 05, length 10
-- Postal code: 5 digits only
-- Name: min 3 chars, Arabic/English only
-- Submit button disabled until all required fields valid
-- Success state: green border + checkmark on validated fields
-
-#### 7.2 — Saved Addresses
-- Step 1 shows previously used address as tappable card (stored in AsyncStorage)
-- "استخدام هذا العنوان" quick-fill button
-- "إضافة عنوان جديد" option to show the form
-
-#### 7.3 — Card Payment Fields
-- When "بطاقة بنكية" selected: expand card number / expiry / CVV fields with animation
-- Card number: formatted as XXXX-XXXX-XXXX-XXXX
-- Detect card type (Visa/Mastercard) and show icon
-- Expiry auto-formats MM/YY
-
-#### 7.4 — Gift Wrap Option
-- New section in Step 2: "تغليف هدايا" toggle
-- If enabled: add 15 ر.س + show gift message text input (max 100 chars)
-- Gift icon animates when toggled on
-
-#### 7.5 — Order Review Step Enhancement
-- Step 3: show product thumbnails in review list (not just text)
-- Show selected address summary card
-- Show payment method icon + last 4 digits if card
-- Trust badges row before "تأكيد الطلب" button
-
-#### 7.6 — Step Navigation
-- Allow tapping completed step circles to go back to that step
-- Step 2 "التالي" → Step 3, with back arrow in header going to Step 2
+| Feature | Temu | Shein | AliExpress | سوق |
+|---|---|---|---|---|
+| Infinite scroll | ✅ | ✅ | ✅ | ❌ |
+| Real-time search autocomplete | ✅ | ✅ | ✅ | ❌ |
+| Image pinch-to-zoom | ✅ | ✅ | ✅ | ❌ |
+| Product video | ✅ | ✅ | ✅ | ❌ |
+| Color swatches on card | ✅ | ✅ | ✅ | ❌ |
+| Sold-out overlay on card | ✅ | ✅ | ✅ | ❌ |
+| Shimmer skeleton loaders | ✅ | ✅ | ✅ | ❌ (static grey) |
+| Per-product flash countdown | ✅ | ✅ | ✅ | Partial |
+| Loyalty points + tier progress | ✅ | ✅ | ✅ | UI-only |
+| Real payment gateway | ✅ | ✅ | ✅ | ❌ |
+| Wishlist folders | ✅ | ✅ | ❌ | ❌ |
+| Active filter chips on results | ✅ | ✅ | ✅ | ❌ |
+| Price drop alerts | ✅ | ✅ | ✅ | ❌ |
+| Review photos | ✅ | ✅ | ✅ | ❌ |
+| "Complete the look" bundles | ✅ | ✅ | ✅ | ❌ |
+| Confetti / celebration animation | ✅ | ✅ | ❌ | ❌ |
+| Seller Q&A | ✅ | ❌ | ✅ | ❌ |
+| Image / barcode search | ✅ | ✅ | ✅ | ❌ |
+| Share product | ✅ | ✅ | ✅ | ❌ (button wired to nothing) |
+| Personalized feed | ✅ | ✅ | ✅ | Partial (recently viewed) |
+| Dark mode | ❌ | ❌ | ❌ | ✅ |
+| Full Arabic RTL | ❌ | Partial | Partial | ✅ |
 
 ---
 
-### PHASE 8 — Profile — Fully Functional
-**Goal:** Profile that feels like a real account dashboard, not a static mockup.
+## PART 2 — Stage-by-Stage Development Roadmap
 
-#### 8.1 — Edit Profile
-- Tapping "تعديل الملف" opens an edit sheet
-- Fields: name, email, phone, avatar (emoji selector with 12 options)
-- Saved to AsyncStorage, loaded on mount
-- Success toast on save
-
-#### 8.2 — Address Book Screen
-- New screen `/addresses` with list of saved addresses (AsyncStorage)
-- Add/edit/delete/set-default address
-- Each address card: name + city + neighborhood + default badge
-
-#### 8.3 — Loyalty Points System
-- New `LoyaltyContext` with points balance (100 points = 1 ر.س)
-- Earn points: 1 point per ر.س spent (simulated after each order)
-- Profile shows points balance with gold coin icon
-- Redeem points in checkout Step 2 as payment method
-
-#### 8.4 — Dark Mode Switch in Profile
-- "المظهر" row in Settings section with sun/moon icon
-- Toggle with animated transition (smooth 300ms)
-- Persist choice via `ThemeContext` (from Phase 1)
-
-#### 8.5 — Wallet Screen
-- New screen `/wallet` showing balance, recent transactions
-- Top-up and withdraw buttons (UI only)
-- Transaction list with icons and amounts
-
-#### 8.6 — Coupons Screen Upgrade
-- Already has `/my-coupons` — enhance with:
-  - Countdown timer on expiring coupons
-  - Barcode/QR code visual per coupon
-  - "نسخ الكود" copy button with haptic + toast confirmation
+> 12 phases ordered by visual impact → feature depth → infrastructure.
+> Recommended execution order: P1 → P2 → P3 → P4 → P5 → P6 → P7 → P8 → P9 → P10 → P11 → P12
 
 ---
 
-### PHASE 9 — Flash Deals & Brand Store Pages
-**Goal:** Dedicated discovery surfaces that drive urgency and brand loyalty.
+### ═══════════════════════════════════════════
+### PHASE 1 — ProductCard: World-Class Visual Upgrade
+### ═══════════════════════════════════════════
+**Goal:** Transform the most-viewed element in the app into a conversion machine.
+**Impact:** ⭐⭐⭐⭐⭐ | **Effort:** Medium | **Files:** `ProductCard.tsx`, `ProductCardSkeleton.tsx`
 
-#### 9.1 — Flash Deals Screen (`/flash-deals`)
-- Full-screen page accessible from Home "عروض اليوم" section header
-- Large countdown timer at top: HH:MM:SS with pulsing animation
-- Products grid with % discount badges prominently shown
-- Sort by: highest discount · cheapest · almost expired
-- "لا تفوت العرض" sticky CTA banner at bottom
+#### Micro-tasks:
+1. **Flash sale diagonal ribbon**
+   - For `isFlashSale` products: absolute-positioned red diagonal ribbon at top-right of image
+   - Text: "فلاش 🔥" in white Cairo_700Bold
+   - Implemented as a rotated View (rotate: '-45deg') with LinearGradient fill (#E63946 → #C1121F)
 
-#### 9.2 — Brand Store Page (`/brand/[id]`)
-- Brand header: gradient banner + brand logo + brand name in Arabic
-- Brand stats: number of products · avg rating · follower count (UI only)
-- "تابع الماركة" button (follow, stored in state)
-- Products grid filtered to brand
-- Brand story section: short text blurb
+2. **Color swatch preview strip**
+   - Below product name: render up to 3 colored circles from `product.colors` array (18px diameter, 2px white border)
+   - If more than 3 colors: show "+X" in muted text after the circles
+   - No circles if product has no `colors` field
 
-#### 9.3 — Collections/Editorial Page (`/collection/[slug]`)
-- Editorial header with large hero image + collection title
-- Curated product grid
-- "قصة المجموعة" text section
-- Accessed from Story Strip (Phase 2.5)
+3. **Sold-out overlay**
+   - When `product.inStock === false`: dark semi-transparent veil (rgba 0,0,0,0.45) over the entire image
+   - Centered Arabic text "نفد المخزون" in white Cairo_700Bold
+   - "أضف إلى السلة" button becomes grey and disabled (`pointerEvents: 'none'`)
 
----
+4. **Sold count indicator**
+   - Below rating row: "+X مبيعاً" in muted text (12px) when `soldCount > 500`
+   - Format with `toLocaleString('ar-SA')` for Arabic numerals
 
-### PHASE 10 — Order Experience — Delight
-**Goal:** Make order success and tracking feel celebratory and premium.
+5. **Wishlist heart bounce animation**
+   - On toggle to wishlisted: `Animated.sequence` → scale 1 → 1.45 → 1 with spring
+   - Color transitions from `colors.mutedForeground` → `colors.primary` simultaneously via interpolation
 
-#### 10.1 — Confetti on Order Success
-- On mount of `order-success.tsx`: trigger confetti particle animation
-- Use `react-native-reanimated` to animate 30+ colored particles falling from top
-- Particles use brand colors: #E63946, #F5A623, #1D2D50, #2DC653
-- Duration: 2.5 seconds, fade out in last 0.5s
+6. **Flash sale countdown chip on card**
+   - For `isFlashSale` products: small pill at bottom of image showing "⏱ MM:SS" live countdown
+   - Synced to the same target time used by `FlashSaleTimer` component (extract target to a shared constant)
+   - Red background (#E63946), white text, 10px Cairo_700Bold
 
-#### 10.2 — Animated Success Circle
-- Enhance existing circle: add circular progress stroke that draws around the checkmark
-- Stroke animates from 0% to 100% over 600ms using SVG or Animated arc
-- After completion: subtle scale pulse 3 times
+7. **Shimmer skeleton animation**
+   - Replace static grey placeholder in `ProductCardSkeleton` with an `Animated.loop` shimmer
+   - Shimmer: a lighter grey highlight that sweeps from right to left (RTL direction) using `translateX` interpolation
+   - Duration: 1200ms per cycle, loop infinitely
 
-#### 10.3 — Order Tracking — Live Pulse
-- Active step icon: pulsing ring animation (concentric circles expanding & fading)
-- Use `Animated.loop` + spring for continuous pulse
-- ETA countdown: if order is in "في الطريق" state, show live MM:SS countdown
-- Map placeholder: replace static box with animated gradient map-like pattern + moving dot
-
-#### 10.4 — Delivery Driver Card Enhancement
-- Add driver rating: "⭐ ٤.٩" next to driver name
-- Add vehicle info: "هيونداي إيلانترا · أبيض"
-- "شارك الموقع" (share location) button
+8. **"جديد" badge pulse ring**
+   - For `isNew` products: the "جديد" badge at bottom-right emits a pulsing scale ring every 3 seconds
+   - Ring: an absolutely-positioned View with same border-radius, animated from opacity 0.8 → 0 and scale 1 → 1.6
 
 ---
 
-### PHASE 11 — Micro-Interactions & Motion System
-**Goal:** Cohesive motion language that makes the app feel premium and alive.
+### ═══════════════════════════════════════════
+### PHASE 2 — Home Screen: Immersive Visual Overhaul
+### ═══════════════════════════════════════════
+**Goal:** Transform home into a conversion-optimized, editorially rich marketplace feed.
+**Impact:** ⭐⭐⭐⭐⭐ | **Effort:** Large | **Files:** `index.tsx`, `AnnouncementBar.tsx`, `BannerCarousel.tsx`, `StoryStrip.tsx`, `BrandStrip.tsx`, `CategoryRow.tsx`
 
-#### 11.1 — Screen Transition Animations
-- Install/configure custom screen transitions via Expo Router layout
-- Route push: slide from left (RTL-aware) with fade
-- Route pop: slide back to right
-- Modal screens: slide up from bottom with spring
-- Tab switch: fade + subtle scale (no slide — tabs don't slide)
+#### Micro-tasks:
+1. **Fix brand name inconsistency**
+   - Sticky header "الأسطورة" → "سوق" (matches tab bar and app wide identity)
 
-#### 11.2 — Tab Bar Upgrade
-- Tab bar: frosted glass effect on all platforms (web: backdrop-filter blur)
-- Active tab: filled background pill around icon + label
-- Tab switch: smooth color lerp animation
-- Cart/wishlist badge: spring bounce on count change
-- Center "اكتشف" tab: make it the most prominent tab (slightly elevated)
+2. **Category filter — cascade to all sections**
+   - Selecting a category now filters: flash sale products, new arrivals, featured, and best sellers
+   - Each section hides gracefully (`height: 0` + `opacity: 0` animation) if filtered count is 0
+   - "الكل" resets all sections to full content
 
-#### 11.3 — Empty States 2.0
-- Replace plain Ionicons empty states with illustrated SVG scenes
-- Cart empty: shopping bag with floating items illustration
-- Wishlist empty: heart with sparkles
-- Search no results: magnifying glass with question marks
-- Each: animated entrance (float up + fade)
-- Add actionable suggestion below button
+3. **AnnouncementBar — rotating marquee**
+   - Cycle through 3 messages every 2.5 seconds using `Animated.timing` opacity cross-fade
+   - Messages: "🚚 شحن مجاني على الطلبات +٥٠٠ ر.س" · "🎁 خصم ٣٠٪ بكود SAUDI30" · "⭐ انضم لبرنامج المكافآت واكسب نقاط"
+   - Background: gradient left-to-right (#E63946 → #C1121F) with subtle diagonal line texture
 
-#### 11.4 — Button Interactions
-- All primary buttons: subtle gradient (primary → primary+10% lightness)
-- Press state: scale down to 0.97 + darken 10% (using Animated)
-- Loading state: animated spinner replacing button text
-- Success state: green checkmark replaces text for 1.5s then resets
+4. **BannerCarousel — gradient overlay upgrade**
+   - Each banner uses its `bgGradient` data field: `LinearGradient` from transparent (top 40%) to brand color (bottom)
+   - Banner title + subtitle get `textShadow` for legibility over image
+   - CTA pill button: white background + brand-colored text, haptic on press, navigates to search
+   - Progress bars replace dots: thin animated fill bars below the carousel (not dot indicators)
+   - Parallax: image translates at 0.7x scroll speed via scroll event interpolation
 
-#### 11.5 — Scroll-Based Animations
-- Home section titles: fade-in + slide-up as they enter viewport
-- Product cards in grid: staggered entrance animation (each card delays 50ms from previous)
-- Use `IntersectionObserver` (web) or scroll position tracking (native)
+5. **StoryStrip — collection-aware routing**
+   - Each story now receives a `categoryId` or `searchQuery` prop
+   - Tap routes to `/(tabs)/search` with the relevant filter pre-applied as URL param (`?category=fashion`)
+   - Add an animated gradient ring around each story circle (pulsing opacity 0.6→1 loop)
+   - Story label text appears below the circle (was missing)
 
----
+6. **BrandStrip — brand-filtered search routing**
+   - Each brand tap passes `?brand=زارا` param to search screen
+   - Search screen reads this param and pre-applies brand filter on mount
 
-### PHASE 12 — "Complete the Look" & Bundle Deals
-**Goal:** Increase average order value through smart cross-sell and upsell.
+7. **Promo cards — navigation wired**
+   - "شحن مجاني" card → navigates to cart if non-empty, else to search
+   - "عروض حصرية" card → navigates to search with `?sale=true` filter param pre-applied
 
-#### 12.1 — "Complete the Look" on Product Detail
-- New section below product description: "أكملي الإطلالة"
-- Shows 2-3 complementary products (accessories + main + bag for fashion)
-- "أضف الكل للسلة" button with total price shown
-- Outfit preview: stacked images or carousel
+8. **New component: `SocialProofBar`**
+   - Horizontal rotating strip between flash sale section and promo cards
+   - 3 rotating messages (fade transition, 3s interval):
+     - "🔥 تم بيع ١٢٠٠ منتج اليوم"
+     - "👥 ٣٢٠ مستخدم يتسوقون الآن"
+     - "⭐ تقييم المتجر: ٤.٩ من ٥"
+   - Background: colors.secondary with border, Arabic text right-aligned
 
-#### 12.2 — Bundle Deals UI
-- New `BundleDeal` component: "اشتري ٢ بسعر ١ · اشتري ٣ واحصل على ٣٠٪ خصم"
-- Bundle selector on product detail with animated price update
-- Bundle products show as stacked thumbnails
+9. **Flash sale section — urgency upgrade**
+   - Add a pulsing red dot "LIVE" indicator next to the "عروض اليوم" title
+   - Pulsing dot: `Animated.loop` scale 1→1.3→1 at 800ms interval
+   - Flash sale cards: each card shows a mini sold-% bar below the price ("تم بيع ٨٨٪")
 
-#### 12.3 — Cart Upsell
-- "أضف هذه المنتجات لتوفر أكثر" section at cart bottom
-- Algorithmic: show products from categories with highest cart discount
-- Mini horizontal card list, swipeable
-
-#### 12.4 — "Frequently Bought Together"
-- On product detail: "يُشترى معاً في الغالب" section
-- 2 product combo with combined price + discount
-- One-click "أضف الاثنين للسلة" button
+10. **Recently viewed — AsyncStorage persistence**
+    - `RecentlyViewedContext`: on `addToRecentlyViewed`, also persist full array to AsyncStorage
+    - On context mount: load from AsyncStorage as initial state (max 10 items)
+    - This makes recently viewed survive app restarts
 
 ---
 
-### PHASE 13 — Content & Social Features
-**Goal:** Community and trust features that mirror what makes AliExpress/Shein compelling.
+### ═══════════════════════════════════════════
+### PHASE 3 — Search & Discovery: Full Overhaul
+### ═══════════════════════════════════════════
+**Goal:** Instant, intelligent, visually polished discovery — matching the best of Temu.
+**Impact:** ⭐⭐⭐⭐⭐ | **Effort:** Large | **Files:** `search.tsx`
 
-#### 13.1 — Review Photos Support
-- Extend `Review` type to include `photos?: string[]`
-- Review cards: show thumbnail strip if photos exist
-- Photo viewer modal: full-screen with swipe
-- "أضف صوراً" in ReviewModal with expo-image-picker
+#### Micro-tasks:
+1. **Real-time debounced search**
+   - As user types (≥2 characters), filter `PRODUCTS` with 150ms debounce
+   - Results update instantly in grid/list below
+   - Show result count label: "١٢ نتيجة لـ «فستان»" directly below search bar
 
-#### 13.2 — Review Sorting & Filters
-- Above review list: sort by "الأحدث" · "الأعلى تقييماً" · "مع صور"
-- Filter by star count: tap 5★ to show only 5-star reviews
+2. **Autocomplete suggestion dropdown**
+   - While typing, show a dropdown overlay of up to 6 matching product names from mock data
+   - Matched portion of each suggestion highlighted in `colors.primary` bold text
+   - Tap suggestion → fills search field and triggers immediate search
 
-#### 13.3 — "Ask the Seller" Feature
-- On product detail: "أسئلة وأجوبة" section
-- List of preset Q&A pairs (static data)
-- "اسأل سؤالاً" button opens text input modal
-- Shows "سيتم الرد خلال ٢٤ ساعة" confirmation
+3. **Active filter chips bar**
+   - After applying filters via bottom sheet, show a horizontal scrollable chip row below the search bar
+   - Each active filter: pill with label + ✕ dismiss button (e.g., "السعر: ٢٠٠–٥٠٠ ✕")
+   - Tapping ✕ removes just that filter without reopening the sheet
+   - "مسح الكل" chip at end clears all filters at once
 
-#### 13.4 — Editorial "اختيارات المحرر" Section
-- Home section: curated picks with editor photo + quote
-- "اختارت خبيرة الموضة هذه المنتجات لك"
-- 4-product horizontal scroll
+4. **Filter bottom sheet — expanded options**
+   - Add: minimum rating selector (tap star tiers: 4★+, 3★+, any)
+   - Add: brand multi-select (list of unique brands from PRODUCTS as checkboxes)
+   - Add: color filter (color circle multi-select — unique colors from all products)
+   - Add: delivery speed filter chips ("توصيل خلال يوم" / "٢–٣ أيام" / "أي وقت")
+   - Filter button shows active count badge: "تصفية (٣)" when 3 filters active
 
----
+5. **Zero-results empty state illustration**
+   - When no results match: centered layout with large magnifying glass SVG icon
+   - Arabic copy: "لا توجد نتائج لـ «{query}»"
+   - Subtitle: "جرّب كلمة مختلفة أو تحقق من الإملاء"
+   - "مسح البحث" button resets query
 
-### PHASE 14 — Personalization & Gamification
-**Goal:** Make users feel the app knows them — driving retention and repeat purchases.
+6. **Popular searches — trend indicators**
+   - Each popular search chip now shows a trend arrow: 🔥 for top 3, ↑ for rest
+   - Chips animate in with staggered fade+slide from right on screen mount (50ms per chip)
 
-#### 14.1 — Loyalty Points Display
-- Points balance shown in: profile header (gold coin icon) · cart page · checkout
-- Animated counter on points earned: numbers roll up
-- Points tier badges: برونزي · فضي · ذهبي · بلاتيني (based on total spend)
+7. **Recent searches — product thumbnail**
+   - Each recent search term shows a small 28px product image beside it (if a matching product exists)
+   - "مسح الكل" button shows a 3-second undo toast: "تم مسح السجل · تراجع"
 
-#### 14.2 — Daily Check-In Streak
-- Profile section: "سجل يومي" with fire streak emoji
-- Shows consecutive days opened: "٧ أيام متتالية 🔥"
-- Reward: 10 points per day, 50 bonus at 7-day streak
-- Animated calendar grid showing streak history
-
-#### 14.3 — Referral Program UI
-- New section in profile: "أحضر صديقاً واربح"
-- Unique referral code display with copy button
-- "٥٠ ر.س لك + ٥٠ ر.س لصديقك"
-- Share button opens native share sheet
-
-#### 14.4 — Personalized "لك خصيصاً" Section
-- Home section based on recently viewed categories
-- "بناءً على اهتمامك بالملابس، وجدنا لك..."
-- Products filtered by most-viewed `categoryId`
+8. **Search results sort bar**
+   - Sticky row at top of results: result count (right) + sort selector + view toggle (left)
+   - Sort is a compact inline dropdown (not full-screen modal)
+   - View toggle smoothly transitions between grid/list using `LayoutAnimation.configureNext`
 
 ---
 
-### PHASE 15 — Performance & Accessibility
-**Goal:** App that is fast, accessible, and ready for production scale.
+### ═══════════════════════════════════════════
+### PHASE 4 — Product Detail: Premium Experience
+### ═══════════════════════════════════════════
+**Goal:** Product pages that feel editorial, trustworthy, and irresistible.
+**Impact:** ⭐⭐⭐⭐⭐ | **Effort:** Large | **Files:** `product/[id].tsx`, `ReviewModal.tsx`
 
-#### 15.1 — Image Performance
-- Replace all `<Image>` with `<ExpoImage>` (expo-image) for: disk caching · memory caching · crossfade · placeholder
-- Add `contentFit="cover"` and `transition={300}` on all product images
-- Lazy loading: only load images within 2 viewport heights
+#### Micro-tasks:
+1. **Image gallery — pinch-to-zoom**
+   - Wrap each gallery image in `PinchGestureHandler` (from react-native-gesture-handler)
+   - Scale gesture clamped 1x–3.5x, centered on pinch origin
+   - Spring reset to 1x on pinch release (`Animated.spring`)
+   - Double-tap anywhere on image → zoom to 2x at tap position, second double-tap resets
 
-#### 15.2 — List Virtualization
-- Replace `map()` + `View` product grids with `FlatList` with `numColumns={2}` for proper virtualization
-- Add `windowSize={5}` and `maxToRenderPerBatch={6}` for performance
-- Add `getItemLayout` for fixed-height items
+2. **Share button — real implementation**
+   - Wire existing share icon to `Share.share({ message: '${product.nameAr} بسعر ${product.price} ر.س - سوق', url: 'https://souq.app/product/${product.id}' })`
+   - Haptic `impactAsync(Light)` on press
 
-#### 15.3 — Accessibility
-- All interactive elements: `accessibilityLabel` in Arabic (most already done — audit remainder)
-- Add `accessibilityRole` to all buttons, links, inputs
-- Support dynamic font scaling: replace fixed font sizes with `PixelRatio`-aware sizes
-- Minimum touch target: 44×44px for all interactive elements (audit current)
+3. **Size guide modal**
+   - Tapping "دليل المقاسات" link opens a spring bottom sheet
+   - Sheet contains an Arabic measurement table (XS/S/M/L/XL vs. صدر/خصر/أرداف in cm)
+   - Slides up from bottom with handle, tap background or handle to close
 
-#### 15.4 — Code Quality
-- Extract inline StyleSheet objects from component bodies to module scope (not per-render)
-- Eliminate `useMemo(() => StyleSheet.create(...), [colors, ...])` patterns — create styles once, use color vars for dynamic values
-- Add TypeScript strict null checks on navigation params
+4. **Product specifications section**
+   - New collapsible "المواصفات" section below description
+   - Expands/collapses with `Animated.timing` on height
+   - Rows: Material (الخامة), Care (العناية), Origin (بلد المنشأ), Weight (الوزن)
+   - Data sourced from product category with sensible Arabic defaults
+
+5. **"X people viewing" urgency indicator**
+   - Below product name: green pulsing dot + "يشاهد هذا المنتج الآن X شخص"
+   - Number: random 5–20 on mount, refreshes every 30s via `setInterval`
+   - Pulsing dot: scale 1→1.3→1 loop at 900ms
+
+6. **Size/color selection — spring feedback**
+   - On selection: selected chip springs to scale 1.08 then settles at 1.0
+   - Previous selection springs back to 1.0 from any prior scale
+   - Color circle: selected state adds a 3px `colors.primary` ring with 2px gap (outline effect)
+
+7. **Q&A section**
+   - New "أسئلة وأجوبة" section below reviews
+   - Shows 3 preset Q&A pairs per product category (questions about authenticity, delivery, warranty)
+   - "+ اطرح سؤالاً" button → TextInput modal → submit shows toast "تم إرسال سؤالك ✓"
+
+8. **"Customers also bought" section**
+   - Below related products: "اشترى معه أيضاً" with 3 products from DIFFERENT categories
+   - Labeled with "مبيعات مشتركة" and a shopping bags icon
+
+9. **Review photos support**
+   - `ReviewModal`: add up to 3 photo slots using `expo-image-picker`
+   - Selected photos stored as URIs in ReviewsContext review objects
+   - On review card: horizontal photo strip (56×56 rounded squares) above review text if photos exist
+
+10. **Quick-View bottom drawer (long-press on ProductCard)**
+    - Long-press on any ProductCard → opens a bottom sheet with: main image, name, price, color picker, size picker, "أضف للسلة" CTA
+    - Spring slide-up animation, drag-to-dismiss, backdrop tap closes
+    - Lets users add to cart without navigating away from browse feed
 
 ---
 
-## 🎨 Global Design System Upgrades (applied across all phases)
+### ═══════════════════════════════════════════
+### PHASE 5 — Cart & Wishlist: Premium Conversion Layer
+### ═══════════════════════════════════════════
+**Goal:** Cart that maximizes AOV; wishlist that feels like a personal collection board.
+**Impact:** ⭐⭐⭐⭐ | **Effort:** Medium | **Files:** `cart.tsx`, `wishlist.tsx`, `CartContext.tsx`
 
-### Typography Scale
+#### Micro-tasks:
+1. **Cart items — variant display**
+   - Each cart item shows selected size/color below product name
+   - Color: small 14px circle swatch in the selected hex color
+   - Size: small grey pill ("M") next to the color swatch
+
+2. **Cart — "save for later" swipe action**
+   - Second swipe-to-reveal action (right side): reveals a heart icon + "حفظ لاحقاً" label in blue
+   - Tapping moves item from cart to wishlist + shows toast "نُقل إلى المفضلة"
+   - Left swipe: existing delete action (trash, red)
+
+3. **Cart — cross-sell section**
+   - Below order summary card: "قد يعجبك أيضاً ✨" horizontal FlatList (4 products)
+   - Products selected from categories NOT already in the cart
+   - Each card uses compact horizontal layout (image left, name+price+add-btn right)
+
+4. **Cart — dynamic free shipping threshold**
+   - Extract `FREE_SHIPPING_THRESHOLD` to a config constant (e.g., `constants/shipping.ts`)
+   - Progress bar label animates remaining amount with a rolling number counter as qty changes
+   - When threshold crossed: bar fills green, "🎉 مبروك! شحن مجاني مضاف" animated toast
+
+5. **Cart — illustrated empty state**
+   - Replace plain text with: large shopping cart SVG illustration (empty bag with "فارغة" text inside)
+   - Below illustration: "سلتك فارغة" title + "ابدأ التسوق" primary gradient CTA button
+
+6. **Wishlist — folders/collections**
+   - Add a "+" button on wishlist header to create a named collection
+   - Collections stored in `WishlistContext` as `{ id, name, productIds[] }`
+   - Wishlist screen shows "الكل" tab + one tab per collection (horizontal tab strip)
+   - Drag-to-add: long-press product card reveals collection picker overlay
+
+7. **Wishlist — price drop badge**
+   - Each wishlist card checks if `product.discount > 0`: show green "انخفض السعر!" overlay chip on image
+
+8. **Wishlist — sort + filter bar**
+   - Sort options: recently added, price ↑, price ↓, highest rated
+   - Filter chip: category quick-filter below the tab strip
+
+---
+
+### ═══════════════════════════════════════════
+### PHASE 6 — Checkout & Order Experience: Trust & Delight
+### ═══════════════════════════════════════════
+**Goal:** Remove friction from checkout, celebrate order success with world-class animation.
+**Impact:** ⭐⭐⭐⭐ | **Effort:** Large | **Files:** `checkout.tsx`, `order-success.tsx`, `order-tracking.tsx`
+
+#### Micro-tasks:
+1. **Step progress line — animated fill**
+   - Connector line between step circles fills left-to-right (Animated.timing on `width`) when advancing
+   - Retreating: fills right-to-left (reverse animation)
+   - Completed step circle: adds a spring-scale checkmark icon inside
+
+2. **Address — AsyncStorage persistence**
+   - When user submits a new address, save it to AsyncStorage under key `saved_addresses`
+   - Next checkout: saved addresses load from AsyncStorage (not hardcoded)
+   - Show "تم حفظ عنوانك ✓" toast after save
+
+3. **Card payment — inline form expansion**
+   - Selecting "بطاقة بنكية": smoothly expands card fields below (Animated.timing on height)
+   - Fields: Card number (formatted XXXX XXXX XXXX XXXX), Expiry (MM/YY auto-format), CVV (hidden)
+   - Card type detection: as user types, detect Visa/Mastercard/Mada and show icon in card field
+   - Fields validated before allowing step advance
+
+4. **Apple Pay visual treatment**
+   - Apple Pay option: render in official black pill button style with Apple logo (Ionicons `logo-apple`)
+   - Distinct from other payment options — larger, premium visual weight
+
+5. **Order review step — full summary**
+   - Step 3 shows: product images + names + variants + quantities, full address, payment method icon + label, applied coupon chip, delivery ETA date, and final total
+
+6. **Confetti on order success**
+   - On `order-success.tsx` mount: trigger 30-particle confetti explosion
+   - Each particle: a small colored square/circle (8–14px), starting from top-center
+   - `Animated.parallel` with random x drift (-150 to +150), y fall (0 to screen height * 0.6), rotation, and opacity fade
+   - Duration: 2.5 seconds, brand colors (#E63946, #F5A623, #1D2D50, #2DC653, #fff)
+
+7. **Order success — post-purchase star rating**
+   - Below "تتبع طلبك" CTA: "كيف كانت تجربتك؟" with 5 tappable stars
+   - Star tap → haptic success + shows "شكراً على تقييمك! ❤️" inline with spring animation
+
+8. **Order tracking — pulsing active step**
+   - Active step in timeline: pulsing concentric ring (`Animated.loop`, scale 1→1.4, opacity 0.8→0)
+   - Gives a "live" feel to the in-progress step
+   - Map placeholder: animated gradient overlay with a moving delivery truck dot (simple translateX loop)
+
+---
+
+### ═══════════════════════════════════════════
+### PHASE 7 — Profile & Loyalty: Real Account Dashboard
+### ═══════════════════════════════════════════
+**Goal:** Profile that feels like a real user account with loyalty mechanics, not a static mockup.
+**Impact:** ⭐⭐⭐⭐ | **Effort:** Large | **Files:** `profile.tsx`, new `addresses.tsx`, new `wallet.tsx`
+
+#### Micro-tasks:
+1. **Edit profile — AsyncStorage persistence**
+   - Tapping avatar or "تعديل" opens a bottom sheet
+   - Fields: display name, phone, email, avatar choice (12 emoji/icon options)
+   - Saves to AsyncStorage on confirm; profile loads this data on mount
+
+2. **Avatar — image upload**
+   - "تغيير الصورة" option within edit sheet opens `expo-image-picker`
+   - Selected image URI stored in AsyncStorage; displayed as profile photo (circular crop)
+
+3. **Loyalty tier progress bar**
+   - Below avatar: horizontal gradient bar from tier color to next tier color
+   - Label: "عضو ذهبي • ٢٥٠ نقطة حتى البلاتيني"
+   - Tiers (by total spend): برونزي → فضي (1000ر.س) → ذهبي (5000ر.س) → بلاتيني (10000ر.س)
+   - Bar segment fills proportionally; animated on mount (0 → current fill)
+
+4. **New screen: `app/addresses.tsx`**
+   - List of saved addresses from AsyncStorage
+   - Each card: icon + label (المنزل/العمل) + city + district + "افتراضي" badge
+   - Swipe-to-delete, "+" button to add new address (same form as checkout step 1)
+   - Setting a default address updates checkout to pre-select it
+
+5. **New screen: `app/wallet.tsx`**
+   - Header: balance display "٢٥٠ ر.س" with gold coin icon, large bold number
+   - Transaction history: list of mock transactions (earned from orders, spent at checkout)
+   - "أضف رصيداً" and "اسحب" buttons (UI only with toast)
+
+6. **Referral feature**
+   - Profile menu item "ادع صديقاً — اكسب ٥٠ ر.س"
+   - Opens a sheet with generated referral code (user's name initial + 4 random chars)
+   - Share button calls `Share.share()` with referral message
+   - "تمت المشاركة" toast on success
+
+7. **Profile stats — reviews count**
+   - Third stat becomes "تقييماتي" sourced from `ReviewsContext` count (not hardcoded)
+
+8. **Order history — drill-down screen**
+   - Tapping any order in `order-history.tsx` navigates to `app/order-detail/[id].tsx`
+   - Screen shows: order items (images + names + variants), address, payment method, status timeline, total
+
+---
+
+### ═══════════════════════════════════════════
+### PHASE 8 — Micro-interactions & Motion System
+### ═══════════════════════════════════════════
+**Goal:** A cohesive motion language that makes every touch feel premium and every state change feel intentional.
+**Impact:** ⭐⭐⭐⭐⭐ | **Effort:** Medium-Large | **Files:** Multiple
+
+#### Micro-tasks:
+1. **Tab bar — icon spring on select**
+   - Each tab icon bounces on selection: `Animated.spring` scale 1 → 1.3 → 1 (duration 250ms)
+   - Active tab label slides up 4px + fades in simultaneously
+   - Tab bar background: frosted glass effect on all platforms
+
+2. **Add-to-cart — particle burst animation**
+   - On "أضف إلى السلة" tap from any screen: 6 small colored circles fly upward and fade out
+   - Positioned absolutely, originating from button, dispersing in arc toward cart tab icon
+   - Parallel Animated.timing on x, y (spring), opacity
+
+3. **Home scroll — banner parallax**
+   - BannerCarousel images translate at 0.65x the vertical scroll speed
+   - Banner text/CTA layers scroll at 1x — creates depth separation
+   - Implemented via `scrollY` Animated.event → `translateY` interpolation on image layer
+
+4. **Skeleton → content crossfade**
+   - When content loads after refresh: skeletons fade out (`opacity: 1→0`) while real content fades in (`opacity: 0→1`) simultaneously using `Animated.parallel`
+   - Prevents jarring snap-to-content
+
+5. **Price counter animation**
+   - When cart total changes (quantity adjusted): price number rolls via `Animated.timing` with a counter interpolation (from old value to new value over 300ms)
+   - Implemented by animating a shared `Animated.Value` between old and new total
+
+6. **FlashSaleTimer — pulse on last 60s**
+   - When remaining time < 60 seconds: timer digits pulse with `Animated.loop` scale 1 → 1.06 → 1 at 500ms interval
+   - Color shifts from colors.text to colors.primary
+
+7. **Checkout step — directional slide transition**
+   - Advancing steps: content slides in from the LEFT (RTL-correct: next step enters from right of reading direction)
+   - Going back: content slides from the RIGHT
+   - `Animated.timing` on `translateX`, 280ms, eased
+
+8. **Toast — spring entrance + fade exit**
+   - Toast enters: `Animated.spring` translateY from +80 to 0, slight overshoot damping 0.7
+   - Toast exits: `Animated.timing` opacity 1→0 + translateY 0→+20 over 200ms
+   - Replace current timing-based exit with this spring-based system
+
+9. **Button press state — universal standard**
+   - All primary CTAs (gradient buttons): `Animated.spring` scale 0.97 on `onPressIn`, restore on `onPressOut`
+   - Applied uniformly across: Add to Cart, Buy Now, Place Order, Apply Coupon, Next Step buttons
+
+10. **Screen mount fade-in**
+    - Each stack screen mounts with a 180ms `Animated.timing` opacity 0→1
+    - Applied via a shared `useFadeIn` hook that returns a style object
+
+---
+
+### ═══════════════════════════════════════════
+### PHASE 9 — Backend & Data Layer Integration
+### ═══════════════════════════════════════════
+**Goal:** Replace all mock data with a real PostgreSQL backend, establishing a production-grade data pipeline.
+**Impact:** ⭐⭐⭐⭐ | **Effort:** Very Large | **Files:** `lib/db/`, `lib/api-spec/`, `artifacts/api-server/`, all screens
+
+#### Micro-tasks:
+1. **DB Schema — complete table definitions**
+   - `lib/db/src/schema/index.ts`: define all tables using Drizzle `pgTable`:
+     `products`, `categories`, `banners`, `coupons`, `orders`, `order_items`, `users`, `addresses`, `reviews`
+   - Run `pnpm --filter @workspace/db run push`
+
+2. **Seed script**
+   - `lib/db/src/seed.ts`: idempotent seeder for all 12 products, 6 categories, 3 banners, 4 coupons
+   - Matches current mock data structure exactly for zero frontend disruption
+
+3. **OpenAPI spec expansion**
+   - Define all product/category/coupon/order/review endpoints in `openapi.yaml`
+   - Include all filter params (category, brand, price_min, price_max, sort, search, limit, offset)
+   - Run `pnpm --filter @workspace/api-spec run codegen` to regenerate hooks
+
+4. **API Server — implement all routes**
+   - Products router: list with full filter/sort/search/pagination + get by ID
+   - Categories, banners, coupons routers
+   - Orders router: create (POST), list (GET), get by ID
+   - Reviews router: list by product (GET), create (POST)
+
+5. **Frontend — replace mock imports with React Query hooks**
+   - Home: `useGetProducts`, `useGetCategories`, `useGetBanners`
+   - Product detail: `useGetProductById`, `useGetProductReviews`
+   - Search: `useGetProducts` with all filter params
+   - Checkout: `usePostOrder`
+
+6. **Infinite scroll**
+   - Search and category pages use `useInfiniteQuery` for page-based loading
+   - `FlatList` `onEndReached` triggers next page fetch
+   - "جارٍ التحميل..." skeleton row at list bottom during fetch
+
+7. **Offline / error state**
+   - Global error handler in QueryClient: when API call fails, show "لا يوجد اتصال بالإنترنت" banner
+   - Retry button on error states
+
+---
+
+### ═══════════════════════════════════════════
+### PHASE 10 — Authentication System
+### ═══════════════════════════════════════════
+**Goal:** Real user identity with a native-quality onboarding experience.
+**Impact:** ⭐⭐⭐ | **Effort:** Large | **Files:** New screens + `AuthContext.tsx`
+
+#### Micro-tasks:
+1. **Onboarding carousel — `app/auth/welcome.tsx`**
+   - 3 editorial slides with large illustrations, Arabic headline, subtitle
+   - Slide 1: "أفضل المنتجات بأسعار لا تُقاوَم"
+   - Slide 2: "تسوق بالعربية — راحة حقيقية"
+   - Slide 3: "توصيل سريع لباب بيتك"
+   - "تسجيل الدخول" + "إنشاء حساب" + "تسوق كضيف" CTAs at bottom
+
+2. **Login screen — `app/auth/login.tsx`**
+   - Saudi phone number input (05XXXXXXXX format) with Mada-style keyboard
+   - "إرسال رمز التحقق" button → navigates to OTP screen
+   - Social login placeholders: Google / Apple (UI only in v1)
+
+3. **OTP screen — `app/auth/otp.tsx`**
+   - 4 single-char inputs with auto-advance on each digit
+   - In dev: OTP is always "1234" shown in a toast for demo
+   - Correct OTP → spring success checkmark → navigate to home
+   - Resend timer (60s countdown)
+
+4. **Register screen — `app/auth/register.tsx`**
+   - Name, email (optional), phone, password fields with validation
+   - Password: show/hide toggle, strength indicator bar
+
+5. **AuthContext**
+   - Stores: `user` object, `token` (SecureStore), `isAuthenticated`, `isGuest`
+   - `login()`, `logout()`, `register()` methods
+   - Root layout checks auth state and redirects to welcome if needed (protected routes)
+
+6. **Guest mode flow**
+   - Guest can browse freely and add to cart
+   - Tapping checkout as guest → shows "سجّل الدخول لإتمام الطلب" modal with quick options
+
+---
+
+### ═══════════════════════════════════════════
+### PHASE 11 — Advanced Discovery & Gamification
+### ═══════════════════════════════════════════
+**Goal:** Intelligence and delight features that create habit and distinguish from all competitors.
+**Impact:** ⭐⭐⭐⭐ | **Effort:** Large | **Files:** Multiple new screens and components
+
+#### Micro-tasks:
+1. **Barcode scanner**
+   - Camera icon in search → opens `expo-barcode-scanner`
+   - Scanned code triggers mock product lookup (hardcoded EAN → product ID map)
+   - Navigates directly to that product's detail screen
+
+2. **Image search — visual placeholder**
+   - Gallery icon in search opens `expo-image-picker`
+   - Picked image → 1.5s "analyzing" loader animation → shows 3 "visually similar" products (mock results)
+
+3. **Price drop alerts**
+   - Product detail: "أبلغني عند انخفاض السعر 🔔" button
+   - Stores intent in AsyncStorage `{ productId, priceAtSave }`
+   - On app open: check if current mock price < saved price → triggers local notification
+
+4. **Daily check-in streak**
+   - Profile screen: "تسجيل يومي" card with 7-day grid
+   - Each day cell shows a coin icon that fills gold on check-in
+   - First check-in of the day: spring pop animation + points awarded + toast
+   - Streak stored in AsyncStorage, resets if a day is missed
+
+5. **Bundle deals — `BundleCard` component**
+   - On product detail: "اشتريهم معاً واحفظ ١٥٪" section
+   - Shows 2 complementary products as horizontal pair
+   - Combined price with discount, "أضف الحزمة للسلة" CTA
+   - Products selected by category complementarity logic
+
+6. **"لك أنت" personalized feed section**
+   - New home screen section: "بناءً على اهتماماتك ✨"
+   - Derived from: recently viewed categories, wishlist categories, cart categories
+   - Filters products from those categories, de-duplicated from other sections
+   - Shows "لماذا نقترح هذا؟" tooltip on long-press of section title
+
+7. **Spin-the-wheel "اربح خصماً"**
+   - Once-per-day card on home (below personalized section)
+   - Animated spinning wheel (8 segments, 5 discount values + 3 "حظاً أوفر")
+   - Winner segment animates into position with spring deceleration + haptic
+   - Won coupon auto-added to "كوبوناتي"
+
+---
+
+### ═══════════════════════════════════════════
+### PHASE 12 — Performance, Accessibility & PWA
+### ═══════════════════════════════════════════
+**Goal:** Zero-lag, fully accessible, PWA-ready product with pixel-perfect consistency.
+**Impact:** ⭐⭐⭐ | **Effort:** Medium | **Files:** Multiple
+
+#### Micro-tasks:
+1. **`expo-image` migration**
+   - Replace all `<Image>` (react-native) with `<Image>` from `expo-image`
+   - Add `placeholder={blurhash}` for instant blur-to-sharp load transitions
+   - Add `contentFit="cover"` and `transition={200}` for smooth crossfade
+
+2. **FlatList performance audit**
+   - Add `getItemLayout` to all fixed-height FlatLists (product cards, order items)
+   - Add `removeClippedSubviews={Platform.OS !== 'web'}`
+   - Add `maxToRenderPerBatch={6}` and `windowSize={7}` to search results list
+
+3. **Typography constants file**
+   - Create `constants/typography.ts` with all font sizes, line heights, weights as named exports
+   - Migrate all hardcoded font sizes throughout the codebase to use these constants
+
+4. **Accessibility audit**
+   - Verify every interactive element has `accessibilityLabel` (Arabic), `accessibilityRole`, `accessibilityHint`
+   - Ensure minimum touch target 44×44pt everywhere (add `hitSlop` where needed)
+   - Verify screen reader flow in logical RTL reading order
+
+5. **Haptic preference gate**
+   - Add "الاهتزازات" toggle in Profile Settings (stored in AsyncStorage)
+   - All `Haptics.*` calls wrapped in: `if (hapticsEnabled) { ... }`
+
+6. **Web PWA manifest**
+   - `app.json` web config: name "سوق", short_name "سوق", `theme_color: "#E63946"`, `background_color: "#F8F9FC"`
+   - Add `icon` and `splash` for web
+   - Verify service worker caching for offline product browsing
+
+7. **Deep linking configuration**
+   - Expo Router URL schemes: `/product/:id`, `/category/:id`, `/order/:id`, `/brand/:name`
+   - Test deep links from external share (from Phase 4's Share implementation)
+
+8. **Error boundaries — per-screen isolation**
+   - Wrap each tab screen in its own `<ErrorBoundary>` (already exists — ensure it's applied per-tab)
+   - Each boundary shows the Arabic `ErrorFallback` without killing sibling tabs
+
+---
+
+## PART 3 — Execution Protocol
+
+### Workflow
+1. User confirms a phase: "تنفيذ المرحلة ١" or "Execute Phase 1"
+2. All micro-tasks in that phase are executed strictly as described above
+3. Execution summary delivered (task-by-task status)
+4. This file's status table (below) is updated with ✅
+
+### Phase Status Tracker
+
+| Phase | Title | Status | Date Completed |
+|---|---|---|---|
+| P1 | ProductCard: World-Class Visual Upgrade | ⏳ Pending | — |
+| P2 | Home Screen: Immersive Visual Overhaul | ⏳ Pending | — |
+| P3 | Search & Discovery: Full Overhaul | ⏳ Pending | — |
+| P4 | Product Detail: Premium Experience | ⏳ Pending | — |
+| P5 | Cart & Wishlist: Premium Conversion Layer | ⏳ Pending | — |
+| P6 | Checkout & Order Experience | ⏳ Pending | — |
+| P7 | Profile & Loyalty: Real Account Dashboard | ⏳ Pending | — |
+| P8 | Micro-interactions & Motion System | ⏳ Pending | — |
+| P9 | Backend & Data Layer Integration | ⏳ Pending | — |
+| P10 | Authentication System | ⏳ Pending | — |
+| P11 | Advanced Discovery & Gamification | ⏳ Pending | — |
+| P12 | Performance, Accessibility & PWA | ⏳ Pending | — |
+
+### Recommended Execution Order (by visual ROI)
 ```
-Display: Cairo_800ExtraBold 32px / lineHeight 42
-H1: Cairo_800ExtraBold 24px / lineHeight 34
-H2: Cairo_700Bold 20px / lineHeight 28
-H3: Cairo_700Bold 17px / lineHeight 24
-Body: Cairo_400Regular 14px / lineHeight 22
-Caption: Cairo_400Regular 12px / lineHeight 18
-Label: Cairo_600SemiBold 13px / lineHeight 18
+P1 → P2 → P3 → P4 → P8 → P5 → P6 → P7 → P9 → P10 → P11 → P12
 ```
 
-### Motion Tokens
-```
-Fast: 150ms ease-out (micro feedback)
-Normal: 280ms spring (navigation, drawers)
-Slow: 450ms spring (page transitions, celebrations)
-Spring config: tension: 60, friction: 10 (default)
-Spring config: tension: 80, friction: 14 (snappy)
-```
-
-### Elevation System
-```
-Level 1 (cards): shadow 0 2px 8px rgba(0,0,0,0.08)
-Level 2 (drawers): shadow 0 8px 32px rgba(0,0,0,0.16)
-Level 3 (modals): shadow 0 16px 48px rgba(0,0,0,0.24)
-```
-
-### Border Radius Tokens
-```
-sm: 8px (chips, badges)
-md: 12px (inputs, small cards)
-lg: 16px (cards)
-xl: 20px (major cards, banners)
-full: 999px (pills, avatars)
-```
+| Phase | Visual Impact | Effort | Priority |
+|---|---|---|---|
+| P1 — ProductCard | ⭐⭐⭐⭐⭐ | Medium | 🔴 First |
+| P2 — Home Screen | ⭐⭐⭐⭐⭐ | Large | 🔴 Second |
+| P3 — Search | ⭐⭐⭐⭐⭐ | Large | 🔴 Third |
+| P4 — Product Detail | ⭐⭐⭐⭐⭐ | Large | 🟠 High |
+| P8 — Motion System | ⭐⭐⭐⭐⭐ | Medium-Large | 🟠 High |
+| P5 — Cart & Wishlist | ⭐⭐⭐⭐ | Medium | 🟡 Medium |
+| P6 — Checkout | ⭐⭐⭐⭐ | Large | 🟡 Medium |
+| P7 — Profile | ⭐⭐⭐ | Large | 🟡 Medium |
+| P9 — Backend | ⭐⭐⭐⭐ | Very Large | 🔵 Foundation |
+| P10 — Auth | ⭐⭐⭐ | Large | 🔵 Foundation |
+| P11 — Discovery | ⭐⭐⭐⭐ | Large | 🟢 Growth |
+| P12 — Performance | ⭐⭐⭐ | Medium | 🟢 Final |
 
 ---
 
-## ✅ Execution Rules
-
-1. **No phase starts without explicit written confirmation.**
-2. Each phase is atomic — it either ships completely or not at all.
-3. After each phase: take a screenshot, run smoke tests, commit changes.
-4. Design consistency: all new components must use `useColors()` — no hardcoded colors.
-5. RTL compliance: all new layouts must use `flexDirection: "row-reverse"`, `textAlign: "right"`, `writingDirection: "rtl"`.
-6. Performance: no synchronous operations on the main thread; all storage ops use async.
-7. Phases can be executed in any order after Phase 1 (which is a prerequisite).
-
----
-
-*Last updated: May 3, 2026 — Version 1.0*
-*Author: Replit Agent — Strategy based on full codebase analysis*
+*File created: May 2026 | Path: `/ROADMAP.md`*
+*This is the permanent, authoritative source for all development phases.*
+*No code changes are made without referencing this file and receiving explicit user confirmation.*
