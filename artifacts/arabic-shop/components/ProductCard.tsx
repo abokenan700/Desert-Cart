@@ -270,7 +270,7 @@ const ProductCard = React.memo(function ProductCard({
           textAlign: "center",
         },
         info: {
-          padding: 12,
+          padding: compact ? 8 : 12,
         },
         brand: {
           fontSize: 10,
@@ -280,12 +280,12 @@ const ProductCard = React.memo(function ProductCard({
           writingDirection: "rtl",
         },
         name: {
-          fontSize: 13,
+          fontSize: compact ? 12 : 13,
           color: colors.text,
           fontFamily: "Cairo_600SemiBold",
           textAlign: "right",
           writingDirection: "rtl",
-          lineHeight: 19,
+          lineHeight: compact ? 17 : 19,
           marginTop: 2,
         },
         swatchRow: {
@@ -327,16 +327,17 @@ const ProductCard = React.memo(function ProductCard({
         priceRow: {
           flexDirection: "row-reverse",
           alignItems: "center",
-          marginTop: 6,
-          gap: 6,
+          justifyContent: "space-between",
+          marginTop: compact ? 4 : 6,
+          gap: compact ? 4 : 6,
         },
         price: {
-          fontSize: 15,
+          fontSize: compact ? 13 : 15,
           color: colors.primary,
           fontFamily: "Cairo_700Bold",
         },
         originalPrice: {
-          fontSize: 11,
+          fontSize: compact ? 10 : 11,
           color: colors.mutedForeground,
           fontFamily: "Cairo_400Regular",
           textDecorationLine: "line-through",
@@ -359,6 +360,17 @@ const ProductCard = React.memo(function ProductCard({
         },
         addBtnTextDisabled: {
           color: colors.mutedForeground,
+        },
+        cartIconBtn: {
+          width: 30,
+          height: 30,
+          borderRadius: 15,
+          backgroundColor: colors.primary,
+          alignItems: "center",
+          justifyContent: "center",
+        },
+        cartIconBtnDisabled: {
+          backgroundColor: colors.border,
         },
       }),
     [colors, compact]
@@ -460,12 +472,12 @@ const ProductCard = React.memo(function ProductCard({
 
         <View style={styles.info}>
           <Text style={styles.brand}>{product.brand}</Text>
-          <Text style={styles.name} numberOfLines={2}>
+          <Text style={styles.name} numberOfLines={compact ? 1 : 2}>
             {product.nameAr}
           </Text>
 
-          {/* Color swatch strip */}
-          {visibleColors.length > 0 && (
+          {/* Color swatch strip — hidden in compact */}
+          {!compact && visibleColors.length > 0 && (
             <View style={styles.swatchRow}>
               {visibleColors.map((c, i) => (
                 <View key={i} style={[styles.swatch, { backgroundColor: c }]} />
@@ -476,58 +488,86 @@ const ProductCard = React.memo(function ProductCard({
             </View>
           )}
 
-          <View style={styles.ratingRow}>
-            <Text style={styles.ratingText}>
-              ({product.reviewCount.toLocaleString("ar-SA")})
-            </Text>
-            <Ionicons name="star" size={11} color="#F5A623" />
-            <Text
-              style={[
-                styles.ratingText,
-                { color: "#F5A623", fontFamily: "Cairo_600SemiBold" },
-              ]}
-            >
-              {product.rating}
-            </Text>
-          </View>
+          {/* Rating row — hidden in compact */}
+          {!compact && (
+            <View style={styles.ratingRow}>
+              <Text style={styles.ratingText}>
+                ({product.reviewCount.toLocaleString("ar-SA")})
+              </Text>
+              <Ionicons name="star" size={11} color="#F5A623" />
+              <Text
+                style={[
+                  styles.ratingText,
+                  { color: "#F5A623", fontFamily: "Cairo_600SemiBold" },
+                ]}
+              >
+                {product.rating}
+              </Text>
+            </View>
+          )}
 
-          {/* Sold count indicator */}
-          {product.soldCount && product.soldCount > 500 ? (
+          {/* Sold count — hidden in compact */}
+          {!compact && product.soldCount && product.soldCount > 500 ? (
             <Text style={styles.soldCount}>
               +{product.soldCount.toLocaleString("ar-SA")} مبيعاً
             </Text>
           ) : null}
 
+          {/* Price row — in compact: price + cart icon side by side */}
           <View style={styles.priceRow}>
-            {product.originalPrice && (
-              <Text style={styles.originalPrice}>
-                {product.originalPrice.toLocaleString("ar-SA")} ر.س
+            <View>
+              {product.originalPrice && (
+                <Text style={styles.originalPrice}>
+                  {product.originalPrice.toLocaleString("ar-SA")} ر.س
+                </Text>
+              )}
+              <Text style={styles.price}>
+                {product.price.toLocaleString("ar-SA")} ر.س
               </Text>
+            </View>
+
+            {compact && (
+              <TouchableOpacity
+                style={[
+                  styles.cartIconBtn,
+                  !product.inStock && styles.cartIconBtnDisabled,
+                ]}
+                onPress={handleAddToCart}
+                disabled={!product.inStock}
+                hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                accessibilityLabel={`أضف ${product.nameAr} إلى السلة`}
+              >
+                <Ionicons
+                  name="cart"
+                  size={15}
+                  color="#fff"
+                />
+              </TouchableOpacity>
             )}
-            <Text style={styles.price}>
-              {product.price.toLocaleString("ar-SA")} ر.س
-            </Text>
           </View>
 
-          <TouchableOpacity
-            style={[styles.addBtn, !product.inStock && styles.addBtnDisabled]}
-            onPress={handleAddToCart}
-            disabled={!product.inStock}
-            accessibilityLabel={
-              product.inStock
-                ? `أضف ${product.nameAr} إلى السلة`
-                : "نفد المخزون"
-            }
-          >
-            <Text
-              style={[
-                styles.addBtnText,
-                !product.inStock && styles.addBtnTextDisabled,
-              ]}
+          {/* Full add-to-cart button — only in normal mode */}
+          {!compact && (
+            <TouchableOpacity
+              style={[styles.addBtn, !product.inStock && styles.addBtnDisabled]}
+              onPress={handleAddToCart}
+              disabled={!product.inStock}
+              accessibilityLabel={
+                product.inStock
+                  ? `أضف ${product.nameAr} إلى السلة`
+                  : "نفد المخزون"
+              }
             >
-              {product.inStock ? "أضف إلى السلة" : "نفد المخزون"}
-            </Text>
-          </TouchableOpacity>
+              <Text
+                style={[
+                  styles.addBtnText,
+                  !product.inStock && styles.addBtnTextDisabled,
+                ]}
+              >
+                {product.inStock ? "أضف إلى السلة" : "نفد المخزون"}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </TouchableOpacity>
     </Animated.View>
