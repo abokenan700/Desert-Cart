@@ -11,7 +11,6 @@ import {
   RefreshControl,
   Animated,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -378,12 +377,6 @@ export default function HomeScreen() {
 
         {/* Flash Sale Section */}
         <View style={styles.flashSaleContainer}>
-          <LinearGradient
-            colors={["#E63946", "#C1121F", "#FF6B6B"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.flashSaleTopAccent}
-          />
           <View style={styles.flashSaleHeader}>
             <FlashSaleTimer />
             <View style={styles.flashSaleLeft}>
