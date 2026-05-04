@@ -1,32 +1,23 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import { View, Text, StyleSheet, Animated } from "react-native";
 import { useColors } from "@/hooks/useColors";
+import { getFlashTimeLeft } from "@/constants/flashSale";
 
-function getTimeLeft(target: Date) {
-  const diff = Math.max(0, target.getTime() - Date.now());
-  const h = Math.floor(diff / 3600000);
-  const m = Math.floor((diff % 3600000) / 60000);
-  const s = Math.floor((diff % 60000) / 1000);
-  return { h, m, s };
-}
+const pad = (n: number) => String(n).padStart(2, "0");
 
 export default function FlashSaleTimer() {
   const colors = useColors();
-  const targetRef = useRef<Date | null>(null);
-  if (!targetRef.current) {
-    targetRef.current = new Date(
-      Date.now() + 6 * 3600 * 1000 + 23 * 60 * 1000 + 41 * 1000
-    );
-  }
-  const target = targetRef.current;
-
-  const [time, setTime] = useState(() => getTimeLeft(target));
+  const [time, setTime] = useState(getFlashTimeLeft);
   const glowAnim = useRef(new Animated.Value(0.4)).current;
+  const pulseScale = useRef(new Animated.Value(1)).current;
+
+  const totalSeconds = time.h * 3600 + time.m * 60 + time.s;
+  const isUrgent = totalSeconds < 60;
 
   useEffect(() => {
-    const id = setInterval(() => setTime(getTimeLeft(target)), 1000);
+    const id = setInterval(() => setTime(getFlashTimeLeft()), 1000);
     return () => clearInterval(id);
-  }, [target]);
+  }, []);
 
   useEffect(() => {
     const pulse = Animated.loop(
@@ -47,7 +38,25 @@ export default function FlashSaleTimer() {
     return () => pulse.stop();
   }, [glowAnim]);
 
-  const pad = (n: number) => String(n).padStart(2, "0");
+  useEffect(() => {
+    if (!isUrgent) return;
+    const urgentPulse = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseScale, {
+          toValue: 1.06,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseScale, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    urgentPulse.start();
+    return () => urgentPulse.stop();
+  }, [isUrgent, pulseScale]);
 
   const styles = useMemo(
     () =>
@@ -92,11 +101,15 @@ export default function FlashSaleTimer() {
   );
 
   return (
-    <View style={styles.row}>
+    <Animated.View
+      style={[styles.row, isUrgent && { transform: [{ scale: pulseScale }] }]}
+    >
       <Text style={styles.label}>ينتهي بعد:</Text>
       <Animated.View style={[styles.glowWrapper, { opacity: glowAnim }]}>
         <View style={styles.block}>
-          <Text style={styles.digit}>{pad(time.s)}</Text>
+          <Text style={[styles.digit, isUrgent && { color: "#FFE0E0" }]}>
+            {pad(time.s)}
+          </Text>
         </View>
       </Animated.View>
       <Text style={styles.sep}>:</Text>
@@ -107,6 +120,6 @@ export default function FlashSaleTimer() {
       <View style={styles.block}>
         <Text style={styles.digit}>{pad(time.h)}</Text>
       </View>
-    </View>
+    </Animated.View>
   );
 }

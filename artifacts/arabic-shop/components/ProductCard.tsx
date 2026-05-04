@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, useCallback } from "react";
+import React, { useRef, useMemo, useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,15 +9,19 @@ import {
   Dimensions,
   Platform,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { Product } from "@/data/mockData";
+import { getFlashTimeLeft } from "@/constants/flashSale";
 
 const { width } = Dimensions.get("window");
 export const CARD_WIDTH = (width - 48) / 2;
+
+const pad = (n: number) => String(n).padStart(2, "0");
 
 interface ProductCardProps {
   product: Product;
@@ -31,8 +35,44 @@ const ProductCard = React.memo(function ProductCard({
   const colors = useColors();
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
+
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const heartScale = useRef(new Animated.Value(1)).current;
+  const pulseRingScale = useRef(new Animated.Value(1)).current;
+  const pulseRingOpacity = useRef(new Animated.Value(0)).current;
+
   const wishlisted = isWishlisted(product.id);
+
+  const [flashTime, setFlashTime] = useState(getFlashTimeLeft);
+
+  useEffect(() => {
+    if (!product.isFlashSale) return;
+    const id = setInterval(() => setFlashTime(getFlashTimeLeft()), 1000);
+    return () => clearInterval(id);
+  }, [product.isFlashSale]);
+
+  useEffect(() => {
+    if (!product.isNew) return;
+    const triggerPulse = () => {
+      pulseRingScale.setValue(1);
+      pulseRingOpacity.setValue(0.8);
+      Animated.parallel([
+        Animated.timing(pulseRingScale, {
+          toValue: 1.7,
+          duration: 700,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseRingOpacity, {
+          toValue: 0,
+          duration: 700,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    };
+    triggerPulse();
+    const id = setInterval(triggerPulse, 3000);
+    return () => clearInterval(id);
+  }, [product.isNew, pulseRingScale, pulseRingOpacity]);
 
   const handlePressIn = useCallback(() => {
     Animated.spring(scaleAnim, {
@@ -55,12 +95,30 @@ const ProductCard = React.memo(function ProductCard({
   }, [product.id]);
 
   const handleAddToCart = useCallback(() => {
+    if (!product.inStock) return;
     addToCart(product);
   }, [addToCart, product]);
 
   const handleToggleWishlist = useCallback(() => {
     toggleWishlist(product);
-  }, [toggleWishlist, product]);
+    Animated.sequence([
+      Animated.spring(heartScale, {
+        toValue: 1.45,
+        useNativeDriver: true,
+        speed: 80,
+        bounciness: 12,
+      }),
+      Animated.spring(heartScale, {
+        toValue: 1,
+        useNativeDriver: true,
+        speed: 40,
+        bounciness: 6,
+      }),
+    ]).start();
+  }, [toggleWishlist, product, heartScale]);
+
+  const visibleColors = product.colors ? product.colors.slice(0, 3) : [];
+  const extraColors = product.colors ? Math.max(0, product.colors.length - 3) : 0;
 
   const styles = useMemo(
     () =>
@@ -87,15 +145,19 @@ const ProductCard = React.memo(function ProductCard({
           width: "100%",
           aspectRatio: 3 / 4,
           backgroundColor: colors.secondary,
+          overflow: "hidden",
         },
         image: {
           width: "100%",
           height: "100%",
         },
-        wishlistBtn: {
+        wishlistBtnWrapper: {
           position: "absolute",
           top: 10,
           left: 10,
+          zIndex: 10,
+        },
+        wishlistBtn: {
           width: 36,
           height: 36,
           borderRadius: 18,
@@ -127,14 +189,43 @@ const ProductCard = React.memo(function ProductCard({
           fontSize: 10,
           fontFamily: "Cairo_700Bold",
         },
-        newBadge: {
+        flashRibbon: {
+          position: "absolute",
+          top: 14,
+          right: -24,
+          width: 88,
+          paddingVertical: 5,
+          alignItems: "center",
+          transform: [{ rotate: "45deg" }],
+          zIndex: 5,
+        },
+        flashRibbonText: {
+          color: "#fff",
+          fontSize: 9,
+          fontFamily: "Cairo_700Bold",
+          letterSpacing: 0.3,
+        },
+        newBadgeContainer: {
           position: "absolute",
           bottom: 10,
           right: 10,
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 5,
+        },
+        newPulseRing: {
+          position: "absolute",
+          width: 36,
+          height: 20,
+          borderRadius: 10,
+          borderWidth: 1.5,
+          borderColor: colors.success,
+        },
+        newBadge: {
           backgroundColor: colors.success,
-          borderRadius: 12,
+          borderRadius: 10,
           paddingHorizontal: 8,
-          paddingVertical: 4,
+          paddingVertical: 3,
           shadowColor: "#000",
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.15,
@@ -145,6 +236,34 @@ const ProductCard = React.memo(function ProductCard({
           color: "#fff",
           fontSize: 10,
           fontFamily: "Cairo_700Bold",
+        },
+        countdownChip: {
+          position: "absolute",
+          bottom: 10,
+          left: 10,
+          backgroundColor: "rgba(230,57,70,0.92)",
+          borderRadius: 8,
+          paddingHorizontal: 7,
+          paddingVertical: 3,
+          zIndex: 5,
+        },
+        countdownText: {
+          color: "#fff",
+          fontSize: 9,
+          fontFamily: "Cairo_700Bold",
+        },
+        soldOutOverlay: {
+          ...StyleSheet.absoluteFillObject,
+          backgroundColor: "rgba(0,0,0,0.48)",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 8,
+        },
+        soldOutText: {
+          color: "#fff",
+          fontSize: 13,
+          fontFamily: "Cairo_700Bold",
+          textAlign: "center",
         },
         info: {
           padding: 12,
@@ -165,6 +284,24 @@ const ProductCard = React.memo(function ProductCard({
           lineHeight: 19,
           marginTop: 2,
         },
+        swatchRow: {
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          marginTop: 5,
+          gap: 4,
+        },
+        swatch: {
+          width: 14,
+          height: 14,
+          borderRadius: 7,
+          borderWidth: 1.5,
+          borderColor: "rgba(0,0,0,0.08)",
+        },
+        swatchMore: {
+          fontSize: 9,
+          color: colors.mutedForeground,
+          fontFamily: "Cairo_400Regular",
+        },
         ratingRow: {
           flexDirection: "row-reverse",
           alignItems: "center",
@@ -175,6 +312,13 @@ const ProductCard = React.memo(function ProductCard({
           fontSize: 11,
           color: colors.mutedForeground,
           fontFamily: "Cairo_400Regular",
+        },
+        soldCount: {
+          fontSize: 10,
+          color: colors.mutedForeground,
+          fontFamily: "Cairo_400Regular",
+          textAlign: "right",
+          marginTop: 2,
         },
         priceRow: {
           flexDirection: "row-reverse",
@@ -201,10 +345,16 @@ const ProductCard = React.memo(function ProductCard({
           alignItems: "center",
           justifyContent: "center",
         },
+        addBtnDisabled: {
+          backgroundColor: colors.border,
+        },
         addBtnText: {
           color: "#fff",
           fontSize: 12,
           fontFamily: "Cairo_600SemiBold",
+        },
+        addBtnTextDisabled: {
+          color: colors.mutedForeground,
         },
       }),
     [colors]
@@ -227,28 +377,77 @@ const ProductCard = React.memo(function ProductCard({
             style={styles.image}
             resizeMode="cover"
           />
-          <TouchableOpacity
-            style={styles.wishlistBtn}
-            onPress={handleToggleWishlist}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            accessibilityLabel={
-              wishlisted ? "إزالة من المفضلة" : "إضافة للمفضلة"
-            }
+
+          {/* Wishlist button with heart bounce */}
+          <Animated.View
+            style={[
+              styles.wishlistBtnWrapper,
+              { transform: [{ scale: heartScale }] },
+            ]}
           >
-            <Ionicons
-              name={wishlisted ? "heart" : "heart-outline"}
-              size={16}
-              color={wishlisted ? colors.primary : colors.mutedForeground}
-            />
-          </TouchableOpacity>
-          {product.discount && (
+            <TouchableOpacity
+              style={styles.wishlistBtn}
+              onPress={handleToggleWishlist}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              accessibilityLabel={
+                wishlisted ? "إزالة من المفضلة" : "إضافة للمفضلة"
+              }
+            >
+              <Ionicons
+                name={wishlisted ? "heart" : "heart-outline"}
+                size={16}
+                color={wishlisted ? colors.primary : colors.mutedForeground}
+              />
+            </TouchableOpacity>
+          </Animated.View>
+
+          {/* Flash sale ribbon OR discount badge */}
+          {product.isFlashSale ? (
+            <LinearGradient
+              colors={["#E63946", "#C1121F"]}
+              style={styles.flashRibbon}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+            >
+              <Text style={styles.flashRibbonText}>فلاش 🔥</Text>
+            </LinearGradient>
+          ) : product.discount ? (
             <View style={styles.discountBadge}>
               <Text style={styles.discountText}>-{product.discount}٪</Text>
             </View>
-          )}
+          ) : null}
+
+          {/* New badge with pulse ring */}
           {product.isNew && (
-            <View style={styles.newBadge}>
-              <Text style={styles.newText}>جديد</Text>
+            <View style={styles.newBadgeContainer}>
+              <Animated.View
+                style={[
+                  styles.newPulseRing,
+                  {
+                    opacity: pulseRingOpacity,
+                    transform: [{ scale: pulseRingScale }],
+                  },
+                ]}
+              />
+              <View style={styles.newBadge}>
+                <Text style={styles.newText}>جديد</Text>
+              </View>
+            </View>
+          )}
+
+          {/* Flash sale countdown chip */}
+          {product.isFlashSale && (
+            <View style={styles.countdownChip}>
+              <Text style={styles.countdownText}>
+                ⏱ {pad(flashTime.m)}:{pad(flashTime.s)}
+              </Text>
+            </View>
+          )}
+
+          {/* Sold-out overlay */}
+          {!product.inStock && (
+            <View style={styles.soldOutOverlay}>
+              <Text style={styles.soldOutText}>نفد المخزون</Text>
             </View>
           )}
         </View>
@@ -258,6 +457,19 @@ const ProductCard = React.memo(function ProductCard({
           <Text style={styles.name} numberOfLines={2}>
             {product.nameAr}
           </Text>
+
+          {/* Color swatch strip */}
+          {visibleColors.length > 0 && (
+            <View style={styles.swatchRow}>
+              {visibleColors.map((c, i) => (
+                <View key={i} style={[styles.swatch, { backgroundColor: c }]} />
+              ))}
+              {extraColors > 0 && (
+                <Text style={styles.swatchMore}>+{extraColors}</Text>
+              )}
+            </View>
+          )}
+
           <View style={styles.ratingRow}>
             <Text style={styles.ratingText}>
               ({product.reviewCount.toLocaleString("ar-SA")})
@@ -272,6 +484,14 @@ const ProductCard = React.memo(function ProductCard({
               {product.rating}
             </Text>
           </View>
+
+          {/* Sold count indicator */}
+          {product.soldCount && product.soldCount > 500 ? (
+            <Text style={styles.soldCount}>
+              +{product.soldCount.toLocaleString("ar-SA")} مبيعاً
+            </Text>
+          ) : null}
+
           <View style={styles.priceRow}>
             {product.originalPrice && (
               <Text style={styles.originalPrice}>
@@ -282,12 +502,25 @@ const ProductCard = React.memo(function ProductCard({
               {product.price.toLocaleString("ar-SA")} ر.س
             </Text>
           </View>
+
           <TouchableOpacity
-            style={styles.addBtn}
+            style={[styles.addBtn, !product.inStock && styles.addBtnDisabled]}
             onPress={handleAddToCart}
-            accessibilityLabel={`أضف ${product.nameAr} إلى السلة`}
+            disabled={!product.inStock}
+            accessibilityLabel={
+              product.inStock
+                ? `أضف ${product.nameAr} إلى السلة`
+                : "نفد المخزون"
+            }
           >
-            <Text style={styles.addBtnText}>أضف إلى السلة</Text>
+            <Text
+              style={[
+                styles.addBtnText,
+                !product.inStock && styles.addBtnTextDisabled,
+              ]}
+            >
+              {product.inStock ? "أضف إلى السلة" : "نفد المخزون"}
+            </Text>
           </TouchableOpacity>
         </View>
       </TouchableOpacity>

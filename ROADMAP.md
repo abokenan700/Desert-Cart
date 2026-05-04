@@ -845,7 +845,7 @@
 
 | Phase | Title | Status | Date Completed |
 |---|---|---|---|
-| P1 | ProductCard: World-Class Visual Upgrade | ⏳ Pending | — |
+| P1 | ProductCard: World-Class Visual Upgrade | ✅ Complete | Flash ribbon, color swatches, sold-out overlay, sold count, heart bounce, flash countdown chip, shimmer skeleton, جديد pulse ring |
 | P2 | Home Screen: Immersive Visual Overhaul | ⏳ Pending | — |
 | P3 | Search & Discovery: Full Overhaul | ⏳ Pending | — |
 | P4 | Product Detail: Premium Experience | ⏳ Pending | — |
