@@ -311,15 +311,10 @@ export default function HomeScreen() {
       <AnnouncementBar />
       <HomeHeader onPressNotifications={() => setNotificationsVisible(true)} />
 
-      <Animated.ScrollView
+      <ScrollView
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 80 + bottomPad }}
-        scrollEventThrottle={16}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true }
-        )}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -558,7 +553,7 @@ export default function HomeScreen() {
             ))}
           </View>
         )}
-      </Animated.ScrollView>
+      </ScrollView>
 
       <VoiceSearch
         visible={voiceVisible}
