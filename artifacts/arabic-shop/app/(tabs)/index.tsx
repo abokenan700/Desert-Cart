@@ -149,8 +149,8 @@ export default function HomeScreen() {
         container: { flex: 1, backgroundColor: colors.background },
         scroll: { flex: 1 },
         searchBar: {
-          marginHorizontal: 16,
-          marginVertical: 5,
+          marginHorizontal: 8,
+          marginVertical: 3,
           flexDirection: "row-reverse",
           alignItems: "center",
           backgroundColor: colors.card,
@@ -329,6 +329,8 @@ export default function HomeScreen() {
           onPress={() => router.push("/(tabs)/search")}
           activeOpacity={0.8}
         >
+          <Ionicons name="search-outline" size={18} color={colors.mutedForeground} />
+          <Text style={styles.searchText}>ابحث عن منتجات، ماركات...</Text>
           <TouchableOpacity
             onPress={() => setVoiceVisible(true)}
             accessibilityLabel="البحث الصوتي"
@@ -336,8 +338,6 @@ export default function HomeScreen() {
           >
             <Ionicons name="mic" size={20} color={colors.primary} />
           </TouchableOpacity>
-          <Text style={styles.searchText}>ابحث عن منتجات، ماركات...</Text>
-          <Ionicons name="search-outline" size={18} color={colors.mutedForeground} />
         </TouchableOpacity>
 
         <CategoryRow

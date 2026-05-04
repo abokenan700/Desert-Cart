@@ -12,7 +12,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useTheme } from "@/context/ThemeContext";
-import { useCart } from "@/context/CartContext";
 import { useNotifications } from "@/context/NotificationsContext";
 
 interface HomeHeaderProps {
@@ -23,7 +22,6 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
   const colors = useColors();
   const { isDark, toggleTheme } = useTheme();
   const insets = useSafeAreaInsets();
-  const { totalCount } = useCart();
   const { unreadCount } = useNotifications();
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
@@ -33,8 +31,8 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
       StyleSheet.create({
         header: {
           backgroundColor: colors.card,
-          paddingTop: 8,
-          paddingBottom: 6,
+          paddingTop: 5,
+          paddingBottom: 4,
           paddingHorizontal: 16,
           flexDirection: "row-reverse",
           alignItems: "center",
@@ -152,19 +150,6 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
           {unreadCount > 0 && (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{unreadCount > 9 ? "9+" : unreadCount}</Text>
-            </View>
-          )}
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.iconBtn}
-          onPress={() => router.push("/(tabs)/cart" as any)}
-          accessibilityLabel="سلة التسوق"
-          accessibilityRole="button"
-        >
-          <Ionicons name="bag-outline" size={20} color={colors.text} />
-          {totalCount > 0 && (
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{totalCount > 9 ? "9+" : totalCount}</Text>
             </View>
           )}
         </TouchableOpacity>
