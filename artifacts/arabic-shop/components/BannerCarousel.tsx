@@ -13,7 +13,7 @@ import { Banner } from "@/data/mockData";
 
 const { width } = Dimensions.get("window");
 const BANNER_HEIGHT = 185;
-const BANNER_WIDTH = width - 16;
+const BANNER_WIDTH = width - 8;
 const AUTO_PLAY_INTERVAL = 4200;
 
 interface BannerCarouselProps {
@@ -63,7 +63,7 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        container: { marginHorizontal: 8, marginTop: 4, marginBottom: 0 },
+        container: { marginHorizontal: 4, marginTop: 4, marginBottom: 0 },
         scroll: { borderRadius: 22, overflow: "hidden" },
         slide: {
           width: BANNER_WIDTH,

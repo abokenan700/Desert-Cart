@@ -150,7 +150,7 @@ export default function HomeScreen() {
         container: { flex: 1, backgroundColor: colors.background },
         scroll: { flex: 1 },
         searchBar: {
-          marginHorizontal: 8,
+          marginHorizontal: 4,
           marginVertical: 3,
           flexDirection: "row-reverse",
           alignItems: "center",
@@ -234,7 +234,7 @@ export default function HomeScreen() {
           fontFamily: "Cairo_600SemiBold",
         },
         flashSaleContainer: {
-          marginHorizontal: 8,
+          marginHorizontal: 4,
           marginTop: 10,
           marginBottom: 2,
           borderRadius: 18,
