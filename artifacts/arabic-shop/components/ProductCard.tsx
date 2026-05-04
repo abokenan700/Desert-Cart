@@ -26,11 +26,13 @@ const pad = (n: number) => String(n).padStart(2, "0");
 interface ProductCardProps {
   product: Product;
   style?: object;
+  onLongPress?: () => void;
 }
 
 const ProductCard = React.memo(function ProductCard({
   product,
   style,
+  onLongPress,
 }: ProductCardProps) {
   const colors = useColors();
   const { addToCart } = useCart();
@@ -367,6 +369,8 @@ const ProductCard = React.memo(function ProductCard({
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         onPress={handlePress}
+        onLongPress={onLongPress}
+        delayLongPress={400}
         style={styles.card}
         accessibilityLabel={product.nameAr}
         accessibilityRole="button"

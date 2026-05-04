@@ -849,7 +849,7 @@
 | P2 | Home Screen: Immersive Visual Overhaul | ✅ Complete | Brand fix سوق, cascade filters, LIVE dot, SocialProofBar, promo nav, brand/story routing, AsyncStorage recently viewed, FlatList RTL fix |
 | P3 | Search & Discovery: Full Overhaul | ✅ Complete | Debounced search, autocomplete+highlight, trend indicators, staggered popular chips, recent thumbnails, rating/delivery/brand-multiselect filters, improved empty state |
 | P4 | Product Detail: Premium Experience | ✅ Complete | Share button, viewing count pulsing indicator, size guide modal, collapsible specs, Q&A section + ask modal, Customers Also Bought strip, color ring effect, spring size selection |
-| P5 | Cart & Wishlist: Premium Conversion Layer | ⏳ Pending | — |
+| P5 | Cart & Wishlist: Premium Conversion Layer | ✅ Complete | Color swatch + size pill in cart, save-for-later bidirectional swipe, promo code field (WELCOME10/SAVE20/SUMMER15), cross-sell strip, free-shipping milestone toast, wishlist sort/filter bar, price drop badge, collections tabs + create modal + long-press picker |
 | P6 | Checkout & Order Experience | ⏳ Pending | — |
 | P7 | Profile & Loyalty: Real Account Dashboard | ⏳ Pending | — |
 | P8 | Micro-interactions & Motion System | ⏳ Pending | — |
