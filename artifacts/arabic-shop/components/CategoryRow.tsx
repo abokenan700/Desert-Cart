@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
+  Pressable,
   ScrollView,
   StyleSheet,
   Platform,
@@ -38,6 +38,7 @@ const CategoryRow = React.memo(function CategoryRow({
         categoryItem: {
           alignItems: "center",
           gap: 6,
+          width: 72,
         },
         tile: {
           width: 54,
@@ -59,9 +60,9 @@ const CategoryRow = React.memo(function CategoryRow({
         },
         label: {
           fontSize: 11,
-          fontFamily: "Cairo_600SemiBold",
+          fontFamily: "Cairo_700Bold",
           textAlign: "center",
-          maxWidth: 64,
+          width: 72,
         },
       }),
     [colors]
@@ -78,16 +79,16 @@ const CategoryRow = React.memo(function CategoryRow({
         const isSelected = selected === cat.id;
         return (
           <View key={cat.id} style={styles.categoryItem}>
-            <TouchableOpacity
-              style={[
+            <Pressable
+              style={({ pressed }) => [
                 styles.tile,
                 {
                   backgroundColor: isSelected ? cat.color : cat.bgColor,
                   borderColor: isSelected ? cat.color : `${cat.color}40`,
+                  opacity: pressed ? 0.72 : 1,
                 },
               ]}
               onPress={() => onSelect(cat.id)}
-              activeOpacity={0.75}
               accessibilityLabel={cat.nameAr}
               accessibilityRole="button"
               accessibilityState={{ selected: isSelected }}
@@ -97,15 +98,9 @@ const CategoryRow = React.memo(function CategoryRow({
                 size={24}
                 color={isSelected ? "#fff" : cat.color}
               />
-            </TouchableOpacity>
+            </Pressable>
             <Text
-              style={[
-                styles.label,
-                {
-                  color: isSelected ? cat.color : colors.text,
-                  fontFamily: isSelected ? "Cairo_700Bold" : "Cairo_600SemiBold",
-                },
-              ]}
+              style={[styles.label, { color: isSelected ? cat.color : colors.text }]}
               numberOfLines={1}
             >
               {cat.nameAr}
