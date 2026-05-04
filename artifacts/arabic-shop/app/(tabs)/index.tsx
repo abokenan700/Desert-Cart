@@ -11,6 +11,7 @@ import {
   RefreshControl,
   Animated,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -179,8 +180,8 @@ export default function HomeScreen() {
           backgroundColor: colors.secondary,
           marginVertical: 4,
         },
-        horizontalList: { paddingHorizontal: 12, gap: 10 },
-        horizontalCard: { width: width * 0.36 },
+        horizontalList: { paddingHorizontal: 12, gap: 8 },
+        horizontalCard: { width: width * 0.32 },
         productGrid: {
           flexDirection: "row-reverse",
           flexWrap: "wrap",
@@ -237,21 +238,25 @@ export default function HomeScreen() {
           marginTop: 10,
           marginBottom: 2,
           borderRadius: 18,
-          borderWidth: 1.5,
-          borderColor: `${colors.primary}28`,
+          borderWidth: 2,
+          borderColor: "#E63946",
           backgroundColor: colors.card,
           overflow: "hidden",
           paddingBottom: 14,
           ...Platform.select({
             ios: {
-              shadowColor: colors.primary,
-              shadowOffset: { width: 0, height: 3 },
-              shadowOpacity: 0.1,
-              shadowRadius: 10,
+              shadowColor: "#E63946",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.22,
+              shadowRadius: 12,
             },
-            android: { elevation: 4 },
-            web: { boxShadow: `0 3px 12px ${colors.primary}18` } as any,
+            android: { elevation: 6 },
+            web: { boxShadow: "0 4px 16px rgba(230,57,70,0.22)" } as any,
           }),
+        },
+        flashSaleTopAccent: {
+          height: 4,
+          width: "100%",
         },
         flashSaleHeader: {
           flexDirection: "row-reverse",
@@ -373,6 +378,12 @@ export default function HomeScreen() {
 
         {/* Flash Sale Section */}
         <View style={styles.flashSaleContainer}>
+          <LinearGradient
+            colors={["#E63946", "#C1121F", "#FF6B6B"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.flashSaleTopAccent}
+          />
           <View style={styles.flashSaleHeader}>
             <FlashSaleTimer />
             <View style={styles.flashSaleLeft}>

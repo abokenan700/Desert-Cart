@@ -126,7 +126,7 @@ const ProductCard = React.memo(function ProductCard({
     () =>
       StyleSheet.create({
         card: {
-          width: CARD_WIDTH,
+          flex: 1,
           backgroundColor: colors.card,
           borderRadius: 20,
           overflow: "hidden",
@@ -363,7 +363,7 @@ const ProductCard = React.memo(function ProductCard({
   );
 
   return (
-    <Animated.View style={[{ transform: [{ scale: scaleAnim }] }, style]}>
+    <Animated.View style={[{ width: CARD_WIDTH }, style, { transform: [{ scale: scaleAnim }] }]}>
       <TouchableOpacity
         activeOpacity={1}
         onPressIn={handlePressIn}

@@ -20,10 +20,6 @@ author = "agent"
 task = "workflow.run"
 args = "Arabic Shop"
 
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "API Server"
-
 [[workflows.workflow]]
 name = "Arabic Shop"
 author = "agent"
@@ -35,18 +31,6 @@ outputType = "console"
 task = "shell.exec"
 args = "PORT=8000 pnpm --filter @workspace/arabic-shop run dev"
 waitForPort = 8000
-
-[[workflows.workflow]]
-name = "API Server"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "PORT=8080 pnpm --filter @workspace/api-server run dev"
-waitForPort = 8080
-
-[workflows.workflow.metadata]
-outputType = "console"
 
 [agent]
 stack = "BEST_EFFORT_FALLBACK"
@@ -63,6 +47,10 @@ externalPort = 5000
 [[ports]]
 localPort = 5001
 externalPort = 3000
+
+[[ports]]
+localPort = 8000
+externalPort = 8000
 
 [[ports]]
 localPort = 8080
@@ -83,10 +71,6 @@ externalPort = 80
 [[ports]]
 localPort = 20427
 externalPort = 3001
-
-[[ports]]
-localPort = 8000
-externalPort = 8000
 
 [nix]
 channel = "stable-25_05"
