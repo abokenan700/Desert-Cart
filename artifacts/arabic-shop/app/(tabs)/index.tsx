@@ -234,7 +234,7 @@ export default function HomeScreen() {
           fontFamily: "Cairo_600SemiBold",
         },
         flashSaleContainer: {
-          marginHorizontal: 20,
+          marginHorizontal: 6,
           marginTop: 10,
           marginBottom: 2,
           borderRadius: 18,
