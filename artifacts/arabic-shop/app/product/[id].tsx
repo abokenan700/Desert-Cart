@@ -232,8 +232,8 @@ export default function ProductDetailScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     try {
       await Share.share({
-        message: `${product.nameAr} بسعر ${product.price.toLocaleString("ar-SA")} ر.س — سوق\nhttps://souq.app/product/${product.id}`,
-        url: `https://souq.app/product/${product.id}`,
+        message: `${product.nameAr} بسعر ${product.price.toLocaleString("ar-SA")} ر.س — الأسطورة\nhttps://al-ostora.app/product/${product.id}`,
+        url: `https://al-ostora.app/product/${product.id}`,
         title: product.nameAr,
       });
     } catch {}

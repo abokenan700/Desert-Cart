@@ -433,7 +433,7 @@ export default function ProfileScreen() {
           </View>
         ))}
 
-        <Text style={styles.versionText}>الإصدار ١.٠.٠ — سوق</Text>
+        <Text style={styles.versionText}>الإصدار ١.٠.٠ — الأسطورة</Text>
       </ScrollView>
     </View>
   );

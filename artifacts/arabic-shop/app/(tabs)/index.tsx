@@ -42,7 +42,6 @@ import {
 } from "@/data/mockData";
 
 const { width } = Dimensions.get("window");
-const STICKY_THRESHOLD = 140;
 
 export default function HomeScreen() {
   const colors = useColors();
@@ -56,7 +55,6 @@ export default function HomeScreen() {
   const { notifications, markAllRead, unreadCount } = useNotifications();
   const { recentlyViewed } = useRecentlyViewed();
 
-  const scrollY = useRef(new Animated.Value(0)).current;
   const liveDotScale = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -77,17 +75,6 @@ export default function HomeScreen() {
     anim.start();
     return () => anim.stop();
   }, [liveDotScale]);
-
-  const stickyOpacity = scrollY.interpolate({
-    inputRange: [STICKY_THRESHOLD - 20, STICKY_THRESHOLD + 30],
-    outputRange: [0, 1],
-    extrapolate: "clamp",
-  });
-  const stickyTranslateY = scrollY.interpolate({
-    inputRange: [STICKY_THRESHOLD - 20, STICKY_THRESHOLD + 30],
-    outputRange: [-48, 0],
-    extrapolate: "clamp",
-  });
 
   const filteredFlashSale = useMemo(
     () =>
@@ -305,60 +292,6 @@ export default function HomeScreen() {
           paddingHorizontal: 12,
           justifyContent: "space-between",
         },
-        stickyHeader: {
-          position: "absolute",
-          left: 0,
-          right: 0,
-          zIndex: 100,
-          backgroundColor: colors.primary,
-          flexDirection: "row-reverse",
-          alignItems: "center",
-          justifyContent: "space-between",
-          paddingHorizontal: 16,
-          paddingVertical: 10,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.15,
-          shadowRadius: 6,
-          elevation: 8,
-        },
-        stickyTitle: {
-          fontSize: 16,
-          fontFamily: "Cairo_800ExtraBold",
-          color: "#fff",
-        },
-        stickyActions: {
-          flexDirection: "row-reverse",
-          alignItems: "center",
-          gap: 6,
-        },
-        stickyBtn: {
-          width: 36,
-          height: 36,
-          borderRadius: 18,
-          backgroundColor: "rgba(255,255,255,0.18)",
-          alignItems: "center",
-          justifyContent: "center",
-          position: "relative",
-        },
-        stickyBadge: {
-          position: "absolute",
-          top: -3,
-          right: -3,
-          width: 15,
-          height: 15,
-          borderRadius: 8,
-          backgroundColor: "#fff",
-          alignItems: "center",
-          justifyContent: "center",
-          borderWidth: 1.5,
-          borderColor: colors.primary,
-        },
-        stickyBadgeText: {
-          color: colors.primary,
-          fontSize: 8,
-          fontFamily: "Cairo_700Bold",
-        },
         emptySection: {
           paddingHorizontal: 16,
           paddingVertical: 12,
@@ -372,8 +305,6 @@ export default function HomeScreen() {
       }),
     [colors]
   );
-
-  const stickyTop = Platform.OS === "web" ? 67 + 30 + 60 : insets.top + 30 + 60;
 
   return (
     <View style={styles.container}>
@@ -628,52 +559,6 @@ export default function HomeScreen() {
           </View>
         )}
       </Animated.ScrollView>
-
-      <Animated.View
-        style={[
-          styles.stickyHeader,
-          {
-            top: stickyTop,
-            opacity: stickyOpacity,
-            transform: [{ translateY: stickyTranslateY }],
-          },
-        ]}
-        pointerEvents="box-none"
-      >
-        <Text style={styles.stickyTitle}>سوق</Text>
-        <View style={styles.stickyActions}>
-          <TouchableOpacity
-            style={styles.stickyBtn}
-            onPress={() => setNotificationsVisible(true)}
-          >
-            <Ionicons name="notifications-outline" size={18} color="#fff" />
-            {unreadCount > 0 && (
-              <View style={styles.stickyBadge}>
-                <Text style={styles.stickyBadgeText}>{unreadCount}</Text>
-              </View>
-            )}
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.stickyBtn}
-            onPress={() => router.push("/(tabs)/search")}
-          >
-            <Ionicons name="search-outline" size={18} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.stickyBtn}
-            onPress={() => router.push("/(tabs)/cart" as any)}
-          >
-            <Ionicons name="bag-outline" size={18} color="#fff" />
-            {totalCount > 0 && (
-              <View style={styles.stickyBadge}>
-                <Text style={styles.stickyBadgeText}>
-                  {totalCount > 9 ? "9+" : totalCount}
-                </Text>
-              </View>
-            )}
-          </TouchableOpacity>
-        </View>
-      </Animated.View>
 
       <VoiceSearch
         visible={voiceVisible}
