@@ -33,18 +33,18 @@ const CategoryRow = React.memo(function CategoryRow({
         },
         contentContainer: {
           paddingHorizontal: 16,
-          gap: 10,
+          gap: 16,
         },
         categoryItem: {
           alignItems: "center",
           gap: 6,
         },
         tile: {
-          width: 62,
-          height: 62,
+          width: 54,
+          height: 54,
           alignItems: "center",
           justifyContent: "center",
-          borderRadius: 18,
+          borderRadius: 27,
           borderWidth: 2,
           ...Platform.select({
             ios: {
