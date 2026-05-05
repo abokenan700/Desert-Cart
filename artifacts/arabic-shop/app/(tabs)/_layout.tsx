@@ -127,8 +127,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="cart"
         options={{
-          title: "سلتي",
-          tabBarIcon: (props) => <CartTabIcon {...props} />,
+          href: null,
         }}
       />
       <Tabs.Screen

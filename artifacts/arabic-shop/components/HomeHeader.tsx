@@ -13,6 +13,7 @@ import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useTheme } from "@/context/ThemeContext";
 import { useNotifications } from "@/context/NotificationsContext";
+import { useCart } from "@/context/CartContext";
 
 interface HomeHeaderProps {
   onPressNotifications: () => void;
@@ -23,6 +24,7 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
   const { isDark, toggleTheme } = useTheme();
   const insets = useSafeAreaInsets();
   const { unreadCount } = useNotifications();
+  const { totalCount } = useCart();
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
 
@@ -150,6 +152,19 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
           {unreadCount > 0 && (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{unreadCount > 9 ? "9+" : unreadCount}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.iconBtn}
+          onPress={() => router.push("/(tabs)/cart")}
+          accessibilityLabel="السلة"
+          accessibilityRole="button"
+        >
+          <Ionicons name="bag-outline" size={20} color={colors.text} />
+          {totalCount > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{totalCount > 9 ? "9+" : totalCount}</Text>
             </View>
           )}
         </TouchableOpacity>
