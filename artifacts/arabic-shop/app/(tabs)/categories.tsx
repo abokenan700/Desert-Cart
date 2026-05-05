@@ -292,17 +292,6 @@ export default function CategoriesScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 8 }}
         >
-          {/* Section header */}
-          <View style={s.contentHeader}>
-            <TouchableOpacity
-              onPress={() => router.push(`/(tabs)/search?category=${selectedL1Id}` as any)}
-              style={[styles.seeAllBtn, { borderColor: selectedL1.color }]}
-            >
-              <Ionicons name="arrow-forward" size={13} color={selectedL1.color} />
-              <Text style={[styles.seeAllText, { color: selectedL1.color }]}>عرض الكل</Text>
-            </TouchableOpacity>
-          </View>
-
           {/* Sub-categories grid */}
           <View style={s.grid}>
             {selectedL1.subCategories.map((sub) => (
