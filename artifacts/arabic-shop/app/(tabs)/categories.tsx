@@ -550,6 +550,7 @@ export default function CategoriesScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
+  const topPad    = Platform.OS === "web" ? 0 : insets.top;
   const bottomPad = Platform.OS === "web" ? 84 : insets.bottom + 68;
 
   const contentWidth = width - SIDEBAR_WIDTH;
@@ -630,6 +631,7 @@ export default function CategoriesScreen() {
 
   return (
     <View style={s.container}>
+      {topPad > 0 && <View style={{ height: topPad, backgroundColor: colors.background }} />}
       <L1TabStrip selectedId={selectedL1Id} onSelect={handleSelectL1} />
 
       <View style={s.banner}>

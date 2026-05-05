@@ -33,7 +33,7 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
       StyleSheet.create({
         header: {
           backgroundColor: colors.card,
-          paddingTop: 5,
+          paddingTop: topPad + 5,
           paddingBottom: 4,
           paddingHorizontal: 16,
           flexDirection: "row-reverse",
