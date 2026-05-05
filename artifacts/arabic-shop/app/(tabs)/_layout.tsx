@@ -140,6 +140,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="categories"
+        options={{
+          title: "الأقسام",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? "grid" : "grid-outline"} size={22} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="index"
         options={{
           title: "الرئيسية",
