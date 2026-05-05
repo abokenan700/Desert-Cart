@@ -8,7 +8,7 @@
     "build": "node scripts/build.js",
     "serve": "node server/serve.js",
     "serve-static": "node serve-static.js",
-    "export": "pnpm exec expo export --platform web --output-dir dist",
+    "export": "pnpm exec expo export --platform web --output-dir dist && sed -i 's/shrink-to-fit=no\"/shrink-to-fit=no, viewport-fit=cover\"/' dist/index.html",
     "start": "pnpm run export && pnpm run serve-static",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

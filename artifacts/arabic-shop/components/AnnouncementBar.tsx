@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   Animated,
-  Platform,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -21,7 +20,7 @@ const ANIM_DURATION = 450;
 
 export default function AnnouncementBar() {
   const insets = useSafeAreaInsets();
-  const topPad = Platform.OS === "web" ? 0 : insets.top;
+  const topPad = insets.top ?? 0;
 
   const translateY = useRef(new Animated.Value(28)).current;
   const opacity = useRef(new Animated.Value(0)).current;
