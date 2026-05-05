@@ -301,10 +301,6 @@ export default function CategoriesScreen() {
               <Ionicons name="arrow-forward" size={13} color={selectedL1.color} />
               <Text style={[styles.seeAllText, { color: selectedL1.color }]}>عرض الكل</Text>
             </TouchableOpacity>
-            <View style={{ alignItems: "flex-end" }}>
-              <Text style={s.contentTitle}>{selectedL1.nameAr}</Text>
-              <Text style={s.contentCount}>{formatCount(totalProducts)} منتج</Text>
-            </View>
           </View>
 
           {/* Sub-categories grid */}
