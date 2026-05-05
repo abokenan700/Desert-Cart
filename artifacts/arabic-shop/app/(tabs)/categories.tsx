@@ -6,8 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
-  FlatList,
-  Dimensions,
+  useWindowDimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -15,10 +14,7 @@ import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { CATEGORY_TREE, Level1Category, Level2Category } from "@/data/categoryData";
 
-const { width } = Dimensions.get("window");
 const SIDEBAR_WIDTH = 64;
-const CONTENT_WIDTH = width - SIDEBAR_WIDTH;
-const CARD_WIDTH = (CONTENT_WIDTH - 24) / 2;
 
 function formatCount(n: number): string {
   if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
@@ -43,8 +39,8 @@ function SidebarItem({
         styles.sidebarItem,
         isSelected && {
           backgroundColor: colors.card,
-          borderRightWidth: 3,
-          borderRightColor: category.color,
+          borderLeftWidth: 3,
+          borderLeftColor: category.color,
         },
       ]}
     >
@@ -70,16 +66,18 @@ function SidebarItem({
 function SubCategoryCard({
   sub,
   onPress,
+  cardWidth,
 }: {
   sub: Level2Category;
   onPress: () => void;
+  cardWidth: number;
 }) {
   const colors = useColors();
   return (
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.82}
-      style={[styles.subCard, { backgroundColor: colors.card, borderColor: `${colors.border}60` }]}
+      style={[styles.subCard, { width: cardWidth, backgroundColor: colors.card, borderColor: `${colors.border}60` }]}
     >
       <View style={[styles.subIconWrap, { backgroundColor: sub.bgColor }]}>
         <Ionicons name={sub.icon as any} size={26} color={sub.color} />
@@ -112,8 +110,12 @@ function SubCategoryCard({
 export default function CategoriesScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 84 : insets.bottom + 68;
+
+  const contentWidth = width - SIDEBAR_WIDTH;
+  const cardWidth = (contentWidth - 28) / 2;
 
   const [selectedL1Id, setSelectedL1Id] = useState(CATEGORY_TREE[0].id);
 
@@ -168,16 +170,22 @@ export default function CategoriesScreen() {
         },
         body: {
           flex: 1,
-          flexDirection: "row-reverse",
+          position: "relative",
         },
         sidebar: {
+          position: "absolute",
+          top: 0,
+          right: 0,
+          bottom: 0,
           width: SIDEBAR_WIDTH,
           backgroundColor: colors.secondary,
           borderLeftWidth: 1,
           borderLeftColor: colors.border,
+          zIndex: 1,
         },
         content: {
           flex: 1,
+          paddingRight: SIDEBAR_WIDTH,
           backgroundColor: colors.background,
         },
         contentHeader: {
@@ -206,7 +214,7 @@ export default function CategoriesScreen() {
           paddingBottom: bottomPad + 8,
         },
       }),
-    [colors, topPad, bottomPad]
+    [colors, topPad, bottomPad, width]
   );
 
   return (
@@ -222,7 +230,41 @@ export default function CategoriesScreen() {
       </View>
 
       <View style={s.body}>
-        {/* Sidebar — Level 1 */}
+        {/* Content — Level 2 grid (left) */}
+        <ScrollView
+          style={s.content}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 8 }}
+        >
+          {/* Section header */}
+          <View style={s.contentHeader}>
+            <TouchableOpacity
+              onPress={() => router.push(`/(tabs)/search?category=${selectedL1Id}` as any)}
+              style={[styles.seeAllBtn, { borderColor: selectedL1.color }]}
+            >
+              <Ionicons name="arrow-forward" size={13} color={selectedL1.color} />
+              <Text style={[styles.seeAllText, { color: selectedL1.color }]}>عرض الكل</Text>
+            </TouchableOpacity>
+            <View style={{ alignItems: "flex-end" }}>
+              <Text style={s.contentTitle}>{selectedL1.nameAr}</Text>
+              <Text style={s.contentCount}>{formatCount(totalProducts)} منتج</Text>
+            </View>
+          </View>
+
+          {/* Sub-categories grid */}
+          <View style={s.grid}>
+            {selectedL1.subCategories.map((sub) => (
+              <SubCategoryCard
+                key={sub.id}
+                sub={sub}
+                cardWidth={cardWidth}
+                onPress={() => handleSubPress(sub)}
+              />
+            ))}
+          </View>
+        </ScrollView>
+
+        {/* Sidebar — Level 1 (right) */}
         <ScrollView
           style={s.sidebar}
           showsVerticalScrollIndicator={false}
@@ -237,39 +279,6 @@ export default function CategoriesScreen() {
             />
           ))}
         </ScrollView>
-
-        {/* Content — Level 2 grid */}
-        <ScrollView
-          style={s.content}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 8 }}
-        >
-          {/* Section header */}
-          <View style={s.contentHeader}>
-            <View style={{ alignItems: "flex-end" }}>
-              <Text style={s.contentTitle}>{selectedL1.nameAr}</Text>
-              <Text style={s.contentCount}>{formatCount(totalProducts)} منتج</Text>
-            </View>
-            <TouchableOpacity
-              onPress={() => router.push(`/(tabs)/search?category=${selectedL1Id}` as any)}
-              style={[styles.seeAllBtn, { borderColor: selectedL1.color }]}
-            >
-              <Text style={[styles.seeAllText, { color: selectedL1.color }]}>عرض الكل</Text>
-              <Ionicons name="arrow-back" size={13} color={selectedL1.color} />
-            </TouchableOpacity>
-          </View>
-
-          {/* Sub-categories grid */}
-          <View style={s.grid}>
-            {selectedL1.subCategories.map((sub) => (
-              <SubCategoryCard
-                key={sub.id}
-                sub={sub}
-                onPress={() => handleSubPress(sub)}
-              />
-            ))}
-          </View>
-        </ScrollView>
       </View>
     </View>
   );
@@ -281,8 +290,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     alignItems: "center",
     justifyContent: "center",
-    borderRightWidth: 3,
-    borderRightColor: "transparent",
+    borderLeftWidth: 3,
+    borderLeftColor: "transparent",
     width: SIDEBAR_WIDTH,
   },
   sidebarIconWrap: {
@@ -299,7 +308,6 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   subCard: {
-    width: CARD_WIDTH,
     borderRadius: 16,
     padding: 12,
     borderWidth: 1,
