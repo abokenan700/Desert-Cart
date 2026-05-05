@@ -8,6 +8,7 @@ import {
   Platform,
   useWindowDimensions,
   Animated,
+  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -16,7 +17,17 @@ import { useColors } from "@/hooks/useColors";
 import { CATEGORY_TREE, Level1Category, Level2Category } from "@/data/categoryData";
 
 const SIDEBAR_WIDTH = 64;
-const BANNER_HEIGHT = 130;
+const BANNER_HEIGHT = 180;
+
+const BANNER_SLIDES = [
+  { categoryId: "fashion",      uri: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=900&h=400&fit=crop&q=85" },
+  { categoryId: "electronics",  uri: "https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=900&h=400&fit=crop&q=85" },
+  { categoryId: "accessories",  uri: "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=900&h=400&fit=crop&q=85" },
+  { categoryId: "beauty",       uri: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=900&h=400&fit=crop&q=85" },
+  { categoryId: "home",         uri: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=900&h=400&fit=crop&q=85" },
+  { categoryId: "sports",       uri: "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=900&h=400&fit=crop&q=85" },
+  { categoryId: "kids",         uri: "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=900&h=400&fit=crop&q=85" },
+];
 
 function formatCount(n: number): string {
   if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
@@ -24,137 +35,71 @@ function formatCount(n: number): string {
 }
 
 function CategoryBanner({
-  bannerWidth,
   onSelectCategory,
 }: {
-  bannerWidth: number;
   onSelectCategory: (id: string) => void;
 }) {
   const [activeIdx, setActiveIdx] = useState(0);
-  const translateX = useRef(new Animated.Value(0)).current;
+  const [prevIdx, setPrevIdx] = useState<number | null>(null);
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const idxRef = useRef(0);
-  const count = CATEGORY_TREE.length;
+  const count = BANNER_SLIDES.length;
 
   const goTo = useCallback(
     (next: number) => {
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 220,
-          useNativeDriver: true,
-        }),
-        Animated.timing(translateX, {
-          toValue: -20,
-          duration: 220,
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        idxRef.current = next;
-        setActiveIdx(next);
-        translateX.setValue(20);
-        Animated.parallel([
-          Animated.timing(fadeAnim, {
-            toValue: 1,
-            duration: 280,
-            useNativeDriver: true,
-          }),
-          Animated.timing(translateX, {
-            toValue: 0,
-            duration: 280,
-            useNativeDriver: true,
-          }),
-        ]).start();
-      });
+      if (next === idxRef.current) return;
+      setPrevIdx(idxRef.current);
+      fadeAnim.setValue(0);
+      idxRef.current = next;
+      setActiveIdx(next);
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }).start(() => setPrevIdx(null));
     },
-    [fadeAnim, translateX]
+    [fadeAnim]
   );
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const next = (idxRef.current + 1) % count;
-      goTo(next);
-    }, 3000);
+      goTo((idxRef.current + 1) % count);
+    }, 4000);
     return () => clearInterval(interval);
   }, [goTo, count]);
 
-  const cat = CATEGORY_TREE[activeIdx];
-  const totalSubs = cat.subCategories.length;
-  const totalProducts = cat.subCategories.reduce((a, s) => a + s.productCount, 0);
-
-  const decorCircles = [
-    { size: 80, top: -20, left: 20, opacity: 0.15 },
-    { size: 50, top: 30, left: -10, opacity: 0.1 },
-    { size: 110, top: -30, left: bannerWidth * 0.25, opacity: 0.08 },
-  ];
+  const current = BANNER_SLIDES[activeIdx];
+  const prev = prevIdx !== null ? BANNER_SLIDES[prevIdx] : null;
+  const catId = current.categoryId;
 
   return (
-    <View style={[bannerStyles.wrapper, { height: BANNER_HEIGHT, backgroundColor: cat.bgColor }]}>
-      {decorCircles.map((c, i) => (
-        <View
-          key={i}
-          style={[
-            bannerStyles.decoCircle,
-            {
-              width: c.size,
-              height: c.size,
-              borderRadius: c.size / 2,
-              top: c.top,
-              left: c.left,
-              backgroundColor: cat.color,
-              opacity: c.opacity,
-            },
-          ]}
+    <View style={bannerStyles.wrapper}>
+      {prev && (
+        <Image
+          source={{ uri: prev.uri }}
+          style={StyleSheet.absoluteFillObject}
+          resizeMode="cover"
         />
-      ))}
-
-      <Animated.View
-        style={[
-          bannerStyles.content,
-          { opacity: fadeAnim, transform: [{ translateX }] },
-        ]}
-      >
-        <TouchableOpacity
-          activeOpacity={0.85}
-          onPress={() => onSelectCategory(cat.id)}
-          style={bannerStyles.touchable}
-        >
-          <View style={[bannerStyles.iconCircle, { backgroundColor: cat.color }]}>
-            <Ionicons name={cat.icon as any} size={32} color="#fff" />
-          </View>
-
-          <View style={bannerStyles.textBlock}>
-            <Text style={[bannerStyles.catName, { color: cat.color }]}>{cat.nameAr}</Text>
-            <View style={bannerStyles.statsRow}>
-              <View style={[bannerStyles.statPill, { backgroundColor: `${cat.color}18` }]}>
-                <Ionicons name="grid-outline" size={11} color={cat.color} />
-                <Text style={[bannerStyles.statText, { color: cat.color }]}>{totalSubs} قسم</Text>
-              </View>
-              <View style={[bannerStyles.statPill, { backgroundColor: `${cat.color}18` }]}>
-                <Ionicons name="cube-outline" size={11} color={cat.color} />
-                <Text style={[bannerStyles.statText, { color: cat.color }]}>{formatCount(totalProducts)} منتج</Text>
-              </View>
-            </View>
-            <View style={bannerStyles.subsRow}>
-              {cat.subCategories.slice(0, 3).map((s) => (
-                <Text key={s.id} style={[bannerStyles.subChip, { color: cat.color, borderColor: `${cat.color}40` }]}>
-                  {s.nameAr}
-                </Text>
-              ))}
-            </View>
-          </View>
-        </TouchableOpacity>
-      </Animated.View>
-
-      <View style={bannerStyles.dots}>
-        {CATEGORY_TREE.map((_, i) => (
-          <TouchableOpacity key={i} onPress={() => goTo(i)} activeOpacity={0.7}>
+      )}
+      <Animated.Image
+        source={{ uri: current.uri }}
+        style={[StyleSheet.absoluteFillObject, { opacity: fadeAnim }]}
+        resizeMode="cover"
+      />
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={() => onSelectCategory(catId)}
+        style={StyleSheet.absoluteFillObject}
+      />
+      <View style={bannerStyles.dotsOverlay}>
+        {BANNER_SLIDES.map((_, i) => (
+          <TouchableOpacity key={i} onPress={() => goTo(i)} activeOpacity={0.7} hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}>
             <View
               style={[
                 bannerStyles.dot,
                 {
-                  backgroundColor: i === activeIdx ? cat.color : `${cat.color}40`,
-                  width: i === activeIdx ? 18 : 6,
+                  backgroundColor: i === activeIdx ? "#fff" : "rgba(255,255,255,0.45)",
+                  width: i === activeIdx ? 20 : 6,
                 },
               ]}
             />
@@ -167,84 +112,20 @@ function CategoryBanner({
 
 const bannerStyles = StyleSheet.create({
   wrapper: {
+    height: BANNER_HEIGHT,
     overflow: "hidden",
     position: "relative",
+    backgroundColor: "#ddd",
   },
-  decoCircle: {
+  dotsOverlay: {
     position: "absolute",
-  },
-  content: {
-    flex: 1,
-  },
-  touchable: {
-    flex: 1,
-    flexDirection: "row-reverse",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    gap: 14,
-  },
-  iconCircle: {
-    width: 68,
-    height: 68,
-    borderRadius: 22,
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-    ...Platform.select({
-      ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8 },
-      android: { elevation: 6 },
-      web: { boxShadow: "0 4px 12px rgba(0,0,0,0.18)" } as any,
-    }),
-  },
-  textBlock: {
-    flex: 1,
-    alignItems: "flex-end",
-  },
-  catName: {
-    fontSize: 20,
-    fontFamily: "Cairo_800ExtraBold",
-    textAlign: "right",
-    marginBottom: 6,
-  },
-  statsRow: {
-    flexDirection: "row-reverse",
-    gap: 6,
-    marginBottom: 6,
-  },
-  statPill: {
-    flexDirection: "row-reverse",
-    alignItems: "center",
-    gap: 3,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 10,
-  },
-  statText: {
-    fontSize: 10,
-    fontFamily: "Cairo_600SemiBold",
-  },
-  subsRow: {
-    flexDirection: "row-reverse",
-    flexWrap: "wrap",
-    gap: 4,
-  },
-  subChip: {
-    fontSize: 9,
-    fontFamily: "Cairo_400Regular",
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-    borderRadius: 8,
-    borderWidth: 1,
-    overflow: "hidden",
-  },
-  dots: {
-    flexDirection: "row-reverse",
+    bottom: 10,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     gap: 5,
-    paddingBottom: 8,
-    paddingTop: 2,
   },
   dot: {
     height: 6,
@@ -428,7 +309,6 @@ export default function CategoriesScreen() {
     <View style={s.container}>
       <View style={s.topSpacer} />
       <CategoryBanner
-        bannerWidth={width}
         onSelectCategory={(id) => setSelectedL1Id(id)}
       />
 
