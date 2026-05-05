@@ -4,8 +4,10 @@ import {
   Text,
   StyleSheet,
   Animated,
+  Platform,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const ANNOUNCEMENTS = [
   "✦ شحن مجاني على جميع الطلبات فوق ٥٠٠ ر.س ✦",
@@ -18,6 +20,9 @@ const DISPLAY_DURATION = 3200;
 const ANIM_DURATION = 450;
 
 export default function AnnouncementBar() {
+  const insets = useSafeAreaInsets();
+  const topPad = Platform.OS === "web" ? 0 : insets.top;
+
   const translateY = useRef(new Animated.Value(28)).current;
   const opacity = useRef(new Animated.Value(0)).current;
   const currentIndex = useRef(0);
@@ -80,7 +85,7 @@ export default function AnnouncementBar() {
       colors={["#E63946", "#C1121F"]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
-      style={styles.container}
+      style={[styles.container, { paddingTop: topPad, height: 30 + topPad }]}
     >
       <View style={styles.inner}>
         <Animated.Text
@@ -101,7 +106,7 @@ const styles = StyleSheet.create({
   container: {
     height: 30,
     overflow: "hidden",
-    justifyContent: "center",
+    justifyContent: "flex-end",
   },
   inner: {
     height: 30,
