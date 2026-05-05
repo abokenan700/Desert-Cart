@@ -1,4 +1,4 @@
-modules = ["nodejs-20", "web", "bash"]
+modules = ["nodejs-20"]
 
 [deployment]
 router = "application"
@@ -43,30 +43,6 @@ timeoutMs = 20000
 [[ports]]
 localPort = 5000
 externalPort = 80
-
-[[ports]]
-localPort = 8000
-externalPort = 8000
-
-[[ports]]
-localPort = 8080
-externalPort = 8080
-
-[[ports]]
-localPort = 8081
-externalPort = 8081
-
-[[ports]]
-localPort = 8082
-externalPort = 3003
-
-[[ports]]
-localPort = 20426
-externalPort = 80
-
-[[ports]]
-localPort = 20427
-externalPort = 3001
 
 [nix]
 channel = "stable-25_05"
