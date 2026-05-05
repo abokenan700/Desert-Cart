@@ -101,6 +101,8 @@ const bannerStyles = StyleSheet.create({
     overflow: "hidden",
     position: "relative",
     backgroundColor: "#ddd",
+    marginHorizontal: 10,
+    borderRadius: 14,
   },
 });
 
