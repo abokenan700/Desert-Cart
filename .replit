@@ -29,7 +29,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "PORT=5000 node /home/runner/workspace/artifacts/arabic-shop/serve-static.js"
+args = "cd artifacts/arabic-shop && node serve-static.js"
 waitForPort = 5000
 
 [agent]
@@ -43,14 +43,6 @@ timeoutMs = 20000
 [[ports]]
 localPort = 5000
 externalPort = 80
-
-[[ports]]
-localPort = 20426
-externalPort = 3000
-
-[[ports]]
-localPort = 20427
-externalPort = 3001
 
 [nix]
 channel = "stable-25_05"
