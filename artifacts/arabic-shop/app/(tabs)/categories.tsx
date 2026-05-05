@@ -17,7 +17,7 @@ import { useColors } from "@/hooks/useColors";
 import { CATEGORY_TREE, Level1Category, Level2Category } from "@/data/categoryData";
 
 const SIDEBAR_WIDTH = 64;
-const BANNER_HEIGHT = 180;
+const BANNER_HEIGHT = 120;
 
 const BANNER_SLIDES = [
   { categoryId: "fashion",      uri: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=900&h=400&fit=crop&q=85" },
@@ -91,21 +91,6 @@ function CategoryBanner({
         onPress={() => onSelectCategory(catId)}
         style={StyleSheet.absoluteFillObject}
       />
-      <View style={bannerStyles.dotsOverlay}>
-        {BANNER_SLIDES.map((_, i) => (
-          <TouchableOpacity key={i} onPress={() => goTo(i)} activeOpacity={0.7} hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}>
-            <View
-              style={[
-                bannerStyles.dot,
-                {
-                  backgroundColor: i === activeIdx ? "#fff" : "rgba(255,255,255,0.45)",
-                  width: i === activeIdx ? 20 : 6,
-                },
-              ]}
-            />
-          </TouchableOpacity>
-        ))}
-      </View>
     </View>
   );
 }
@@ -116,20 +101,6 @@ const bannerStyles = StyleSheet.create({
     overflow: "hidden",
     position: "relative",
     backgroundColor: "#ddd",
-  },
-  dotsOverlay: {
-    position: "absolute",
-    bottom: 10,
-    left: 0,
-    right: 0,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 5,
-  },
-  dot: {
-    height: 6,
-    borderRadius: 3,
   },
 });
 
@@ -253,7 +224,7 @@ export default function CategoriesScreen() {
       StyleSheet.create({
         container: { flex: 1, backgroundColor: colors.background },
         topSpacer: {
-          height: topPad,
+          height: Platform.OS === "web" ? topPad : 0,
           backgroundColor: colors.background,
         },
         body: {
