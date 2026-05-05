@@ -224,7 +224,7 @@ export default function CategoriesScreen() {
       StyleSheet.create({
         container: { flex: 1, backgroundColor: colors.background },
         topSpacer: {
-          height: Platform.OS === "web" ? topPad : 0,
+          height: 0,
           backgroundColor: colors.background,
         },
         body: {
