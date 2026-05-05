@@ -13,11 +13,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
-import { CATEGORY_TREE, Level1Category, Level2Category } from "@/data/categoryData";
+import { CATEGORY_TREE, Level2Category } from "@/data/categoryData";
 
 const SIDEBAR_WIDTH = 76;
-const BANNER_HEIGHT = 120;
+const BANNER_HEIGHT = 116;
+const TAB_STRIP_HEIGHT = 76;
+const CIRCLE_MAX = 96;
 
+/* ─────────────────────────────────────────────────────────────── */
 const CATEGORY_IMAGES: Record<string, string> = {
   "fashion-women":      "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=200&h=200&fit=crop&q=80",
   "fashion-men":        "https://images.unsplash.com/photo-1594938298603-c8148b3f2a3f?w=200&h=200&fit=crop&q=80",
@@ -77,55 +80,62 @@ function L1TabStrip({
 }) {
   const colors = useColors();
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.tabStrip}
-      style={{ backgroundColor: colors.background }}
-    >
-      {CATEGORY_TREE.map((cat) => {
-        const isSelected = cat.id === selectedId;
-        return (
-          <TouchableOpacity
-            key={cat.id}
-            activeOpacity={0.75}
-            onPress={() => onSelect(cat.id)}
-            style={styles.tabItem}
-          >
-            <View
-              style={[
-                styles.tabIconWrap,
-                {
-                  backgroundColor: isSelected ? cat.color : cat.bgColor,
-                  borderColor: isSelected ? cat.color : `${cat.color}30`,
-                },
-              ]}
+    // FIX: explicit height prevents ScrollView from expanding vertically on web
+    <View style={{ height: TAB_STRIP_HEIGHT, backgroundColor: colors.background }}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        // FIX: row-reverse so first item is on the right (RTL)
+        contentContainerStyle={[styles.tabStrip, { flexDirection: "row-reverse" }]}
+        style={{ flex: 1 }}
+      >
+        {CATEGORY_TREE.map((cat) => {
+          const isSelected = cat.id === selectedId;
+          return (
+            <TouchableOpacity
+              key={cat.id}
+              activeOpacity={0.75}
+              onPress={() => onSelect(cat.id)}
+              style={styles.tabItem}
             >
-              <Ionicons
-                name={cat.icon as any}
-                size={20}
-                color={isSelected ? "#fff" : cat.color}
-              />
-            </View>
-            <Text
-              style={[
-                styles.tabLabel,
-                {
-                  color: isSelected ? cat.color : colors.mutedForeground,
-                  fontFamily: isSelected ? "Cairo_700Bold" : "Cairo_400Regular",
-                },
-              ]}
-              numberOfLines={1}
-            >
-              {cat.nameAr}
-            </Text>
-            {isSelected && (
-              <View style={[styles.tabUnderline, { backgroundColor: cat.color }]} />
-            )}
-          </TouchableOpacity>
-        );
-      })}
-    </ScrollView>
+              <View
+                style={[
+                  styles.tabIconWrap,
+                  {
+                    backgroundColor: isSelected ? cat.color : cat.bgColor,
+                    borderColor: isSelected ? cat.color : `${cat.color}40`,
+                  },
+                ]}
+              >
+                <Ionicons
+                  name={cat.icon as any}
+                  size={19}
+                  color={isSelected ? "#fff" : cat.color}
+                />
+              </View>
+              <Text
+                style={[
+                  styles.tabLabel,
+                  {
+                    color: isSelected ? cat.color : colors.mutedForeground,
+                    fontFamily: isSelected ? "Cairo_700Bold" : "Cairo_400Regular",
+                  },
+                ]}
+                numberOfLines={1}
+              >
+                {cat.nameAr}
+              </Text>
+              {/* FIX: underline as bottom border on the icon wrap, not absolute positioned */}
+              {isSelected && (
+                <View style={[styles.tabDot, { backgroundColor: cat.color }]} />
+              )}
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+      {/* Bottom separator */}
+      <View style={[styles.tabStripBorder, { backgroundColor: colors.border }]} />
+    </View>
   );
 }
 
@@ -135,6 +145,8 @@ function StaticBanner({ categoryId }: { categoryId: string }) {
   return (
     <View style={bannerStyles.wrapper}>
       <Image source={{ uri }} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
+      {/* Subtle gradient overlay for text readability */}
+      <View style={bannerStyles.overlay} />
     </View>
   );
 }
@@ -144,9 +156,12 @@ const bannerStyles = StyleSheet.create({
     height: BANNER_HEIGHT,
     overflow: "hidden",
     backgroundColor: "#ddd",
-    marginHorizontal: 3,
-    borderRadius: 14,
-    marginBottom: 0,
+    marginHorizontal: 6,
+    borderRadius: 12,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.08)",
   },
 });
 
@@ -168,29 +183,34 @@ function L2SidebarItem({
       style={[
         styles.sidebarItem,
         isSelected && {
-          backgroundColor: colors.card,
-          borderRightWidth: 3,
-          borderRightColor: sub.color,
+          backgroundColor: `${sub.color}10`,
+          // FIX: border on LEFT side (facing the content area)
+          borderLeftWidth: 3,
+          borderLeftColor: sub.color,
         },
       ]}
     >
       <View
         style={[
           styles.sidebarIconWrap,
-          { backgroundColor: isSelected ? sub.bgColor : "transparent" },
+          {
+            backgroundColor: isSelected ? sub.bgColor : "transparent",
+          },
         ]}
       >
         <Ionicons
           name={sub.icon as any}
-          size={18}
+          size={17}
           color={isSelected ? sub.color : colors.mutedForeground}
         />
       </View>
       <Text
         style={[
           styles.sidebarLabel,
-          { color: isSelected ? sub.color : colors.mutedForeground,
-            fontFamily: isSelected ? "Cairo_600SemiBold" : "Cairo_400Regular" },
+          {
+            color: isSelected ? sub.color : colors.mutedForeground,
+            fontFamily: isSelected ? "Cairo_600SemiBold" : "Cairo_400Regular",
+          },
         ]}
         numberOfLines={2}
       >
@@ -214,6 +234,7 @@ function L3CircleCard({
 }) {
   const colors = useColors();
   const imgUri = CATEGORY_IMAGES[parentSub.id];
+  const r = circleSize / 2;
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -226,20 +247,24 @@ function L3CircleCard({
           {
             width: circleSize,
             height: circleSize,
-            borderRadius: circleSize / 2,
+            borderRadius: r,
             backgroundColor: parentSub.bgColor,
-            borderColor: `${parentSub.color}20`,
+            borderColor: `${parentSub.color}25`,
           },
         ]}
       >
         {imgUri ? (
           <Image
             source={{ uri: imgUri }}
-            style={{ width: circleSize, height: circleSize, borderRadius: circleSize / 2 }}
+            style={{ width: circleSize, height: circleSize, borderRadius: r }}
             resizeMode="cover"
           />
         ) : (
-          <Ionicons name={parentSub.icon as any} size={Math.round(circleSize * 0.38)} color={parentSub.color} />
+          <Ionicons
+            name={parentSub.icon as any}
+            size={Math.round(circleSize * 0.38)}
+            color={parentSub.color}
+          />
         )}
       </View>
       <Text style={[styles.subName, { color: colors.text }]} numberOfLines={2}>
@@ -249,17 +274,40 @@ function L3CircleCard({
   );
 }
 
+/* ── Content area header ─────────────────────────────────────── */
+function ContentHeader({ sub }: { sub: Level2Category }) {
+  const colors = useColors();
+  return (
+    <View
+      style={[
+        styles.contentHeader,
+        { borderBottomColor: colors.border },
+      ]}
+    >
+      <View style={[styles.contentHeaderDot, { backgroundColor: sub.color }]} />
+      <Text style={[styles.contentHeaderText, { color: colors.text }]}>
+        {sub.nameAr}
+      </Text>
+      <Text style={[styles.contentHeaderCount, { color: colors.mutedForeground }]}>
+        {sub.productCount.toLocaleString("ar-SA")} منتج
+      </Text>
+    </View>
+  );
+}
+
 /* ── Main screen ─────────────────────────────────────────────── */
 export default function CategoriesScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  const topPad = Platform.OS === "web" ? 67 : insets.top;
+  const topPad   = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 84 : insets.bottom + 68;
 
+  // FIX: cap circle size so they don't get absurdly large on wide screens
   const contentWidth = width - SIDEBAR_WIDTH;
-  const cols = 3;
-  const circleSize = Math.floor((contentWidth - 32 - (cols - 1) * 10) / cols);
+  const cols = 4;
+  const rawCircle = Math.floor((contentWidth - 24 - (cols - 1) * 10) / cols);
+  const circleSize = Math.min(rawCircle, CIRCLE_MAX);
 
   const [selectedL1Id, setSelectedL1Id] = useState(CATEGORY_TREE[0].id);
   const [selectedL2Id, setSelectedL2Id] = useState(CATEGORY_TREE[0].subCategories[0].id);
@@ -270,32 +318,31 @@ export default function CategoriesScreen() {
   );
 
   const selectedL2 = useMemo(
-    () => selectedL1.subCategories.find((s) => s.id === selectedL2Id) ?? selectedL1.subCategories[0],
+    () =>
+      selectedL1.subCategories.find((s) => s.id === selectedL2Id) ??
+      selectedL1.subCategories[0],
     [selectedL1, selectedL2Id]
   );
 
   const handleSelectL1 = useCallback((id: string) => {
     setSelectedL1Id(id);
-    const newL1 = CATEGORY_TREE.find((c) => c.id === id);
-    if (newL1?.subCategories[0]) {
-      setSelectedL2Id(newL1.subCategories[0].id);
-    }
+    const l1 = CATEGORY_TREE.find((c) => c.id === id);
+    if (l1?.subCategories[0]) setSelectedL2Id(l1.subCategories[0].id);
   }, []);
 
   const s = useMemo(
     () =>
       StyleSheet.create({
-        container: { flex: 1, backgroundColor: colors.background },
-        topSpacer: { height: topPad, backgroundColor: colors.background },
-        body: { flex: 1, position: "relative" },
+        container:  { flex: 1, backgroundColor: colors.background },
+        topSpacer:  { height: topPad, backgroundColor: colors.background },
+        banner:     { paddingTop: 6, paddingBottom: 6 },
+        body:       { flex: 1, position: "relative" },
         sidebar: {
           position: "absolute",
-          top: 0,
-          right: 0,
-          bottom: 0,
+          top: 0, right: 0, bottom: 0,
           width: SIDEBAR_WIDTH,
           backgroundColor: colors.secondary,
-          borderLeftWidth: 1,
+          borderLeftWidth: StyleSheet.hairlineWidth,
           borderLeftColor: colors.border,
           zIndex: 1,
         },
@@ -309,8 +356,9 @@ export default function CategoriesScreen() {
           flexWrap: "wrap",
           paddingHorizontal: 12,
           gap: 10,
-          paddingTop: 14,
+          paddingTop: 12,
           paddingBottom: bottomPad + 8,
+          justifyContent: "flex-start",
         },
       }),
     [colors, topPad, bottomPad]
@@ -320,19 +368,19 @@ export default function CategoriesScreen() {
     <View style={s.container}>
       <View style={s.topSpacer} />
 
-      {/* L1 tabs */}
+      {/* L1 category tabs */}
       <L1TabStrip selectedId={selectedL1Id} onSelect={handleSelectL1} />
 
-      {/* Banner */}
-      <StaticBanner categoryId={selectedL1Id} />
+      {/* Banner image for selected L1 */}
+      <View style={s.banner}>
+        <StaticBanner categoryId={selectedL1Id} />
+      </View>
 
-      {/* Body */}
+      {/* Body: sidebar (L2) + content (L3 circles) */}
       <View style={s.body}>
-        {/* Content: L3 circles */}
-        <ScrollView
-          style={s.content}
-          showsVerticalScrollIndicator={false}
-        >
+        {/* L3 content area */}
+        <ScrollView style={s.content} showsVerticalScrollIndicator={false}>
+          <ContentHeader sub={selectedL2} />
           <View style={s.grid}>
             {selectedL2.items.map((item) => (
               <L3CircleCard
@@ -340,13 +388,15 @@ export default function CategoriesScreen() {
                 item={item}
                 parentSub={selectedL2}
                 circleSize={circleSize}
-                onPress={() => router.push(`/(tabs)/search?category=${selectedL1Id}` as any)}
+                onPress={() =>
+                  router.push(`/(tabs)/search?category=${selectedL1Id}` as any)
+                }
               />
             ))}
           </View>
         </ScrollView>
 
-        {/* Sidebar: L2 subcategories */}
+        {/* L2 subcategory sidebar */}
         <ScrollView
           style={s.sidebar}
           showsVerticalScrollIndicator={false}
@@ -366,54 +416,57 @@ export default function CategoriesScreen() {
   );
 }
 
+/* ─────────────────────────────────────────────────────────────── */
 const styles = StyleSheet.create({
   /* L1 tab strip */
   tabStrip: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
     paddingVertical: 8,
-    gap: 6,
-    flexDirection: "row",
+    gap: 4,
+    alignItems: "center",
   },
   tabItem: {
     alignItems: "center",
-    paddingHorizontal: 6,
-    minWidth: 56,
-    position: "relative",
+    paddingHorizontal: 8,
+    minWidth: 58,
   },
   tabIconWrap: {
-    width: 42,
-    height: 42,
-    borderRadius: 14,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1.5,
-    marginBottom: 4,
+    marginBottom: 3,
   },
   tabLabel: {
     fontSize: 10,
     textAlign: "center",
+    lineHeight: 14,
   },
-  tabUnderline: {
-    position: "absolute",
-    bottom: -8,
-    left: 8,
-    right: 8,
-    height: 2,
-    borderRadius: 1,
+  tabDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    marginTop: 3,
+  },
+  tabStripBorder: {
+    height: StyleSheet.hairlineWidth,
+    marginHorizontal: 12,
   },
 
   /* L2 sidebar */
   sidebarItem: {
     paddingVertical: 10,
-    paddingHorizontal: 6,
+    paddingHorizontal: 4,
     alignItems: "center",
-    borderRightWidth: 3,
-    borderRightColor: "transparent",
     width: SIDEBAR_WIDTH,
+    borderLeftWidth: 3,
+    borderLeftColor: "transparent",
   },
   sidebarIconWrap: {
-    width: 36,
-    height: 36,
+    width: 34,
+    height: 34,
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
@@ -423,6 +476,31 @@ const styles = StyleSheet.create({
     fontSize: 9,
     textAlign: "center",
     lineHeight: 13,
+  },
+
+  /* Content header */
+  contentHeader: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    gap: 8,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  contentHeaderDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  contentHeaderText: {
+    flex: 1,
+    textAlign: "right",
+    fontSize: 13,
+    fontFamily: "Cairo_700Bold",
+  },
+  contentHeaderCount: {
+    fontSize: 11,
+    fontFamily: "Cairo_400Regular",
   },
 
   /* L3 circle card */
@@ -436,15 +514,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 6,
     ...Platform.select({
-      ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 10 },
-      android: { elevation: 3 },
-      web: { boxShadow: "0 4px 14px rgba(0,0,0,0.08)" } as any,
+      ios:     { shadowColor: "#000", shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.07, shadowRadius: 8 },
+      android: { elevation: 2 },
+      web:     { boxShadow: "0 3px 10px rgba(0,0,0,0.07)" } as any,
     }),
   },
   subName: {
     fontSize: 11,
     fontFamily: "Cairo_600SemiBold",
     textAlign: "center",
-    lineHeight: 17,
+    lineHeight: 16,
   },
 });
