@@ -93,20 +93,6 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
           alignItems: "center",
           justifyContent: "center",
         },
-        cartBtn: {
-          width: 42,
-          height: 42,
-          borderRadius: 14,
-          backgroundColor: colors.primary,
-          alignItems: "center",
-          justifyContent: "center",
-          position: "relative",
-          shadowColor: colors.primary,
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.45,
-          shadowRadius: 8,
-          elevation: 6,
-        },
         badge: {
           position: "absolute",
           top: -4,
@@ -170,12 +156,12 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
           )}
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.cartBtn}
+          style={styles.iconBtn}
           onPress={() => router.push("/(tabs)/cart")}
           accessibilityLabel="السلة"
           accessibilityRole="button"
         >
-          <Ionicons name="bag-handle" size={20} color="#fff" />
+          <Ionicons name="bag-outline" size={20} color={colors.text} />
           {totalCount > 0 && (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{totalCount > 9 ? "9+" : totalCount}</Text>
