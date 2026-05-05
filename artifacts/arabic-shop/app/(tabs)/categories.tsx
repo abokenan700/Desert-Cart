@@ -17,7 +17,7 @@ import { useColors } from "@/hooks/useColors";
 import { CATEGORY_TREE, Level1Category, Level2Category } from "@/data/categoryData";
 
 const SIDEBAR_WIDTH = 64;
-const BANNER_HEIGHT = 120;
+const BANNER_HEIGHT = 128;
 
 const BANNER_SLIDES = [
   { categoryId: "fashion",      uri: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=900&h=400&fit=crop&q=85" },
@@ -101,7 +101,7 @@ const bannerStyles = StyleSheet.create({
     overflow: "hidden",
     position: "relative",
     backgroundColor: "#ddd",
-    marginHorizontal: 6,
+    marginHorizontal: 3,
     borderRadius: 14,
   },
 });
