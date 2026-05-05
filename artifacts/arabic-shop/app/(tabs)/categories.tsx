@@ -16,7 +16,7 @@ import { useColors } from "@/hooks/useColors";
 import { CATEGORY_TREE, Level1Category, Level2Category } from "@/data/categoryData";
 
 const { width } = Dimensions.get("window");
-const SIDEBAR_WIDTH = 96;
+const SIDEBAR_WIDTH = 64;
 const CONTENT_WIDTH = width - SIDEBAR_WIDTH;
 const CARD_WIDTH = (CONTENT_WIDTH - 24) / 2;
 
@@ -41,33 +41,28 @@ function SidebarItem({
       activeOpacity={0.75}
       style={[
         styles.sidebarItem,
-        isSelected && { backgroundColor: colors.card, borderRightWidth: 3, borderRightColor: category.color },
+        isSelected && {
+          backgroundColor: colors.card,
+          borderRightWidth: 3,
+          borderRightColor: category.color,
+        },
       ]}
     >
       <View
         style={[
           styles.sidebarIconWrap,
-          { backgroundColor: isSelected ? category.bgColor : colors.secondary },
+          { backgroundColor: isSelected ? category.bgColor : "transparent" },
         ]}
       >
         <Ionicons
           name={category.icon as any}
-          size={20}
+          size={22}
           color={isSelected ? category.color : colors.mutedForeground}
         />
       </View>
-      <Text
-        style={[
-          styles.sidebarLabel,
-          {
-            color: isSelected ? category.color : colors.mutedForeground,
-            fontFamily: isSelected ? "Cairo_700Bold" : "Cairo_400Regular",
-          },
-        ]}
-        numberOfLines={2}
-      >
-        {category.nameAr}
-      </Text>
+      {isSelected && (
+        <View style={[styles.sidebarDot, { backgroundColor: category.color }]} />
+      )}
     </TouchableOpacity>
   );
 }
@@ -282,24 +277,26 @@ export default function CategoriesScreen() {
 
 const styles = StyleSheet.create({
   sidebarItem: {
-    paddingVertical: 14,
-    paddingHorizontal: 8,
-    alignItems: "center",
-    borderRightWidth: 3,
-    borderRightColor: "transparent",
-  },
-  sidebarIconWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
+    paddingVertical: 10,
+    paddingHorizontal: 0,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 6,
+    borderRightWidth: 3,
+    borderRightColor: "transparent",
+    width: SIDEBAR_WIDTH,
   },
-  sidebarLabel: {
-    fontSize: 10,
-    textAlign: "center",
-    lineHeight: 14,
+  sidebarIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sidebarDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    marginTop: 5,
   },
   subCard: {
     width: CARD_WIDTH,
