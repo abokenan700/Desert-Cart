@@ -1,9 +1,11 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
+  Pressable,
+  Animated,
   StyleSheet,
   Platform,
   useWindowDimensions,
@@ -13,7 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
-import { CATEGORY_TREE, Level2Category } from "@/data/categoryData";
+import { CATEGORY_TREE, Level1Category, Level2Category } from "@/data/categoryData";
 
 const SIDEBAR_WIDTH = 76;
 const BANNER_HEIGHT = 116;
@@ -70,6 +72,68 @@ const BANNER_MAP: Record<string, string> = {
   kids:        "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=900&h=300&fit=crop&q=85",
 };
 
+/* ── Single animated L1 tab item (matches CategoryRow style) ─── */
+function L1TabItem({
+  cat,
+  isSelected,
+  onSelect,
+}: {
+  cat: Level1Category;
+  isSelected: boolean;
+  onSelect: (id: string) => void;
+}) {
+  const colors = useColors();
+  const scale = useRef(new Animated.Value(isSelected ? 1.1 : 1)).current;
+
+  useEffect(() => {
+    Animated.spring(scale, {
+      toValue: isSelected ? 1.1 : 1,
+      useNativeDriver: true,
+      damping: 12,
+      stiffness: 200,
+      mass: 0.8,
+    }).start();
+  }, [isSelected]);
+
+  return (
+    <View style={styles.tabItem}>
+      <Animated.View style={{ transform: [{ scale }] }}>
+        <Pressable
+          style={({ pressed }) => [
+            styles.tabCircle,
+            {
+              backgroundColor: isSelected ? cat.color : cat.bgColor,
+              borderColor: isSelected ? cat.color : `${cat.color}40`,
+              opacity: pressed ? 0.72 : 1,
+            },
+          ]}
+          onPress={() => onSelect(cat.id)}
+          accessibilityRole="button"
+          accessibilityState={{ selected: isSelected }}
+        >
+          <Ionicons
+            name={cat.icon as any}
+            size={24}
+            color={isSelected ? "#fff" : cat.color}
+          />
+        </Pressable>
+      </Animated.View>
+      <Text
+        style={[
+          styles.tabLabel,
+          {
+            color: isSelected ? cat.color : colors.text,
+            fontFamily: isSelected ? "Cairo_700Bold" : "Cairo_700Bold",
+          },
+        ]}
+        numberOfLines={1}
+      >
+        {cat.nameAr}
+      </Text>
+    </View>
+  );
+}
+
 /* ── L1 horizontal tab strip ─────────────────────────────────── */
 function L1TabStrip({
   selectedId,
@@ -80,60 +144,25 @@ function L1TabStrip({
 }) {
   const colors = useColors();
   return (
-    // FIX: explicit height prevents ScrollView from expanding vertically on web
-    <View style={{ height: TAB_STRIP_HEIGHT, backgroundColor: colors.background }}>
+    <View style={{ backgroundColor: colors.card }}>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        // FIX: row-reverse so first item is on the right (RTL)
-        contentContainerStyle={[styles.tabStrip, { flexDirection: "row-reverse" }]}
-        style={{ flex: 1 }}
+        style={[
+          styles.tabScrollView,
+          Platform.OS === "web" && ({ direction: "rtl" } as any),
+        ]}
+        contentContainerStyle={styles.tabStrip}
       >
-        {CATEGORY_TREE.map((cat) => {
-          const isSelected = cat.id === selectedId;
-          return (
-            <TouchableOpacity
-              key={cat.id}
-              activeOpacity={0.75}
-              onPress={() => onSelect(cat.id)}
-              style={styles.tabItem}
-            >
-              <View
-                style={[
-                  styles.tabIconWrap,
-                  {
-                    backgroundColor: isSelected ? cat.color : cat.bgColor,
-                    borderColor: isSelected ? cat.color : `${cat.color}40`,
-                  },
-                ]}
-              >
-                <Ionicons
-                  name={cat.icon as any}
-                  size={19}
-                  color={isSelected ? "#fff" : cat.color}
-                />
-              </View>
-              <Text
-                style={[
-                  styles.tabLabel,
-                  {
-                    color: isSelected ? cat.color : colors.mutedForeground,
-                    fontFamily: isSelected ? "Cairo_700Bold" : "Cairo_400Regular",
-                  },
-                ]}
-                numberOfLines={1}
-              >
-                {cat.nameAr}
-              </Text>
-              {/* FIX: underline as bottom border on the icon wrap, not absolute positioned */}
-              {isSelected && (
-                <View style={[styles.tabDot, { backgroundColor: cat.color }]} />
-              )}
-            </TouchableOpacity>
-          );
-        })}
+        {CATEGORY_TREE.map((cat) => (
+          <L1TabItem
+            key={cat.id}
+            cat={cat}
+            isSelected={cat.id === selectedId}
+            onSelect={onSelect}
+          />
+        ))}
       </ScrollView>
-      {/* Bottom separator */}
       <View style={[styles.tabStripBorder, { backgroundColor: colors.border }]} />
     </View>
   );
@@ -419,36 +448,36 @@ export default function CategoriesScreen() {
 /* ─────────────────────────────────────────────────────────────── */
 const styles = StyleSheet.create({
   /* L1 tab strip */
+  tabScrollView: {
+    paddingVertical: 4,
+  },
   tabStrip: {
-    paddingHorizontal: 8,
-    paddingVertical: 8,
-    gap: 4,
-    alignItems: "center",
+    paddingHorizontal: 16,
+    gap: 2,
   },
   tabItem: {
     alignItems: "center",
-    paddingHorizontal: 8,
-    minWidth: 58,
+    gap: 4,
+    width: 60,
   },
-  tabIconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+  tabCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1.5,
-    marginBottom: 3,
+    borderWidth: 2,
+    ...Platform.select({
+      ios:     { shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 6 },
+      android: { elevation: 3 },
+      web:     { boxShadow: "0 2px 8px rgba(0,0,0,0.1)" } as any,
+    }),
   },
   tabLabel: {
-    fontSize: 10,
+    fontSize: 9,
+    fontFamily: "Cairo_700Bold",
     textAlign: "center",
-    lineHeight: 14,
-  },
-  tabDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 3,
-    marginTop: 3,
+    width: 60,
   },
   tabStripBorder: {
     height: StyleSheet.hairlineWidth,
