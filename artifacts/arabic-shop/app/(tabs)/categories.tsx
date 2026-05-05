@@ -151,43 +151,37 @@ function SidebarItem({
 function SubCategoryCard({
   sub,
   onPress,
-  cardWidth,
+  circleSize,
 }: {
   sub: Level2Category;
   onPress: () => void;
-  cardWidth: number;
+  circleSize: number;
 }) {
   const colors = useColors();
+  const iconSize = Math.round(circleSize * 0.38);
   return (
     <TouchableOpacity
       onPress={onPress}
-      activeOpacity={0.82}
-      style={[styles.subCard, { width: cardWidth, backgroundColor: colors.card, borderColor: `${colors.border}60` }]}
+      activeOpacity={0.75}
+      style={[styles.subCard, { width: circleSize, alignItems: "center" }]}
     >
-      <View style={[styles.subIconWrap, { backgroundColor: sub.bgColor }]}>
-        <Ionicons name={sub.icon as any} size={26} color={sub.color} />
+      <View
+        style={[
+          styles.subCircle,
+          {
+            width: circleSize,
+            height: circleSize,
+            borderRadius: circleSize / 2,
+            backgroundColor: sub.bgColor,
+            borderColor: `${sub.color}30`,
+          },
+        ]}
+      >
+        <Ionicons name={sub.icon as any} size={iconSize} color={sub.color} />
       </View>
       <Text style={[styles.subName, { color: colors.text }]} numberOfLines={2}>
         {sub.nameAr}
       </Text>
-      <Text style={[styles.subCount, { color: colors.mutedForeground }]}>
-        {formatCount(sub.productCount)} منتج
-      </Text>
-      <View style={styles.subItemsWrap}>
-        {sub.items.slice(0, 3).map((item) => (
-          <Text key={item.id} style={[styles.subItemChip, { color: sub.color, backgroundColor: sub.bgColor }]}>
-            {item.nameAr}
-          </Text>
-        ))}
-        {sub.items.length > 3 && (
-          <Text style={[styles.subItemChip, { color: colors.mutedForeground, backgroundColor: colors.secondary }]}>
-            +{sub.items.length - 3}
-          </Text>
-        )}
-      </View>
-      <View style={[styles.subArrow, { backgroundColor: sub.color }]}>
-        <Ionicons name="arrow-back" size={12} color="#fff" />
-      </View>
     </TouchableOpacity>
   );
 }
@@ -200,7 +194,8 @@ export default function CategoriesScreen() {
   const bottomPad = Platform.OS === "web" ? 84 : insets.bottom + 68;
 
   const contentWidth = width - SIDEBAR_WIDTH;
-  const cardWidth = (contentWidth - 28) / 2;
+  const cols = 3;
+  const circleSize = Math.floor((contentWidth - 32 - (cols - 1) * 12) / cols);
 
   const [selectedL1Id, setSelectedL1Id] = useState(CATEGORY_TREE[0].id);
 
@@ -270,8 +265,9 @@ export default function CategoriesScreen() {
         grid: {
           flexDirection: "row-reverse",
           flexWrap: "wrap",
-          paddingHorizontal: 8,
-          gap: 8,
+          paddingHorizontal: 16,
+          gap: 12,
+          paddingTop: 16,
           paddingBottom: bottomPad + 8,
         },
       }),
@@ -298,7 +294,7 @@ export default function CategoriesScreen() {
               <SubCategoryCard
                 key={sub.id}
                 sub={sub}
-                cardWidth={cardWidth}
+                circleSize={circleSize}
                 onPress={() => handleSubPress(sub)}
               />
             ))}
@@ -349,61 +345,25 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   subCard: {
-    borderRadius: 16,
-    padding: 12,
+    alignItems: "center",
+    paddingBottom: 4,
+  },
+  subCircle: {
+    alignItems: "center",
+    justifyContent: "center",
     borderWidth: 1,
-    position: "relative",
-    overflow: "hidden",
+    marginBottom: 8,
     ...Platform.select({
-      ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.07, shadowRadius: 6 },
-      android: { elevation: 2 },
-      web: { boxShadow: "0 2px 6px rgba(0,0,0,0.07)" } as any,
+      ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 10 },
+      android: { elevation: 3 },
+      web: { boxShadow: "0 4px 14px rgba(0,0,0,0.08)" } as any,
     }),
   },
-  subIconWrap: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 10,
-  },
   subName: {
-    fontSize: 13,
-    fontFamily: "Cairo_700Bold",
-    textAlign: "right",
-    marginBottom: 2,
-    lineHeight: 18,
-  },
-  subCount: {
-    fontSize: 11,
-    fontFamily: "Cairo_400Regular",
-    textAlign: "right",
-    marginBottom: 8,
-  },
-  subItemsWrap: {
-    flexDirection: "row-reverse",
-    flexWrap: "wrap",
-    gap: 4,
-    marginBottom: 10,
-  },
-  subItemChip: {
-    fontSize: 9,
+    fontSize: 12,
     fontFamily: "Cairo_600SemiBold",
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 6,
-    overflow: "hidden",
-  },
-  subArrow: {
-    position: "absolute",
-    bottom: 10,
-    left: 10,
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    alignItems: "center",
-    justifyContent: "center",
+    textAlign: "center",
+    lineHeight: 18,
   },
   headerBadge: {
     width: 42,
