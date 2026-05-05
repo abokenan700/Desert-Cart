@@ -29,7 +29,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd artifacts/arabic-shop && node serve-static.js"
+args = "cd artifacts/arabic-shop && PORT=5000 node serve-static.js"
 waitForPort = 5000
 
 [agent]
