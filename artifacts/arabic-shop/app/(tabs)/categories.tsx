@@ -319,7 +319,55 @@ export default function CategoriesScreen() {
           paddingHorizontal: 16,
           gap: 10,
           paddingTop: 16,
-          paddingBottom: bottomPad + 8,
+          paddingBottom: 8,
+        },
+        l3Section: {
+          paddingHorizontal: 14,
+          paddingTop: 14,
+          paddingBottom: 6,
+        },
+        l3Header: {
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          gap: 8,
+          marginBottom: 10,
+          paddingBottom: 8,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.border,
+        },
+        l3HeaderDot: {
+          width: 10,
+          height: 10,
+          borderRadius: 5,
+        },
+        l3HeaderText: {
+          fontSize: 13,
+          fontFamily: "Cairo_700Bold",
+          color: colors.text,
+          flex: 1,
+          textAlign: "right",
+        },
+        l3Chips: {
+          flexDirection: "row-reverse",
+          flexWrap: "wrap",
+          gap: 8,
+          paddingBottom: 8,
+        },
+        l3Chip: {
+          paddingHorizontal: 12,
+          paddingVertical: 5,
+          borderRadius: 20,
+          borderWidth: 1,
+        },
+        l3ChipText: {
+          fontSize: 11,
+          fontFamily: "Cairo_500Medium",
+        },
+        l3Divider: {
+          height: 1,
+          marginHorizontal: 14,
+          backgroundColor: colors.border,
+          opacity: 0.5,
         },
       }),
     [colors, topPad, bottomPad, width]
@@ -339,7 +387,7 @@ export default function CategoriesScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 8 }}
         >
-          {/* Sub-categories grid */}
+          {/* Sub-categories circles grid */}
           <View style={s.grid}>
             {selectedL1.subCategories.map((sub) => (
               <SubCategoryCard
@@ -350,6 +398,33 @@ export default function CategoriesScreen() {
               />
             ))}
           </View>
+
+          {/* Level 3 items grouped by Level 2 */}
+          {selectedL1.subCategories.map((sub, idx) => (
+            <View key={sub.id}>
+              {idx > 0 && <View style={s.l3Divider} />}
+              <View style={s.l3Section}>
+                <View style={s.l3Header}>
+                  <View style={[s.l3HeaderDot, { backgroundColor: sub.color }]} />
+                  <Text style={s.l3HeaderText}>{sub.nameAr}</Text>
+                </View>
+                <View style={s.l3Chips}>
+                  {sub.items.map((item) => (
+                    <TouchableOpacity
+                      key={item.id}
+                      activeOpacity={0.7}
+                      onPress={() => router.push(`/(tabs)/search?category=${selectedL1Id}` as any)}
+                      style={[s.l3Chip, { borderColor: `${sub.color}40`, backgroundColor: sub.bgColor }]}
+                    >
+                      <Text style={[s.l3ChipText, { color: sub.color }]}>{item.nameAr}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            </View>
+          ))}
+
+          <View style={{ height: bottomPad + 16 }} />
         </ScrollView>
 
         {/* Sidebar — Level 1 (right) */}
