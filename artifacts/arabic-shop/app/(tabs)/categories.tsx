@@ -19,6 +19,45 @@ import { CATEGORY_TREE, Level1Category, Level2Category } from "@/data/categoryDa
 const SIDEBAR_WIDTH = 64;
 const BANNER_HEIGHT = 128;
 
+const CATEGORY_IMAGES: Record<string, string> = {
+  "fashion-women":      "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=200&h=200&fit=crop&q=80",
+  "fashion-men":        "https://images.unsplash.com/photo-1594938298603-c8148b3f2a3f?w=200&h=200&fit=crop&q=80",
+  "fashion-abayas":     "https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=200&h=200&fit=crop&q=80",
+  "fashion-kids":       "https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=200&h=200&fit=crop&q=80",
+  "fashion-sport":      "https://images.unsplash.com/photo-1556906781-9a412961a24b?w=200&h=200&fit=crop&q=80",
+  "elec-phones":        "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop&q=80",
+  "elec-computers":     "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=200&h=200&fit=crop&q=80",
+  "elec-tv":            "https://images.unsplash.com/photo-1593359677879-a4bb92f4975f?w=200&h=200&fit=crop&q=80",
+  "elec-cameras":       "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=200&h=200&fit=crop&q=80",
+  "elec-gaming":        "https://images.unsplash.com/photo-1580327344181-c1163234e5a0?w=200&h=200&fit=crop&q=80",
+  "elec-smarthome":     "https://images.unsplash.com/photo-1558002038-1055907df827?w=200&h=200&fit=crop&q=80",
+  "home-furniture":     "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200&h=200&fit=crop&q=80",
+  "home-kitchen":       "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop&q=80",
+  "home-decor":         "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=200&h=200&fit=crop&q=80",
+  "home-cleaning":      "https://images.unsplash.com/photo-1563453392212-326f5e854473?w=200&h=200&fit=crop&q=80",
+  "home-garden":        "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=200&h=200&fit=crop&q=80",
+  "beauty-perfumes":    "https://images.unsplash.com/photo-1541643600914-78b084683702?w=200&h=200&fit=crop&q=80",
+  "beauty-makeup":      "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=200&h=200&fit=crop&q=80",
+  "beauty-skin":        "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=200&h=200&fit=crop&q=80",
+  "beauty-hair":        "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=200&h=200&fit=crop&q=80",
+  "beauty-men":         "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=200&h=200&fit=crop&q=80",
+  "acc-watches":        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop&q=80",
+  "acc-bags":           "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=200&h=200&fit=crop&q=80",
+  "acc-shoes":          "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=200&fit=crop&q=80",
+  "acc-jewelry":        "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=200&h=200&fit=crop&q=80",
+  "acc-glasses":        "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=200&h=200&fit=crop&q=80",
+  "acc-belts":          "https://images.unsplash.com/photo-1594938374182-a57d0e1e2e6c?w=200&h=200&fit=crop&q=80",
+  "sports-clothes":     "https://images.unsplash.com/photo-1461897104016-0b3b00cc81ee?w=200&h=200&fit=crop&q=80",
+  "sports-equipment":   "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=200&h=200&fit=crop&q=80",
+  "sports-supplements": "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=200&h=200&fit=crop&q=80",
+  "sports-specific":    "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&h=200&fit=crop&q=80",
+  "sports-outdoor":     "https://images.unsplash.com/photo-1551632811-561732d1e306?w=200&h=200&fit=crop&q=80",
+  "kids-toys":          "https://images.unsplash.com/photo-1558877385-81a1c7e67d72?w=200&h=200&fit=crop&q=80",
+  "kids-clothes":       "https://images.unsplash.com/photo-1471286174890-9c112ac6823b?w=200&h=200&fit=crop&q=80",
+  "kids-school":        "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=200&h=200&fit=crop&q=80",
+  "kids-baby":          "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=200&h=200&fit=crop&q=80",
+};
+
 const BANNER_SLIDES = [
   { categoryId: "fashion",      uri: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=900&h=400&fit=crop&q=85" },
   { categoryId: "electronics",  uri: "https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=900&h=400&fit=crop&q=85" },
@@ -158,12 +197,12 @@ function SubCategoryCard({
   circleSize: number;
 }) {
   const colors = useColors();
-  const iconSize = Math.round(circleSize * 0.38);
+  const imgUri = CATEGORY_IMAGES[sub.id];
   return (
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.75}
-      style={[styles.subCard, { width: circleSize, alignItems: "center" }]}
+      style={[styles.subCard, { width: circleSize }]}
     >
       <View
         style={[
@@ -173,11 +212,23 @@ function SubCategoryCard({
             height: circleSize,
             borderRadius: circleSize / 2,
             backgroundColor: sub.bgColor,
-            borderColor: `${sub.color}30`,
+            borderColor: `${sub.color}20`,
           },
         ]}
       >
-        <Ionicons name={sub.icon as any} size={iconSize} color={sub.color} />
+        {imgUri ? (
+          <Image
+            source={{ uri: imgUri }}
+            style={{
+              width: circleSize,
+              height: circleSize,
+              borderRadius: circleSize / 2,
+            }}
+            resizeMode="cover"
+          />
+        ) : (
+          <Ionicons name={sub.icon as any} size={Math.round(circleSize * 0.38)} color={sub.color} />
+        )}
       </View>
       <Text style={[styles.subName, { color: colors.text }]} numberOfLines={2}>
         {sub.nameAr}
@@ -194,8 +245,8 @@ export default function CategoriesScreen() {
   const bottomPad = Platform.OS === "web" ? 84 : insets.bottom + 68;
 
   const contentWidth = width - SIDEBAR_WIDTH;
-  const cols = 3;
-  const circleSize = Math.floor((contentWidth - 32 - (cols - 1) * 12) / cols);
+  const cols = 4;
+  const circleSize = Math.floor((contentWidth - 32 - (cols - 1) * 10) / cols);
 
   const [selectedL1Id, setSelectedL1Id] = useState(CATEGORY_TREE[0].id);
 
@@ -266,7 +317,7 @@ export default function CategoriesScreen() {
           flexDirection: "row-reverse",
           flexWrap: "wrap",
           paddingHorizontal: 16,
-          gap: 12,
+          gap: 10,
           paddingTop: 16,
           paddingBottom: bottomPad + 8,
         },
