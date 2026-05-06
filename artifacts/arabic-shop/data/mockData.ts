@@ -53,12 +53,14 @@ export interface Review {
 }
 
 export const CATEGORIES: Category[] = [
-  { id: "all", nameAr: "الكل", icon: "apps", color: "#E63946", bgColor: "#FFF0F1" },
-  { id: "fashion", nameAr: "ملابس", icon: "shirt-outline", color: "#7C3AED", bgColor: "#F5F0FF" },
-  { id: "accessories", nameAr: "إكسسوارات", icon: "watch-outline", color: "#F5A623", bgColor: "#FFF8EC" },
+  { id: "all",         nameAr: "الكل",       icon: "apps",                  color: "#E63946", bgColor: "#FFF0F1" },
+  { id: "fashion",     nameAr: "ملابس",      icon: "shirt-outline",         color: "#7C3AED", bgColor: "#F5F0FF" },
   { id: "electronics", nameAr: "إلكترونيات", icon: "phone-portrait-outline", color: "#3B82F6", bgColor: "#EFF6FF" },
-  { id: "home", nameAr: "المنزل", icon: "home-outline", color: "#0D9488", bgColor: "#F0FDFA" },
-  { id: "beauty", nameAr: "جمال", icon: "flower-outline", color: "#EC4899", bgColor: "#FDF2F8" },
+  { id: "home",        nameAr: "المنزل",     icon: "home-outline",          color: "#0D9488", bgColor: "#F0FDFA" },
+  { id: "beauty",      nameAr: "جمال",       icon: "flower-outline",        color: "#EC4899", bgColor: "#FDF2F8" },
+  { id: "accessories", nameAr: "إكسسوارات", icon: "watch-outline",         color: "#F5A623", bgColor: "#FFF8EC" },
+  { id: "sports",      nameAr: "رياضة",      icon: "football-outline",      color: "#10B981", bgColor: "#ECFDF5" },
+  { id: "kids",        nameAr: "أطفال",      icon: "happy-outline",         color: "#F59E0B", bgColor: "#FFFBEB" },
 ];
 
 export const BANNERS: Banner[] = [

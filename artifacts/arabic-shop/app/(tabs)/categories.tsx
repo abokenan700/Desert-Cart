@@ -16,6 +16,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { CATEGORY_TREE, Level1Category, Level2Category } from "@/data/categoryData";
+import { CATEGORIES } from "@/data/mockData";
+import CategoryRow from "@/components/CategoryRow";
 
 const SIDEBAR_WIDTH = 82;
 const BANNER_HEIGHT = 120;
@@ -676,7 +678,11 @@ export default function CategoriesScreen() {
         </TouchableOpacity>
       </View>
 
-      <L1TabStrip selectedId={selectedL1Id} onSelect={handleSelectL1} />
+      <CategoryRow
+        categories={CATEGORIES.filter((c) => c.id !== "all")}
+        selected={selectedL1Id}
+        onSelect={handleSelectL1}
+      />
 
       <View style={s.banner}>
         <RichBanner l1={selectedL1} />
