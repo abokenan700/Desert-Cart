@@ -19,8 +19,8 @@ import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 const CIRCLE_R   = 30;  // active tab floating circle radius
 const BAR_H      = 64;  // height of the bar body
 const NOTCH_D    = 28;  // how deep the concave notch dips into the bar
-const NOTCH_HALF = 26;  // half‑width of the inner notch bowl
-const NOTCH_EXT  = 18;  // bezier tangent extension to smooth the curve
+const NOTCH_HALF = 29;  // half‑width of the inner notch bowl
+const NOTCH_EXT  = 19;  // bezier tangent extension to smooth the curve
 const CORNER_R   = 22;  // bar corner radius
 // Circle center sits this many px above the bar top edge:
 const CIRCLE_ABOVE = CIRCLE_R - NOTCH_D + 2; // = 4 px
