@@ -574,9 +574,12 @@ export default function SearchScreen() {
         </View>
       </View>
 
+      {/* ── Content wrapper (allows dropdowns to float over content) ── */}
+      <View style={{ flex: 1, position: "relative" }}>
+
       {/* ── Autocomplete dropdown ── */}
       {showAutocomplete && (
-        <View style={styles.autocompletePanel}>
+        <View style={[styles.autocompletePanel, { position: "absolute", top: 0, left: 0, right: 0, zIndex: 200 }]}>
           {autocompleteSuggestions.map((product) => (
             <TouchableOpacity
               key={product.id}
@@ -602,7 +605,7 @@ export default function SearchScreen() {
 
       {/* ── Recent searches panel ── */}
       {showSuggestions && recentSearches.length > 0 && (
-        <View style={styles.suggestionsPanel}>
+        <View style={[styles.suggestionsPanel, { position: "absolute", top: 0, left: 0, right: 0, zIndex: 200 }]}>
           <View style={styles.suggestionsRow}>
             <Text style={styles.suggestionsTitle}>عمليات البحث الأخيرة</Text>
             <TouchableOpacity onPress={handleClearHistory}>
@@ -811,6 +814,9 @@ export default function SearchScreen() {
           </View>
         )}
       </Animated.ScrollView>
+
+      </View>
+      {/* ── End content wrapper ── */}
 
       <VoiceSearch
         visible={voiceVisible}
