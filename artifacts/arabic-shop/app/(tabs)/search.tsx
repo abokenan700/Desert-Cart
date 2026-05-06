@@ -416,9 +416,17 @@ export default function SearchScreen() {
         },
         viewToggle: { flexDirection: "row-reverse", alignItems: "center", backgroundColor: colors.card, borderRadius: 10, padding: 2, gap: 2, borderWidth: 1, borderColor: `${colors.border}70` },
         viewToggleBtn: { width: 34, height: 34, borderRadius: 8, alignItems: "center", justifyContent: "center" },
-        searchRow: { flexDirection: "row-reverse", alignItems: "center", gap: 8 },
+        filterRow: {
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          justifyContent: "space-between",
+          paddingHorizontal: 12,
+          paddingVertical: 8,
+          backgroundColor: colors.card,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.border,
+        },
         searchInputWrap: {
-          flex: 1,
           flexDirection: "row-reverse",
           alignItems: "center",
           backgroundColor: colors.card,
@@ -539,62 +547,30 @@ export default function SearchScreen() {
     <View style={styles.container}>
       {/* ── Header ── */}
       <View style={styles.header}>
-        <View style={styles.searchRow}>
-          <View style={styles.viewToggle}>
-            <TouchableOpacity
-              style={[styles.viewToggleBtn, viewMode === "grid" && { backgroundColor: colors.secondary }]}
-              onPress={() => { Haptics.selectionAsync(); setViewMode("grid"); }}
-            >
-              <Ionicons name="grid-outline" size={18} color={viewMode === "grid" ? colors.primary : colors.mutedForeground} />
+        <View style={styles.searchInputWrap}>
+          <TextInput
+            ref={inputRef}
+            style={styles.input}
+            placeholder="ابحث عن أي منتج، ماركة..."
+            placeholderTextColor={colors.mutedForeground}
+            value={query}
+            onChangeText={handleQueryChange}
+            onFocus={() => setInputFocused(true)}
+            onBlur={() => { setInputFocused(false); commitSearch(query); }}
+            onSubmitEditing={() => commitSearch(query)}
+            returnKeyType="search"
+            textAlign="right"
+          />
+          {query.length > 0 ? (
+            <TouchableOpacity onPress={() => { setQuery(""); setDebouncedQuery(""); }} accessibilityLabel="مسح البحث" hitSlop={8}>
+              <Ionicons name="close-circle" size={18} color={colors.mutedForeground} />
             </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.viewToggleBtn, viewMode === "list" && { backgroundColor: colors.secondary }]}
-              onPress={() => { Haptics.selectionAsync(); setViewMode("list"); }}
-            >
-              <Ionicons name="list-outline" size={18} color={viewMode === "list" ? colors.primary : colors.mutedForeground} />
+          ) : (
+            <TouchableOpacity onPress={() => setVoiceVisible(true)} accessibilityLabel="البحث الصوتي" hitSlop={8}>
+              <Ionicons name="mic" size={19} color={colors.primary} />
             </TouchableOpacity>
-          </View>
-
-          <View style={styles.filterBtnWrapper}>
-            {activeFilterCount > 0 && (
-              <View style={styles.filterBadge}>
-                <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
-              </View>
-            )}
-            <TouchableOpacity
-              style={styles.filterBtn}
-              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); openFilter(); }}
-              accessibilityLabel="الفلاتر"
-            >
-              <Ionicons name="options" size={20} color="#fff" />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.searchInputWrap}>
-            <TextInput
-              ref={inputRef}
-              style={styles.input}
-              placeholder="ابحث عن أي منتج، ماركة..."
-              placeholderTextColor={colors.mutedForeground}
-              value={query}
-              onChangeText={handleQueryChange}
-              onFocus={() => setInputFocused(true)}
-              onBlur={() => { setInputFocused(false); commitSearch(query); }}
-              onSubmitEditing={() => commitSearch(query)}
-              returnKeyType="search"
-              textAlign="right"
-            />
-            {query.length > 0 ? (
-              <TouchableOpacity onPress={() => { setQuery(""); setDebouncedQuery(""); }} accessibilityLabel="مسح البحث" hitSlop={8}>
-                <Ionicons name="close-circle" size={18} color={colors.mutedForeground} />
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity onPress={() => setVoiceVisible(true)} accessibilityLabel="البحث الصوتي" hitSlop={8}>
-                <Ionicons name="mic" size={19} color={colors.primary} />
-              </TouchableOpacity>
-            )}
-            <Ionicons name="search-outline" size={17} color={colors.mutedForeground} />
-          </View>
+          )}
+          <Ionicons name="search-outline" size={17} color={colors.mutedForeground} />
         </View>
       </View>
 
@@ -663,6 +639,38 @@ export default function SearchScreen() {
           selected={selectedCategory}
           onSelect={(id) => { Haptics.selectionAsync(); setSelectedCategory(id); }}
         />
+      </View>
+
+      {/* ── Filter & view toggle row ── */}
+      <View style={styles.filterRow}>
+        <View style={styles.viewToggle}>
+          <TouchableOpacity
+            style={[styles.viewToggleBtn, viewMode === "grid" && { backgroundColor: colors.secondary }]}
+            onPress={() => { Haptics.selectionAsync(); setViewMode("grid"); }}
+          >
+            <Ionicons name="grid-outline" size={18} color={viewMode === "grid" ? colors.primary : colors.mutedForeground} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.viewToggleBtn, viewMode === "list" && { backgroundColor: colors.secondary }]}
+            onPress={() => { Haptics.selectionAsync(); setViewMode("list"); }}
+          >
+            <Ionicons name="list-outline" size={18} color={viewMode === "list" ? colors.primary : colors.mutedForeground} />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.filterBtnWrapper}>
+          {activeFilterCount > 0 && (
+            <View style={styles.filterBadge}>
+              <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
+            </View>
+          )}
+          <TouchableOpacity
+            style={styles.filterBtn}
+            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); openFilter(); }}
+            accessibilityLabel="الفلاتر"
+          >
+            <Ionicons name="options" size={20} color="#fff" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* ── Active filter chips ── */}
