@@ -600,6 +600,36 @@ export default function CategoriesScreen() {
     () =>
       StyleSheet.create({
         container:  { flex: 1, backgroundColor: colors.background },
+        searchHeader: {
+          backgroundColor: colors.background,
+          paddingTop: topPad + 6,
+          paddingHorizontal: 12,
+          paddingBottom: 8,
+        },
+        searchBar: {
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          backgroundColor: colors.card,
+          borderRadius: 14,
+          paddingHorizontal: 12,
+          paddingVertical: 10,
+          borderWidth: 1,
+          borderColor: `${colors.border}70`,
+          gap: 8,
+          ...Platform.select({
+            ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 4 },
+            android: { elevation: 2 },
+            web: { boxShadow: "0 2px 4px rgba(0,0,0,0.06)" } as any,
+          }),
+        },
+        searchText: {
+          flex: 1,
+          fontSize: 13,
+          fontFamily: "Cairo_400Regular",
+          color: colors.mutedForeground,
+          textAlign: "right",
+          writingDirection: "rtl",
+        },
         banner:     { paddingTop: 8, paddingBottom: 8 },
         body:       { flex: 1, position: "relative" },
         sidebar: {
@@ -631,7 +661,21 @@ export default function CategoriesScreen() {
 
   return (
     <View style={s.container}>
-      {topPad > 0 && <View style={{ height: topPad, backgroundColor: colors.background }} />}
+      {/* ── Pinned search bar (same design as home page) ── */}
+      <View style={s.searchHeader}>
+        <TouchableOpacity
+          style={s.searchBar}
+          onPress={() => router.push("/(tabs)/search")}
+          activeOpacity={0.8}
+          accessibilityLabel="البحث"
+          accessibilityRole="button"
+        >
+          <Ionicons name="search-outline" size={18} color={colors.mutedForeground} />
+          <Text style={s.searchText}>ابحث عن منتجات، ماركات...</Text>
+          <Ionicons name="mic" size={20} color={colors.primary} />
+        </TouchableOpacity>
+      </View>
+
       <L1TabStrip selectedId={selectedL1Id} onSelect={handleSelectL1} />
 
       <View style={s.banner}>

@@ -409,18 +409,14 @@ export default function SearchScreen() {
       StyleSheet.create({
         container: { flex: 1, backgroundColor: colors.background },
         header: {
-          backgroundColor: colors.card,
-          paddingTop: topPad + 8,
-          paddingBottom: 12,
-          paddingHorizontal: 16,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.border,
+          backgroundColor: colors.background,
+          paddingTop: topPad + 6,
+          paddingBottom: 10,
+          paddingHorizontal: 12,
         },
-        headerRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", marginBottom: 10 },
-        headerTitle: { fontSize: 22, fontFamily: "Cairo_800ExtraBold", color: colors.text },
-        viewToggle: { flexDirection: "row-reverse", alignItems: "center", backgroundColor: colors.secondary, borderRadius: 10, padding: 2, gap: 2 },
+        viewToggle: { flexDirection: "row-reverse", alignItems: "center", backgroundColor: colors.card, borderRadius: 10, padding: 2, gap: 2, borderWidth: 1, borderColor: `${colors.border}70` },
         viewToggleBtn: { width: 34, height: 34, borderRadius: 8, alignItems: "center", justifyContent: "center" },
-        searchRow: { flexDirection: "row-reverse", alignItems: "center", gap: 10 },
+        searchRow: { flexDirection: "row-reverse", alignItems: "center", gap: 8 },
         searchInputWrap: {
           flex: 1,
           flexDirection: "row-reverse",
@@ -543,25 +539,22 @@ export default function SearchScreen() {
     <View style={styles.container}>
       {/* ── Header ── */}
       <View style={styles.header}>
-        <View style={styles.headerRow}>
-          <Text style={styles.headerTitle}>اكتشف</Text>
+        <View style={styles.searchRow}>
           <View style={styles.viewToggle}>
             <TouchableOpacity
-              style={[styles.viewToggleBtn, viewMode === "grid" && { backgroundColor: colors.card }]}
+              style={[styles.viewToggleBtn, viewMode === "grid" && { backgroundColor: colors.secondary }]}
               onPress={() => { Haptics.selectionAsync(); setViewMode("grid"); }}
             >
               <Ionicons name="grid-outline" size={18} color={viewMode === "grid" ? colors.primary : colors.mutedForeground} />
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.viewToggleBtn, viewMode === "list" && { backgroundColor: colors.card }]}
+              style={[styles.viewToggleBtn, viewMode === "list" && { backgroundColor: colors.secondary }]}
               onPress={() => { Haptics.selectionAsync(); setViewMode("list"); }}
             >
               <Ionicons name="list-outline" size={18} color={viewMode === "list" ? colors.primary : colors.mutedForeground} />
             </TouchableOpacity>
           </View>
-        </View>
 
-        <View style={styles.searchRow}>
           <View style={styles.filterBtnWrapper}>
             {activeFilterCount > 0 && (
               <View style={styles.filterBadge}>
