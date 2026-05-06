@@ -39,9 +39,10 @@ const TAB_CONFIG: Record<string, { label: string; icon: string; iconFocused: str
 };
 
 // ─── SVG bar path with animated notch ────────────────────────────────────────
-function getBarPath(W: number, H: number, cx: number): string {
+function getBarPath(W: number, H: number, cx: number, bottomExt = 0): string {
   const lx = cx - NOTCH_HALF;
   const rx = cx + NOTCH_HALF;
+  const bH = H + bottomExt;
   return [
     `M ${CORNER_R} 0`,
     `L ${lx - NOTCH_EXT} 0`,
@@ -49,8 +50,8 @@ function getBarPath(W: number, H: number, cx: number): string {
     `C ${rx} ${NOTCH_D} ${rx} 0 ${rx + NOTCH_EXT} 0`,
     `L ${W - CORNER_R} 0`,
     `Q ${W} 0 ${W} ${CORNER_R}`,
-    `L ${W} ${H}`,
-    `L 0 ${H}`,
+    `L ${W} ${bH}`,
+    `L 0 ${bH}`,
     `L 0 ${CORNER_R}`,
     `Q 0 0 ${CORNER_R} 0`,
     `Z`,
@@ -66,6 +67,8 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
   const isIOS = Platform.OS === "ios";
   const isWeb = Platform.OS === "web";
 
+  const safePad = isIOS ? 34 : isWeb ? 40 : 20;
+
   const TAB_COUNT = VISIBLE_ORDER.length;
   const tabW = winW / TAB_COUNT;
 
@@ -80,7 +83,7 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
   // Animated notch center X (drives SVG path update via listener)
   const notchCx    = useRef(new Animated.Value(targetCx)).current;
   const circleLeft = useRef(new Animated.Value(targetCx - CIRCLE_R)).current;
-  const [svgPath, setSvgPath]   = useState(() => getBarPath(winW, BAR_H, targetCx));
+  const [svgPath, setSvgPath]   = useState(() => getBarPath(winW, BAR_H, targetCx, safePad));
 
   // Sync animations when active tab or window width changes
   useEffect(() => {
@@ -93,12 +96,11 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
     spring(circleLeft, cx - CIRCLE_R).start();
 
     const id = notchCx.addListener(({ value }) =>
-      setSvgPath(getBarPath(winW, BAR_H, value))
+      setSvgPath(getBarPath(winW, BAR_H, value, safePad))
     );
     return () => notchCx.removeListener(id);
   }, [activeIdx, tabW, winW]);
 
-  const safePad = isIOS ? 20 : isWeb ? 10 : 4;
   const containerH = TOP_PAD + BAR_H + safePad;
   const barColor   = isDark ? colors.card : "#FFFFFF";
 
