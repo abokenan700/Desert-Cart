@@ -23,9 +23,9 @@ const NOTCH_HALF = 30;  // half‑width of the inner notch bowl
 const NOTCH_EXT  = 20;  // bezier tangent extension to smooth the curve
 const CORNER_R   = 22;  // bar corner radius
 // Circle center sits this many px above the bar top edge:
-const CIRCLE_ABOVE = CIRCLE_R - NOTCH_D + 10; // = 18 px
+const CIRCLE_ABOVE = CIRCLE_R - NOTCH_D + 2; // = 10 px
 // Space reserved above the bar so the circle can float:
-const TOP_PAD = CIRCLE_ABOVE + CIRCLE_R; // = 48 px
+const TOP_PAD = CIRCLE_ABOVE + CIRCLE_R; // = 40 px
 
 // ─── Tab meta ────────────────────────────────────────────────────────────────
 const VISIBLE_ORDER = ["index", "categories", "search", "wishlist", "profile"];
