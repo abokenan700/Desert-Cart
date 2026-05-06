@@ -28,7 +28,7 @@ const CIRCLE_ABOVE = CIRCLE_R - NOTCH_D + 2; // = 4 px
 const TOP_PAD = CIRCLE_ABOVE + CIRCLE_R; // = 34 px
 
 // ─── Tab meta ────────────────────────────────────────────────────────────────
-const VISIBLE_ORDER = ["index", "categories", "search", "wishlist", "profile"];
+const VISIBLE_ORDER = ["profile", "wishlist", "search", "categories", "index"];
 
 const TAB_CONFIG: Record<string, { label: string; icon: string; iconFocused: string }> = {
   index:      { label: "الرئيسية", icon: "home-outline",   iconFocused: "home" },
