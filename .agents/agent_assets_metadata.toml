@@ -1,5 +1,4 @@
 uploads = []
-outputs = []
 
 [[generated]]
 id = "1RaxsgQwmx6D8UlkS8eqg"
@@ -66,3 +65,9 @@ id = "mlBcpkpkl-4RX-OTRLgaz"
 uri = "file://artifacts/arabic-shop/assets/logo.png"
 type = "image"
 title = "Luxury fashion e-commerce phone app logo"
+
+[[outputs]]
+id = "gSo5rR8QOYmIWJBtNUha_"
+uri = "file://development-master-plan.md"
+type = "text"
+title = "Master Audit & Transformation Plan (L4)"
