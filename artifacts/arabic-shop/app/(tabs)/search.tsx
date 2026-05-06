@@ -737,28 +737,6 @@ export default function SearchScreen() {
           </View>
         ) : showPopular || showSuggestions ? (
           <>
-            <View style={styles.popularSection}>
-              <Text style={styles.sectionTitle}>الأكثر بحثاً 🔍</Text>
-              <View style={styles.tagsRow}>
-                {POPULAR_SEARCHES.map((s, i) => (
-                  <Animated.View
-                    key={s}
-                    style={{
-                      opacity: staggerAnims[i],
-                      transform: [{ translateX: staggerAnims[i].interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) }],
-                    }}
-                  >
-                    <TouchableOpacity
-                      style={styles.tag}
-                      onPress={() => { setQuery(s); setDebouncedQuery(s); commitSearch(s); setInputFocused(false); }}
-                    >
-                      <Text style={{ fontSize: 13 }}>{i < 3 ? "🔥" : "↑"}</Text>
-                      <Text style={styles.tagText}>{s}</Text>
-                    </TouchableOpacity>
-                  </Animated.View>
-                ))}
-              </View>
-            </View>
 
             <View style={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 4 }}>
               <Text style={styles.sectionTitle}>جميع المنتجات</Text>
