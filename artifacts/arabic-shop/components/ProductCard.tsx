@@ -272,6 +272,11 @@ const ProductCard = React.memo(function ProductCard({
         info: {
           padding: compact ? 8 : 12,
         },
+        brandSwatchRow: {
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          justifyContent: "space-between",
+        },
         brand: {
           fontSize: 10,
           color: colors.mutedForeground,
@@ -289,15 +294,14 @@ const ProductCard = React.memo(function ProductCard({
           marginTop: 2,
         },
         swatchRow: {
-          flexDirection: "row-reverse",
+          flexDirection: "row",
           alignItems: "center",
-          marginTop: 5,
           gap: 4,
         },
         swatch: {
-          width: 14,
-          height: 14,
-          borderRadius: 7,
+          width: 12,
+          height: 12,
+          borderRadius: 6,
           borderWidth: 1.5,
           borderColor: "rgba(0,0,0,0.08)",
         },
@@ -309,8 +313,13 @@ const ProductCard = React.memo(function ProductCard({
         ratingRow: {
           flexDirection: "row-reverse",
           alignItems: "center",
+          justifyContent: "space-between",
           marginTop: 4,
-          gap: 4,
+        },
+        ratingInner: {
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          gap: 3,
         },
         ratingText: {
           fontSize: 11,
@@ -321,15 +330,12 @@ const ProductCard = React.memo(function ProductCard({
           fontSize: 10,
           color: colors.mutedForeground,
           fontFamily: "Cairo_400Regular",
-          textAlign: "right",
-          marginTop: 2,
         },
         priceRow: {
           flexDirection: "row-reverse",
           alignItems: "center",
           justifyContent: "space-between",
           marginTop: compact ? 4 : 6,
-          gap: compact ? 4 : 6,
         },
         price: {
           fontSize: compact ? 13 : 15,
@@ -471,56 +477,52 @@ const ProductCard = React.memo(function ProductCard({
         </View>
 
         <View style={styles.info}>
-          <Text style={styles.brand}>{product.brand}</Text>
+
+          {/* Row 1: Brand (right) + Color swatches (left) */}
+          <View style={styles.brandSwatchRow}>
+            <Text style={styles.brand}>{product.brand}</Text>
+            {!compact && visibleColors.length > 0 && (
+              <View style={styles.swatchRow}>
+                {visibleColors.map((c, i) => (
+                  <View key={i} style={[styles.swatch, { backgroundColor: c }]} />
+                ))}
+                {extraColors > 0 && (
+                  <Text style={styles.swatchMore}>+{extraColors}</Text>
+                )}
+              </View>
+            )}
+          </View>
+
+          {/* Product name */}
           <Text style={styles.name} numberOfLines={compact ? 1 : 2}>
             {product.nameAr}
           </Text>
 
-          {/* Color swatch strip — hidden in compact */}
-          {!compact && visibleColors.length > 0 && (
-            <View style={styles.swatchRow}>
-              {visibleColors.map((c, i) => (
-                <View key={i} style={[styles.swatch, { backgroundColor: c }]} />
-              ))}
-              {extraColors > 0 && (
-                <Text style={styles.swatchMore}>+{extraColors}</Text>
+          {/* Row 2: Rating (right) + Sold count (left) — hidden in compact */}
+          {!compact && (
+            <View style={styles.ratingRow}>
+              <View style={styles.ratingInner}>
+                <Text style={styles.ratingText}>
+                  ({product.reviewCount.toLocaleString("ar-SA")})
+                </Text>
+                <Ionicons name="star" size={11} color="#F5A623" />
+                <Text style={[styles.ratingText, { color: "#F5A623", fontFamily: "Cairo_600SemiBold" }]}>
+                  {product.rating}
+                </Text>
+              </View>
+              {product.soldCount && product.soldCount > 0 && (
+                <Text style={styles.soldCount}>
+                  {product.soldCount.toLocaleString("ar-SA")}+ مبيعاً
+                </Text>
               )}
             </View>
           )}
 
-          {/* Rating row — hidden in compact */}
-          {!compact && (
-            <View style={styles.ratingRow}>
-              <Text style={styles.ratingText}>
-                ({product.reviewCount.toLocaleString("ar-SA")})
-              </Text>
-              <Ionicons name="star" size={11} color="#F5A623" />
-              <Text
-                style={[
-                  styles.ratingText,
-                  { color: "#F5A623", fontFamily: "Cairo_600SemiBold" },
-                ]}
-              >
-                {product.rating}
-              </Text>
-            </View>
-          )}
-
-          {/* Sold count — hidden in compact */}
-          {!compact && product.soldCount && product.soldCount > 500 ? (
-            <Text style={styles.soldCount}>
-              +{product.soldCount.toLocaleString("ar-SA")} مبيعاً
-            </Text>
-          ) : null}
-
-          {/* Price row — in compact: cart icon on right + price on left */}
+          {/* Row 3: Current price (right) + Old price (left) */}
           <View style={styles.priceRow}>
-            {compact && (
+            {compact ? (
               <TouchableOpacity
-                style={[
-                  styles.cartIconBtn,
-                  !product.inStock && styles.cartIconBtnDisabled,
-                ]}
+                style={[styles.cartIconBtn, !product.inStock && styles.cartIconBtnDisabled]}
                 onPress={handleAddToCart}
                 disabled={!product.inStock}
                 hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
@@ -528,18 +530,16 @@ const ProductCard = React.memo(function ProductCard({
               >
                 <Ionicons name="cart" size={15} color="#fff" />
               </TouchableOpacity>
-            )}
-
-            <View>
-              {product.originalPrice && (
+            ) : (
+              product.originalPrice ? (
                 <Text style={styles.originalPrice}>
                   {product.originalPrice.toLocaleString("ar-SA")} ر.س
                 </Text>
-              )}
-              <Text style={styles.price}>
-                {product.price.toLocaleString("ar-SA")} ر.س
-              </Text>
-            </View>
+              ) : <View />
+            )}
+            <Text style={styles.price}>
+              {product.price.toLocaleString("ar-SA")} ر.س
+            </Text>
           </View>
 
           {/* Full add-to-cart button — only in normal mode */}
@@ -548,18 +548,9 @@ const ProductCard = React.memo(function ProductCard({
               style={[styles.addBtn, !product.inStock && styles.addBtnDisabled]}
               onPress={handleAddToCart}
               disabled={!product.inStock}
-              accessibilityLabel={
-                product.inStock
-                  ? `أضف ${product.nameAr} إلى السلة`
-                  : "نفد المخزون"
-              }
+              accessibilityLabel={product.inStock ? `أضف ${product.nameAr} إلى السلة` : "نفد المخزون"}
             >
-              <Text
-                style={[
-                  styles.addBtnText,
-                  !product.inStock && styles.addBtnTextDisabled,
-                ]}
-              >
+              <Text style={[styles.addBtnText, !product.inStock && styles.addBtnTextDisabled]}>
                 {product.inStock ? "أضف إلى السلة" : "نفد المخزون"}
               </Text>
             </TouchableOpacity>
