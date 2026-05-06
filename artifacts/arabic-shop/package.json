@@ -4,7 +4,7 @@
   "private": true,
   "main": "expo-router/entry",
   "scripts": {
-    "dev": "node serve-static.js",
+    "dev": "pnpm exec expo export --platform web --output-dir dist && sed -i 's/shrink-to-fit=no\"/shrink-to-fit=no, viewport-fit=cover\"/' dist/index.html && node serve-static.js",
     "build": "node scripts/build.js",
     "serve": "node server/serve.js",
     "serve-static": "node serve-static.js",
