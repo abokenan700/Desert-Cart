@@ -17,7 +17,6 @@ import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { CATEGORY_TREE, Level1Category, Level2Category } from "@/data/categoryData";
 import { CATEGORIES } from "@/data/mockData";
-import CategoryRow from "@/components/CategoryRow";
 
 const SIDEBAR_WIDTH = 82;
 const BANNER_HEIGHT = 120;
@@ -282,6 +281,7 @@ function L1TabItem({
 /* ── L1 horizontal tab strip ─────────────────────────────────── */
 function L1TabStrip({ selectedId, onSelect }: { selectedId: string; onSelect: (id: string) => void }) {
   const colors = useColors();
+  const cats = CATEGORIES.filter((c) => c.id !== "all") as unknown as Level1Category[];
   return (
     <View style={{ backgroundColor: colors.card }}>
       <ScrollView
@@ -290,7 +290,7 @@ function L1TabStrip({ selectedId, onSelect }: { selectedId: string; onSelect: (i
         style={[styles.tabScrollView, Platform.OS === "web" && ({ direction: "rtl" } as any)]}
         contentContainerStyle={styles.tabStrip}
       >
-        {CATEGORY_TREE.map((cat) => (
+        {cats.map((cat) => (
           <L1TabItem key={cat.id} cat={cat} isSelected={cat.id === selectedId} onSelect={onSelect} />
         ))}
       </ScrollView>
@@ -678,11 +678,7 @@ export default function CategoriesScreen() {
         </TouchableOpacity>
       </View>
 
-      <CategoryRow
-        categories={CATEGORIES.filter((c) => c.id !== "all")}
-        selected={selectedL1Id}
-        onSelect={handleSelectL1}
-      />
+      <L1TabStrip selectedId={selectedL1Id} onSelect={handleSelectL1} />
 
       <View style={s.banner}>
         <RichBanner l1={selectedL1} />
