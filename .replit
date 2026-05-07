@@ -29,7 +29,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd /home/runner/workspace/artifacts/arabic-shop && EXPO_NO_TELEMETRY=1 npx expo export --platform web --output-dir dist && sed -i 's/shrink-to-fit=no\"/shrink-to-fit=no, viewport-fit=cover\"/' dist/index.html && PORT=5000 node serve-static.js"
+args = "cd /home/runner/workspace/artifacts/arabic-shop && EXPO_NO_TELEMETRY=1 pnpm exec expo export --platform web --output-dir dist && sed -i 's/shrink-to-fit=no\"/shrink-to-fit=no, viewport-fit=cover\"/' dist/index.html && PORT=5000 node serve-static.js"
 waitForPort = 5000
 
 [agent]
@@ -43,10 +43,6 @@ timeoutMs = 20000
 [[ports]]
 localPort = 5000
 externalPort = 80
-
-[[ports]]
-localPort = 20426
-externalPort = 3000
 
 [nix]
 channel = "stable-25_05"
