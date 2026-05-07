@@ -26,6 +26,7 @@ import { useNotifications } from "@/context/NotificationsContext";
 import { useAppToast } from "@/context/AppToastContext";
 import { OrderProvider } from "@/context/OrderContext";
 import { ReviewsProvider } from "@/context/ReviewsContext";
+import { AddressProvider } from "@/context/AddressContext";
 
 I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
@@ -42,6 +43,7 @@ function AppProviders({ children }: { children: React.ReactNode }) {
           <AppToastProvider>
             <QueryClientProvider client={queryClient}>
               <CartProvider>
+                <AddressProvider>
                 <OrderProvider>
                   <WishlistProvider>
                     <NotificationsProvider>
@@ -55,6 +57,7 @@ function AppProviders({ children }: { children: React.ReactNode }) {
                       </NotificationsProvider>
                   </WishlistProvider>
                 </OrderProvider>
+                </AddressProvider>
               </CartProvider>
             </QueryClientProvider>
           </AppToastProvider>

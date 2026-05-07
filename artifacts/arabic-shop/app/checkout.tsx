@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo, useCallback } from "react";
+import React, { useState, useRef, useMemo, useCallback, useEffect } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import {
   View,
@@ -22,6 +22,8 @@ import { useCart } from "@/context/CartContext";
 import { useNotifications } from "@/context/NotificationsContext";
 import { validateCoupon, QUICK_COUPON_CODES } from "@/data/coupons";
 import { useOrder } from "@/context/OrderContext";
+import { useAddresses } from "@/context/AddressContext";
+import { useAppToast } from "@/context/AppToastContext";
 
 const STEPS = ["العنوان", "الدفع", "المراجعة"];
 
@@ -32,10 +34,11 @@ const PAYMENT_METHODS = [
   { id: "wallet", label: "المحفظة", icon: "wallet-outline", sub: "رصيدك: ٢٥٠ ر.س" },
 ];
 
-const SAVED_ADDRESSES = [
-  { id: "a1", label: "المنزل", city: "الرياض", district: "العليا", fullName: "سارة العمري", phone: "0501234567" },
-  { id: "a2", label: "العمل", city: "جدة", district: "الروضة", fullName: "سارة العمري", phone: "0501234567" },
-];
+const LABEL_OPTIONS = [
+  { label: "المنزل", icon: "home-outline" },
+  { label: "العمل", icon: "business-outline" },
+  { label: "آخر", icon: "location-outline" },
+] as const;
 
 function CheckoutScreen() {
   const colors = useColors();
@@ -43,6 +46,8 @@ function CheckoutScreen() {
   const { items, total, delivery, discount, subtotal, clearCart } = useCart();
   const { scheduleOrderNotifications } = useNotifications();
   const { setLastOrderNumber } = useOrder();
+  const { addresses, addAddress, deleteAddress } = useAddresses();
+  const { showToast } = useAppToast();
   const [step, setStep] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [couponCode, setCouponCode] = useState("");
@@ -51,7 +56,7 @@ function CheckoutScreen() {
     label: string;
   } | null>(null);
   const [couponError, setCouponError] = useState("");
-  const [selectedAddress, setSelectedAddress] = useState("a1");
+  const [selectedAddress, setSelectedAddress] = useState("");
   const [placing, setPlacing] = useState(false);
   const [useNewAddress, setUseNewAddress] = useState(false);
   const [fullName, setFullName] = useState("");
@@ -61,8 +66,17 @@ function CheckoutScreen() {
   const [postalCode, setPostalCode] = useState("");
   const [addressDetail, setAddressDetail] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [newAddressLabel, setNewAddressLabel] = useState<string>("المنزل");
+  const [saveNewAddress, setSaveNewAddress] = useState(false);
   const couponShake = useRef(new Animated.Value(0)).current;
   const placeBtnScale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    if (!selectedAddress && addresses.length > 0) {
+      const def = addresses.find((a) => a.isDefault) ?? addresses[0];
+      setSelectedAddress(def.id);
+    }
+  }, [addresses, selectedAddress]);
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
@@ -73,14 +87,12 @@ function CheckoutScreen() {
   const finalTotal = Math.max(0, total - couponSavings);
 
   const validateAndAdvance = useCallback(() => {
-    // Using a saved address — no form validation needed
     if (selectedAddress && !useNewAddress) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       setStep(1);
       return;
     }
 
-    // Entering a new address — validate required fields
     const errors: Record<string, string> = {};
     if (!fullName.trim()) errors.fullName = "الاسم الكامل مطلوب";
     if (!phone.trim()) {
@@ -97,10 +109,29 @@ function CheckoutScreen() {
       return;
     }
 
+    if (saveNewAddress) {
+      const labelOpt = LABEL_OPTIONS.find((o) => o.label === newAddressLabel);
+      const icon = labelOpt?.icon ?? "location-outline";
+      const newId = addAddress({
+        label: newAddressLabel,
+        labelIcon: icon,
+        fullName: fullName.trim(),
+        phone: phone.trim(),
+        city: city.trim(),
+        district: district.trim(),
+        postalCode: postalCode.trim(),
+        addressDetail: addressDetail.trim(),
+      });
+      setSelectedAddress(newId);
+      setUseNewAddress(false);
+      setSaveNewAddress(false);
+      showToast("تم حفظ العنوان بنجاح ✓", "success");
+    }
+
     setFieldErrors({});
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setStep(1);
-  }, [selectedAddress, useNewAddress, fullName, phone, city, district]);
+  }, [selectedAddress, useNewAddress, fullName, phone, city, district, saveNewAddress, newAddressLabel, postalCode, addressDetail, addAddress, showToast]);
 
   const applyCoupon = useCallback(
     (code: string) => {
@@ -524,6 +555,63 @@ function CheckoutScreen() {
           borderColor: colors.destructive,
           borderWidth: 1.5,
         },
+        labelChipsRow: {
+          flexDirection: "row-reverse",
+          gap: 8,
+          marginBottom: 14,
+        },
+        labelChip: {
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          gap: 5,
+          paddingHorizontal: 14,
+          paddingVertical: 8,
+          borderRadius: 20,
+          borderWidth: 1.5,
+        },
+        labelChipText: {
+          fontSize: 13,
+          fontFamily: "Cairo_600SemiBold",
+        },
+        saveToggleRow: {
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          justifyContent: "space-between",
+          paddingVertical: 10,
+          borderTopWidth: 1,
+          borderTopColor: colors.border,
+          marginTop: 4,
+          marginBottom: 4,
+        },
+        saveToggleLabel: {
+          fontSize: 13,
+          fontFamily: "Cairo_600SemiBold",
+          color: colors.text,
+        },
+        saveToggleTrack: {
+          width: 44,
+          height: 25,
+          borderRadius: 13,
+          padding: 2,
+          justifyContent: "center",
+        },
+        saveToggleThumb: {
+          width: 21,
+          height: 21,
+          borderRadius: 11,
+          backgroundColor: "#fff",
+        },
+        deleteAddressBtn: {
+          position: "absolute",
+          top: 6,
+          left: 6,
+          width: 20,
+          height: 20,
+          borderRadius: 10,
+          backgroundColor: `${colors.destructive}20`,
+          alignItems: "center",
+          justifyContent: "center",
+        },
       }),
     [colors, topPad, bottomPad]
   );
@@ -536,7 +624,7 @@ function CheckoutScreen() {
             <Text style={styles.sectionTitle}>عنوان التوصيل</Text>
 
             <View style={styles.savedAddressRow}>
-              {SAVED_ADDRESSES.map((addr) => {
+              {addresses.map((addr) => {
                 const active = selectedAddress === addr.id;
                 return (
                   <TouchableOpacity
@@ -566,6 +654,11 @@ function CheckoutScreen() {
                   >
                     <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6 }}>
                       <Ionicons
+                        name={(addr.labelIcon ?? "location-outline") as any}
+                        size={14}
+                        color={active ? colors.primary : colors.mutedForeground}
+                      />
+                      <Ionicons
                         name={active ? "radio-button-on" : "radio-button-off"}
                         size={16}
                         color={active ? colors.primary : colors.mutedForeground}
@@ -582,6 +675,24 @@ function CheckoutScreen() {
                     <Text style={styles.savedAddressSub}>
                       {addr.city} · {addr.district}
                     </Text>
+                    {addr.isDefault && (
+                      <Text style={[styles.savedAddressSub, { color: colors.primary, fontSize: 10 }]}>
+                        ● افتراضي
+                      </Text>
+                    )}
+                    {addresses.length > 1 && (
+                      <TouchableOpacity
+                        style={styles.deleteAddressBtn}
+                        hitSlop={6}
+                        onPress={() => {
+                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                          deleteAddress(addr.id);
+                          if (selectedAddress === addr.id) setSelectedAddress("");
+                        }}
+                      >
+                        <Ionicons name="close" size={11} color={colors.destructive} />
+                      </TouchableOpacity>
+                    )}
                   </TouchableOpacity>
                 );
               })}
@@ -593,15 +704,46 @@ function CheckoutScreen() {
                 setUseNewAddress(true);
                 setSelectedAddress("");
                 setFieldErrors({});
+                setNewAddressLabel("المنزل");
+                setSaveNewAddress(false);
               }}
               activeOpacity={0.7}
             >
               <View style={styles.orLine} />
               <Text style={[styles.orText, useNewAddress && { color: colors.primary, fontFamily: "Cairo_600SemiBold" }]}>
-                أو أدخل عنواناً جديداً
+                + إضافة عنوان جديد
               </Text>
               <View style={styles.orLine} />
             </TouchableOpacity>
+
+            {useNewAddress && (
+              <>
+                <Text style={styles.inputLabel}>تسمية العنوان</Text>
+                <View style={styles.labelChipsRow}>
+                  {LABEL_OPTIONS.map((opt) => {
+                    const active = newAddressLabel === opt.label;
+                    return (
+                      <TouchableOpacity
+                        key={opt.label}
+                        style={[
+                          styles.labelChip,
+                          {
+                            backgroundColor: active ? colors.primaryLight : colors.secondary,
+                            borderColor: active ? colors.primary : colors.border,
+                          },
+                        ]}
+                        onPress={() => { Haptics.selectionAsync(); setNewAddressLabel(opt.label); }}
+                      >
+                        <Ionicons name={opt.icon as any} size={14} color={active ? colors.primary : colors.mutedForeground} />
+                        <Text style={[styles.labelChipText, { color: active ? colors.primary : colors.text }]}>
+                          {opt.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </>
+            )}
 
             <Text style={styles.inputLabel}>الاسم الكامل</Text>
             <TextInput
@@ -709,6 +851,33 @@ function CheckoutScreen() {
               value={addressDetail}
               onChangeText={setAddressDetail}
             />
+
+            {useNewAddress && (
+              <TouchableOpacity
+                style={styles.saveToggleRow}
+                onPress={() => { Haptics.selectionAsync(); setSaveNewAddress((v) => !v); }}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.saveToggleLabel}>حفظ هذا العنوان لاحقاً</Text>
+                <View
+                  style={[
+                    styles.saveToggleTrack,
+                    {
+                      backgroundColor: saveNewAddress ? colors.primary : colors.secondary,
+                      borderWidth: 1,
+                      borderColor: saveNewAddress ? colors.primary : colors.border,
+                    },
+                  ]}
+                >
+                  <Animated.View
+                    style={[
+                      styles.saveToggleThumb,
+                      { alignSelf: saveNewAddress ? "flex-start" : "flex-end" },
+                    ]}
+                  />
+                </View>
+              </TouchableOpacity>
+            )}
           </View>
 
           <View style={styles.nextBtnWrapper}>

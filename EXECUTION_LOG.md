@@ -108,10 +108,45 @@
 
 ---
 
+### ✅ [H-F03] Address management does not persist — saved addresses are hardcoded
+- **الوصف في الخطة:** `SAVED_ADDRESSES` in `checkout.tsx` was a module-level constant (not context state). User could not add, edit, or delete saved addresses, and no data persisted across reloads.
+- **الإصلاح الكامل:**
+
+  **`context/AddressContext.tsx`** (ملف جديد):
+  - `SavedAddress` type: `{ id, label, labelIcon, fullName, phone, city, district, postalCode?, addressDetail?, isDefault }`
+  - `AddressProvider`: يبادئ بـ `DEFAULT_ADDRESSES` (المنزل + العمل) بشكل متزامن
+  - يستعيد من `AsyncStorage` (@al_ostora_addresses_v1) عند التحميل
+  - يستمر في الكتابة عند كل تغيير (بعد hydration) بدون blocking
+  - `addAddress(addr, makeDefault?)` — يُولِّد ID فريداً بـ `Date.now()`، يُسنِّد الافتراضي تلقائياً
+  - `deleteAddress(id)` — يُرقِّي العنوان الأول المتبقي كافتراضي إذا حُذف الافتراضي
+  - `setDefaultAddress(id)` — يُحوِّل جميع `isDefault` لـ false ثم يُعيِّن الجديد
+  - `updateAddress(id, changes)` — تعديل جزئي بـ spread
+
+  **`app/_layout.tsx`**:
+  - يستورد `AddressProvider` ويُغلِّف `CartProvider` به
+
+  **`app/checkout.tsx`**:
+  - حُذف `const SAVED_ADDRESSES = [...]` الثابت نهائياً
+  - يستورد `useAddresses` و `useAppToast`
+  - `useEffect` جديد: يُزامن `selectedAddress` مع `addresses.find(isDefault)` عند تحميل AsyncStorage
+  - `LABEL_OPTIONS` ثابت جديد: `[المنزل (home), العمل (business), آخر (location)]`
+  - حقل **"تسمية العنوان"**: chips سريعة (المنزل / العمل / آخر) تظهر عند فتح الإضافة
+  - toggle **"حفظ هذا العنوان لاحقاً"**: يحفظ عبر `addAddress()` عند التقدم للخطوة التالية + toast تأكيد
+  - زر حذف (×) مدمج في كل بطاقة عنوان محفوظ (يظهر فقط إذا كان هناك أكثر من عنوان)
+  - مؤشر **"● افتراضي"** يظهر أسفل العنوان الافتراضي
+  - أُضيفت أنماط: `labelChipsRow`, `labelChip`, `saveToggleRow`, `saveToggleTrack`, `saveToggleThumb`, `deleteAddressBtn`
+
+- **الملفات المعدّلة:**
+  - `artifacts/arabic-shop/context/AddressContext.tsx` ← جديد
+  - `artifacts/arabic-shop/app/_layout.tsx`
+  - `artifacts/arabic-shop/app/checkout.tsx`
+- **commit:** _(current session)_
+
+---
+
 ### ⏳ المرحلة الثانية المتبقية
 | ID | المهمة |
 |----|--------|
-| H-F03 | Saved addresses are hardcoded — create `AddressContext` |
 | H-D02 | Only 12 products across 6 shared images — expand catalog to 40+ |
 | H-D03 | Reviews recycled across products — create unique reviews per product |
 | H-A02 | `Dimensions.get("window")` at module level — breaks on resize |
