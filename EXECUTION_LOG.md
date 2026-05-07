@@ -55,10 +55,25 @@
 | CRITICAL-S02 | Persist Cart + Wishlist to AsyncStorage — wiped on page refresh |
 | H-U03 | Reorder button shows toast but never calls `addToCart` |
 
+### ✅ [H-U02] Profile stats are hardcoded — Wire to real context values
+- **الوصف في الخطة:** Stats card in `ProfileScreen` uses fully hardcoded numbers: `١٢` orders, `٣` reviews, `ذهبي` membership, and menu badges `٣` on "طلباتي" and `٢` on "كوبونات الخصم". None reflect actual app state.
+- **الإصلاح:**
+  - **طلب**: مرتبط بـ `MOCK_ORDERS.length` ← `٥`
+  - **مفضلة**: كانت مرتبطة جزئياً، نُظِّف الحساب باستخدام `toArabicNumeral`
+  - **تقييم**: مرتبط بعدد الطلبات المُسلَّمة (`MOCK_ORDERS.filter(status === "delivered").length`) ← `٣`
+  - **عضوية**: محسوبة من إجمالي الإنفاق على الطلبات غير الملغاة (`getMembershipTier(totalNonCancelledSpend)`) ← `ذهبي`
+  - **badge طلباتي**: مرتبط بـ `ordersCount` ← `٥`
+  - **badge كوبونات الخصم**: مرتبط بعدد الكوبونات النشطة (`COUPONS.filter(!isCouponExpired)`) ← `٤`
+  - أُضيفت دالة `toArabicNumeral` آمنة تعتمد lookup table بدلاً من `toLocaleString` لتفادي سلوك `-` للصفر في بعض البيئات
+  - جميع الحسابات على مستوى الوحدة (module-level) تُحسب مرة واحدة فقط
+- **الملفات المعدّلة:** `artifacts/arabic-shop/app/(tabs)/profile.tsx`
+- **commit:** _(current session)_
+
+---
+
 ### ⏳ المرحلة الثانية المتبقية
 | ID | المهمة |
 |----|--------|
-| H-U02 | Profile stats are hardcoded — wire to real context values |
 | H-U04 | Banner CTA always navigates to search regardless of banner content |
 | H-F02 | Category L3 item taps have no product navigation |
 | H-F03 | Saved addresses are hardcoded — create `AddressContext` |

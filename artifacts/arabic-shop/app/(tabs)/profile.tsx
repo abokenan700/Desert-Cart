@@ -16,7 +16,8 @@ import { useColors } from "@/hooks/useColors";
 import { useTheme } from "@/context/ThemeContext";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { ACTIVE_ORDER } from "@/data/mockOrders";
+import { ACTIVE_ORDER, MOCK_ORDERS } from "@/data/mockOrders";
+import { COUPONS, isCouponExpired, COUPON_MAP } from "@/data/coupons";
 
 interface MenuItem {
   id: string;
@@ -26,6 +27,34 @@ interface MenuItem {
   color?: string;
   onPress?: () => void;
 }
+
+// ─── Module-level derived stats (static data, no need inside component) ──────
+const ordersCount = MOCK_ORDERS.length;
+const deliveredCount = MOCK_ORDERS.filter((o) => o.status === "delivered").length;
+const activeCouponsCount = COUPONS.filter(
+  (c) => !isCouponExpired(COUPON_MAP[c.code])
+).length;
+
+const totalNonCancelledSpend = MOCK_ORDERS.filter((o) => o.status !== "cancelled")
+  .reduce((sum, o) => sum + o.total, 0);
+
+function getMembershipTier(spend: number): string {
+  if (spend >= 5000) return "بلاتيني";
+  if (spend >= 2000) return "ذهبي";
+  if (spend >= 500)  return "فضي";
+  return "عادي";
+}
+
+const membershipTier = getMembershipTier(totalNonCancelledSpend);
+
+const ARABIC_DIGITS = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+function toArabicNumeral(n: number): string {
+  return String(Math.max(0, Math.floor(n)))
+    .split("")
+    .map((d) => ARABIC_DIGITS[Number(d)] ?? d)
+    .join("");
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 export default function ProfileScreen() {
   const colors = useColors();
@@ -42,7 +71,7 @@ export default function ProfileScreen() {
     {
       title: "طلباتي",
       items: [
-        { id: "orders", icon: "bag-outline", label: "طلباتي", badge: "٣" },
+        { id: "orders", icon: "bag-outline", label: "طلباتي", badge: toArabicNumeral(ordersCount) },
         { id: "track", icon: "locate-outline", label: "تتبع الطلبات" },
         { id: "returns", icon: "return-down-back-outline", label: "المرتجعات والإلغاء" },
       ],
@@ -53,7 +82,7 @@ export default function ProfileScreen() {
         { id: "addresses", icon: "location-outline", label: "عناويني" },
         { id: "payment", icon: "card-outline", label: "طرق الدفع" },
         { id: "wallet", icon: "wallet-outline", label: "المحفظة", badge: "٢٥٠ ر.س", color: colors.success },
-        { id: "coupons", icon: "pricetag-outline", label: "كوبونات الخصم", badge: "٢" },
+        { id: "coupons", icon: "pricetag-outline", label: "كوبونات الخصم", badge: toArabicNumeral(activeCouponsCount) },
       ],
     },
     {
@@ -282,9 +311,7 @@ export default function ProfileScreen() {
     }
   };
 
-  const wishlistStatValue = wishlistCount > 0
-    ? wishlistCount.toLocaleString("ar-SA")
-    : "٠";
+  const wishlistStatValue = toArabicNumeral(wishlistCount);
 
   return (
     <View style={styles.container}>
@@ -310,7 +337,7 @@ export default function ProfileScreen() {
       >
         <View style={styles.statsCard}>
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>١٢</Text>
+            <Text style={styles.statValue}>{toArabicNumeral(ordersCount)}</Text>
             <Text style={styles.statLabel}>طلب</Text>
           </View>
           <View style={styles.statDivider} />
@@ -320,12 +347,12 @@ export default function ProfileScreen() {
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>٣</Text>
+            <Text style={styles.statValue}>{toArabicNumeral(deliveredCount)}</Text>
             <Text style={styles.statLabel}>تقييم</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
-            <Text style={[styles.statValue, { fontSize: 16 }]}>ذهبي</Text>
+            <Text style={[styles.statValue, { fontSize: 16 }]}>{membershipTier}</Text>
             <Text style={styles.statLabel}>عضوية</Text>
           </View>
         </View>
