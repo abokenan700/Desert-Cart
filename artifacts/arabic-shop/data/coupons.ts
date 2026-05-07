@@ -31,8 +31,8 @@ export const COUPONS: CouponDefinition[] = [
     descAr: "خصم ٥٠٪ - عرض محدود المدة",
     discount: 0.50,
     discountLabel: "٥٠٪",
-    expiry: "٥ مايو ٢٠٢٦",
-    expiryDate: new Date(2026, 4, 5),
+    expiry: "٣٠ سبتمبر ٢٠٢٦",
+    expiryDate: new Date(2026, 8, 30),
     minOrder: 500,
   },
   {

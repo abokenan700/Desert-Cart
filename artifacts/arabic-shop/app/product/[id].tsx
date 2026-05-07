@@ -211,13 +211,20 @@ function ProductDetailInner() {
 
   const handleShare = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const baseUrl =
+      Platform.OS === "web" && typeof window !== "undefined"
+        ? window.location.origin
+        : "https://al-ostora.app";
+    const productUrl = `${baseUrl}/product/${product.id}`;
     try {
       await Share.share({
-        message: `${product.nameAr} بسعر ${product.price.toLocaleString("ar-SA")} ر.س — الأسطورة\nhttps://al-ostora.app/product/${product.id}`,
-        url: `https://al-ostora.app/product/${product.id}`,
+        message: `${product.nameAr} بسعر ${product.price.toLocaleString("ar-SA")} ر.س — الأسطورة\n${productUrl}`,
+        url: productUrl,
         title: product.nameAr,
       });
-    } catch {}
+    } catch (e) {
+      console.warn("[ProductDetail] share error:", e);
+    }
   };
 
   const openSizeGuide = () => {
