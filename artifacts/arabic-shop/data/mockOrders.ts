@@ -5,6 +5,7 @@ export interface Order {
   status: "delivered" | "shipping" | "processing" | "cancelled";
   statusAr: string;
   items: string[];
+  productIds?: string[];
   total: number;
   itemCount: number;
 }
@@ -27,6 +28,7 @@ export const MOCK_ORDERS: Order[] = [
     status: "delivered",
     statusAr: "تم التسليم",
     items: ["ساعة ذكية فاخرة"],
+    productIds: ["prod6"],
     total: 1250,
     itemCount: 1,
   },
@@ -37,6 +39,7 @@ export const MOCK_ORDERS: Order[] = [
     status: "delivered",
     statusAr: "تم التسليم",
     items: ["سماعات لاسلكية", "حافظة جلدية", "شاحن سريع"],
+    productIds: ["prod7", "prod5"],
     total: 670,
     itemCount: 3,
   },
@@ -57,6 +60,7 @@ export const MOCK_ORDERS: Order[] = [
     status: "delivered",
     statusAr: "تم التسليم",
     items: ["بلوزة قطنية", "بنطلون جينز"],
+    productIds: ["prod2", "prod4"],
     total: 235,
     itemCount: 2,
   },

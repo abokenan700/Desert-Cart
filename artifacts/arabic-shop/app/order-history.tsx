@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import {
   View,
   Text,
@@ -14,6 +14,8 @@ import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { MOCK_ORDERS, Order } from "@/data/mockOrders";
 import { useAppToast } from "@/context/AppToastContext";
+import { useCart } from "@/context/CartContext";
+import { PRODUCTS } from "@/data/mockData";
 
 const TABS = [
   { id: "all", label: "الكل" },
@@ -26,11 +28,40 @@ export default function OrderHistoryScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { showToast } = useAppToast();
+  const { addToCart } = useCart();
   const [activeTab, setActiveTab] = useState("all");
 
-  const handleReorder = (order: Order) => {
-    showToast(`تمت إضافة ${order.itemCount} منتج للسلة ✓`, "success");
-  };
+  const handleReorder = useCallback((order: Order) => {
+    if (!order.productIds || order.productIds.length === 0) {
+      showToast("المنتجات لم تعد متاحة في الكتالوج", "warning");
+      return;
+    }
+
+    const found = order.productIds.flatMap((id) => {
+      const product = PRODUCTS.find((p) => p.id === id);
+      return product ? [product] : [];
+    });
+
+    if (found.length === 0) {
+      showToast("المنتجات لم تعد متاحة في الكتالوج", "warning");
+      return;
+    }
+
+    found.forEach((product) => addToCart(product));
+
+    const unavailable = order.productIds.length - found.length;
+    if (unavailable > 0) {
+      showToast(
+        `أُضيف ${found.length} منتج للسلة · ${unavailable} غير متاح حالياً`,
+        "info"
+      );
+    } else {
+      showToast(
+        `أُضيف ${found.length === 1 ? found[0].nameAr : `${found.length} منتجات`} للسلة ✓`,
+        "success"
+      );
+    }
+  }, [addToCart, showToast]);
 
   const handleInvoice = (order: Order) => {
     Alert.alert(
