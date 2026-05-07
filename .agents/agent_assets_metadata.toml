@@ -66,61 +66,8 @@ uri = "file://artifacts/arabic-shop/assets/logo.png"
 type = "image"
 title = "Luxury fashion e-commerce phone app logo"
 
-
-# ─── claude-code plugins ───────────────────────────────────────────────────
-[[skills]]
-id = "skill_frontend_design"
-uri = "file://.agents/skills/frontend-design/SKILL.md"
-type = "skill"
-title = "frontend-design — Production-grade UI (from anthropics/claude-code)"
-source = "https://github.com/anthropics/claude-code/tree/main/plugins/frontend-design"
-
-[[skills]]
-id = "skill_feature_dev"
-uri = "file://.agents/skills/feature-dev/SKILL.md"
-type = "skill"
-title = "feature-dev — 7-phase feature workflow (from anthropics/claude-code)"
-source = "https://github.com/anthropics/claude-code/tree/main/plugins/feature-dev"
-
-[[skills]]
-id = "skill_hookify"
-uri = "file://.agents/skills/hookify/SKILL.md"
-type = "skill"
-title = "hookify — Behavior-prevention rules (from anthropics/claude-code)"
-source = "https://github.com/anthropics/claude-code/tree/main/plugins/hookify"
-
-[[skills]]
-id = "skill_hookify_writing_rules"
-uri = "file://.agents/skills/hookify/writing-rules/SKILL.md"
-type = "skill"
-title = "hookify:writing-rules — Rule syntax reference"
-source = "https://github.com/anthropics/claude-code/tree/main/plugins/hookify/skills/writing-rules"
-
-[[skills]]
-id = "skill_code_review"
-uri = "file://.agents/skills/code-review/SKILL.md"
-type = "skill"
-title = "code-review — Multi-agent PR review (from anthropics/claude-code)"
-source = "https://github.com/anthropics/claude-code/tree/main/plugins/code-review"
-
-[[skills]]
-id = "skill_commit_commands"
-uri = "file://.agents/skills/commit-commands/SKILL.md"
-type = "skill"
-title = "commit-commands — Git workflow automation (from anthropics/claude-code)"
-source = "https://github.com/anthropics/claude-code/tree/main/plugins/commit-commands"
-
-# ─── e-commerce reference skills ──────────────────────────────────────────
-[[skills]]
-id = "skill_storefront_ui"
-uri = "file://.agents/skills/storefront-ui/SKILL.md"
-type = "skill"
-title = "storefront-ui — E-commerce UI patterns (from vuestorefront/storefront-ui)"
-source = "https://github.com/vuestorefront/storefront-ui"
-
-[[skills]]
-id = "skill_medusa_patterns"
-uri = "file://.agents/skills/medusa-patterns/SKILL.md"
-type = "skill"
-title = "medusa-patterns — Commerce domain models (from medusajs/medusa)"
-source = "https://github.com/medusajs/medusa"
+[[outputs]]
+id = "pDC_ACHkjvfsgvFrv6xgZ"
+uri = "file://MASTER_DEVELOPMENT_PLAN.md"
+type = "text"
+title = "MASTER_DEVELOPMENT_PLAN.md — الأسطورة Full Audit & Roadmap"

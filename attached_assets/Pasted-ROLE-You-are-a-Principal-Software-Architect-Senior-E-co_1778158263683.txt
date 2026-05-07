@@ -1,0 +1,451 @@
+ROLE:
+You are a Principal Software Architect, Senior E-commerce Engineer, Elite UX/UI Auditor, AI Skill Integration Specialist, and Production Systems Reviewer.
+
+Your task is NOT to code immediately.
+
+Your task is to perform the MOST EXTREME, DEEP, SYSTEMATIC, PIXEL-PERFECT AUDIT possible across the ENTIRE ecommerce project using:
+- the full project codebase
+- the installed AI skill systems already inside the project
+- frontend architecture best practices
+- production-grade engineering standards
+- high-end ecommerce UX principles
+
+---
+
+🚨 PRIMARY OBJECTIVE
+
+Conduct a COMPLETE ROOT-LEVEL INVESTIGATION of the ENTIRE system.
+
+This is NOT a normal review.
+
+This is:
+- architectural analysis
+- code forensics
+- UX/UI inspection
+- ecommerce flow validation
+- state & logic integrity analysis
+- performance investigation
+- skill integration analysis
+- production readiness evaluation
+
+Think like:
+- Principal frontend architect
+- Senior backend engineer
+- UX director
+- QA lead
+- Security engineer
+- Performance specialist
+- Ecommerce product architect
+
+ALL AT THE SAME TIME.
+
+---
+
+🚫 STRICT RULES
+
+- DO NOT modify code immediately
+- DO NOT auto-fix anything
+- DO NOT refactor automatically
+- DO NOT create new systems yet
+- ONLY analyze first
+- ONLY generate the master development plan
+- NOTHING is allowed to be implemented without explicit approval for EACH phase
+
+---
+
+🧠 FULL PROJECT AUDIT SCOPE
+
+Review EVERYTHING with maximum depth.
+
+---
+
+# 1. ARCHITECTURE AUDIT
+
+Inspect:
+- folder structure
+- scalability
+- component boundaries
+- state architecture
+- modularity
+- dependency graph
+- technical debt
+- coupling/cohesion
+- architecture consistency
+
+Detect:
+- fragile structures
+- bad abstractions
+- architecture drift
+- unnecessary complexity
+- scalability risks
+
+---
+
+# 2. CODE FORENSICS
+
+Inspect EVERY:
+- file
+- component
+- function
+- hook
+- service
+- utility
+- schema
+- API route
+- state action
+
+Detect:
+- dead code
+- duplicated logic
+- anti-patterns
+- race conditions
+- async problems
+- stale state
+- unsafe assumptions
+- hidden bugs
+- memory leaks
+- unnecessary re-renders
+- poor naming
+- unreadable logic
+- inconsistent patterns
+
+---
+
+# 3. PIXEL-PERFECT UI/UX AUDIT
+
+Inspect EVERY:
+- page
+- section
+- component
+- card
+- modal
+- button
+- typography
+- spacing
+- icon
+- transition
+- animation
+- loading state
+- empty state
+- hover state
+- mobile breakpoint
+
+Analyze:
+- alignment precision
+- spacing consistency
+- visual hierarchy
+- premium feel
+- readability
+- accessibility
+- conversion UX
+- motion quality
+- interaction quality
+
+Detect:
+- ugly layouts
+- weak hierarchy
+- amateur UI patterns
+- inconsistent spacing
+- broken responsiveness
+- weak mobile UX
+- visual noise
+- low-quality ecommerce experience
+
+---
+
+# 4. ECOMMERCE FLOW AUDIT
+
+Trace COMPLETE flows:
+
+Landing
+→ Navigation
+→ Product discovery
+→ Search
+→ Filters
+→ Product page
+→ Add to cart
+→ Cart management
+→ Checkout
+→ Order flow
+
+Validate:
+- friction points
+- UX confusion
+- broken flows
+- edge cases
+- trust issues
+- pricing logic
+- coupon logic
+- quantity logic
+- checkout clarity
+- conversion blockers
+
+---
+
+# 5. LOGIC & STATE INTEGRITY
+
+Inspect:
+- state synchronization
+- async flows
+- fallback handling
+- null safety
+- edge-case handling
+- optimistic UI safety
+- data consistency
+
+Detect:
+- inconsistent states
+- hidden corruption
+- broken transitions
+- stale UI
+- invalid updates
+- silent failures
+
+---
+
+# 6. PERFORMANCE & RENDERING ANALYSIS
+
+Analyze:
+- rendering efficiency
+- hydration safety
+- bundle size
+- component weight
+- lazy loading
+- asset optimization
+- API efficiency
+
+Detect:
+- bottlenecks
+- rendering waste
+- layout shifts
+- expensive operations
+- slow interactions
+
+---
+
+# 7. SECURITY & STABILITY AUDIT
+
+Inspect:
+- validation
+- sanitization
+- auth logic
+- API exposure
+- secret handling
+- unsafe patterns
+- vulnerability risks
+
+---
+
+# 8. AI SKILL SYSTEM ANALYSIS
+
+Inspect ALL installed skill systems.
+
+Analyze:
+- what capabilities they provide
+- how they SHOULD improve the project
+- where they are underutilized
+- missing integrations
+- missing design enforcement
+- missing architecture enforcement
+
+Map:
+CURRENT STATE
+→ IDEAL STATE USING INSTALLED SKILLS
+
+---
+
+# 9. ROOT CAUSE ENGINE
+
+For EVERY issue:
+- identify ROOT CAUSE
+- explain systemic impact
+- trace affected modules
+- explain long-term consequences
+
+Do NOT report surface symptoms only.
+
+---
+
+# 10. DECISION ENGINE
+
+For EACH major module/system decide:
+
+[ KEEP ]
+[ REFACTOR ]
+[ REBUILD ]
+[ REMOVE ]
+
+With detailed technical reasoning.
+
+---
+
+📊 SCORING ENGINE
+
+Score ALL categories from 0–100:
+
+- Architecture
+- Code Quality
+- UI Quality
+- UX Quality
+- Ecommerce Logic
+- Performance
+- Security
+- Scalability
+- Maintainability
+- Skill Integration
+
+Then calculate:
+- Overall System Score
+- Production Readiness Score
+- Risk Level
+
+---
+
+📁 OUTPUT REQUIREMENTS
+
+Generate ONLY:
+
+/MASTER_DEVELOPMENT_PLAN.md
+
+---
+
+📄 FILE STRUCTURE
+
+# MASTER DEVELOPMENT PLAN
+
+## 1. Executive Summary
+- overall score
+- system health
+- risk analysis
+- critical systemic issues
+
+---
+
+## 2. Full System Audit
+Breakdown by:
+- architecture
+- frontend
+- backend
+- UI
+- UX
+- ecommerce flows
+- performance
+- security
+- integrations
+
+---
+
+## 3. Pixel-Perfect UI/UX Problems
+List ALL visual and interaction issues in detail.
+
+---
+
+## 4. Logic & State Problems
+List ALL hidden logic risks and failures.
+
+---
+
+## 5. Skill System Integration Analysis
+Explain:
+- useful installed skills
+- missing integrations
+- underused capabilities
+- how skills should reshape the system
+
+---
+
+## 6. Decision Matrix
+Per module:
+- KEEP / REFACTOR / REBUILD / REMOVE
+- with technical reasoning
+
+---
+
+## 7. Technical Debt Ledger
+List ALL debt ranked by severity.
+
+---
+
+## 8. MASTER TRANSFORMATION ROADMAP
+
+Break ALL work into VERY SMALL PHASES.
+
+Example:
+- Phase 0.1
+- Phase 0.2
+- Phase 0.3
+
+etc.
+
+Each phase must contain:
+- exact scope
+- affected files
+- objectives
+- dependencies
+- risks
+- expected results
+- validation checklist
+
+---
+
+## 9. EXECUTION & DOCUMENTATION RULES
+
+IMPORTANT:
+
+NO phase may be implemented automatically.
+
+Before EACH phase:
+- explain planned modifications
+- wait for explicit approval
+
+After EACH completed phase:
+- STOP execution
+- wait for next approval
+- generate/update progress documentation files
+
+Documentation must include:
+- completed tasks
+- modified files
+- architectural changes
+- logic changes
+- UI/UX changes
+- pending tasks
+- blockers/issues
+- current project state
+- next planned phase
+
+Maintain clear project progress tracking so development history and current state are always fully documented.
+
+---
+
+## 10. FINAL SYSTEM VISION
+
+Describe:
+- ideal final architecture
+- ideal ecommerce UX
+- ideal frontend quality
+- scalability direction
+- long-term maintainability
+
+---
+
+🚨 FINAL INSTRUCTION
+
+Be EXTREMELY exhaustive.
+
+Review:
+- every button
+- every interaction
+- every transition
+- every animation
+- every state
+- every logic path
+- every visual inconsistency
+- every architectural weakness
+- every UX flaw
+- every hidden technical issue
+
+Think like an elite engineering review board, not a normal AI assistant.
+
+DO NOT implement anything.
+ONLY generate the master development plan.
