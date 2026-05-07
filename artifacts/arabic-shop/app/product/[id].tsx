@@ -99,11 +99,6 @@ function ProductDetailInner() {
   const [reviewModalVisible, setReviewModalVisible] = useState(false);
   const [showAllReviews, setShowAllReviews] = useState(false);
 
-  // Phase 4 new state — seeded from product ID so it's stable across renders
-  const [viewingCount, setViewingCount] = useState(() => {
-    const seed = (id ?? "").split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
-    return (seed % 16) + 5;
-  });
   const [sizeGuideVisible, setSizeGuideVisible] = useState(false);
   const [specsExpanded, setSpecsExpanded] = useState(false);
   const [qaVisible, setQaVisible] = useState(false);
@@ -113,7 +108,6 @@ function ProductDetailInner() {
   const galleryRef = useRef<ScrollView>(null);
   const addBtnScale = useRef(new Animated.Value(1)).current;
   const headerOpacity = useRef(new Animated.Value(0)).current;
-  const viewingPulse = useRef(new Animated.Value(1)).current;
   const specsMaxHeight = useRef(new Animated.Value(0)).current;
   const sizeGuideAnim = useRef(new Animated.Value(height)).current;
   const qaAnim = useRef(new Animated.Value(height)).current;
@@ -125,29 +119,6 @@ function ProductDetailInner() {
   useEffect(() => {
     if (product) addToRecentlyViewed(product);
   }, [product?.id]);
-
-  // Viewing count: small ±1 drift every 30s so it feels live without jarring jumps
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setViewingCount((prev) => {
-        const delta = Math.random() < 0.5 ? -1 : 1;
-        return Math.max(5, Math.min(20, prev + delta));
-      });
-    }, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Pulsing green dot
-  useEffect(() => {
-    const pulse = Animated.loop(
-      Animated.sequence([
-        Animated.timing(viewingPulse, { toValue: 1.35, duration: 700, useNativeDriver: true }),
-        Animated.timing(viewingPulse, { toValue: 1, duration: 700, useNativeDriver: true }),
-      ])
-    );
-    pulse.start();
-    return () => pulse.stop();
-  }, []);
 
   // Specs expand/collapse animation
   useEffect(() => {
@@ -315,12 +286,6 @@ function ProductDetailInner() {
         deliveryBadge: { flexDirection: "row-reverse", alignItems: "center", backgroundColor: colors.successLight, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, gap: 4 },
         deliveryText: { fontSize: 11, fontFamily: "Cairo_600SemiBold", color: colors.success },
         productName: { fontSize: 20, fontFamily: "Cairo_700Bold", color: colors.text, textAlign: "right", writingDirection: "rtl", lineHeight: 30, marginBottom: 8 },
-        // Viewing indicator
-        viewingRow: { flexDirection: "row-reverse", alignItems: "center", gap: 8, marginBottom: 10 },
-        viewingDotWrap: { width: 12, height: 12, alignItems: "center", justifyContent: "center" },
-        viewingDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#22C55E" },
-        viewingText: { fontSize: 12, fontFamily: "Cairo_600SemiBold", color: colors.mutedForeground },
-        viewingHighlight: { color: "#22C55E", fontFamily: "Cairo_700Bold" },
         ratingRow: { flexDirection: "row-reverse", alignItems: "center", gap: 8, marginBottom: 14 },
         ratingValue: { fontSize: 14, fontFamily: "Cairo_700Bold", color: colors.gold },
         reviewCount: { fontSize: 13, fontFamily: "Cairo_400Regular", color: colors.mutedForeground },
@@ -535,18 +500,6 @@ function ProductDetailInner() {
           </View>
 
           <Text style={styles.productName}>{product.nameAr}</Text>
-
-          {/* ── "X people viewing" urgency indicator ── */}
-          <View style={styles.viewingRow}>
-            <View style={styles.viewingDotWrap}>
-              <Animated.View style={[styles.viewingDot, { transform: [{ scale: viewingPulse }] }]} />
-            </View>
-            <Text style={styles.viewingText}>
-              يشاهد هذا المنتج الآن{" "}
-              <Text style={styles.viewingHighlight}>{viewingCount}</Text>
-              {" "}شخص
-            </Text>
-          </View>
 
           {/* Rating row */}
           <View style={styles.ratingRow}>
