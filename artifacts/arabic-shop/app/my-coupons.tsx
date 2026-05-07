@@ -7,7 +7,6 @@ import {
   ScrollView,
   Platform,
   Alert,
-  Share,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -25,11 +24,13 @@ export default function MyCouponsScreen() {
 
   const handleCopy = async (code: string) => {
     try {
-      await Share.share({ message: code });
+      if (Platform.OS === "web" && typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(code);
+      }
       setCopiedCode(code);
       setTimeout(() => setCopiedCode(null), 2000);
     } catch {
-      Alert.alert("كود الخصم", code);
+      Alert.alert("كود الخصم", `كود الخصم الخاص بك:\n${code}`);
     }
   };
 

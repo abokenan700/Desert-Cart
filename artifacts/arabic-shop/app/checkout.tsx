@@ -1,4 +1,5 @@
 import React, { useState, useRef, useMemo, useCallback } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import {
   View,
   Text,
@@ -20,6 +21,7 @@ import { useColors } from "@/hooks/useColors";
 import { useCart } from "@/context/CartContext";
 import { useNotifications } from "@/context/NotificationsContext";
 import { validateCoupon, QUICK_COUPON_CODES } from "@/data/coupons";
+import { useOrder } from "@/context/OrderContext";
 
 const STEPS = ["العنوان", "الدفع", "المراجعة"];
 
@@ -31,15 +33,16 @@ const PAYMENT_METHODS = [
 ];
 
 const SAVED_ADDRESSES = [
-  { id: "a1", label: "المنزل", city: "الرياض", district: "العليا" },
-  { id: "a2", label: "العمل", city: "جدة", district: "الروضة" },
+  { id: "a1", label: "المنزل", city: "الرياض", district: "العليا", fullName: "سارة العمري", phone: "0501234567" },
+  { id: "a2", label: "العمل", city: "جدة", district: "الروضة", fullName: "سارة العمري", phone: "0501234567" },
 ];
 
-export default function CheckoutScreen() {
+function CheckoutScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { items, total, delivery, discount, subtotal, clearCart } = useCart();
   const { scheduleOrderNotifications } = useNotifications();
+  const { setLastOrderNumber } = useOrder();
   const [step, setStep] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [couponCode, setCouponCode] = useState("");
@@ -50,6 +53,7 @@ export default function CheckoutScreen() {
   const [couponError, setCouponError] = useState("");
   const [selectedAddress, setSelectedAddress] = useState("a1");
   const [placing, setPlacing] = useState(false);
+  const [useNewAddress, setUseNewAddress] = useState(false);
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
@@ -69,12 +73,14 @@ export default function CheckoutScreen() {
   const finalTotal = Math.max(0, total - couponSavings);
 
   const validateAndAdvance = useCallback(() => {
-    if (selectedAddress) {
+    // Using a saved address — no form validation needed
+    if (selectedAddress && !useNewAddress) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       setStep(1);
       return;
     }
 
+    // Entering a new address — validate required fields
     const errors: Record<string, string> = {};
     if (!fullName.trim()) errors.fullName = "الاسم الكامل مطلوب";
     if (!phone.trim()) {
@@ -94,7 +100,7 @@ export default function CheckoutScreen() {
     setFieldErrors({});
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setStep(1);
-  }, [selectedAddress, fullName, phone, city, district]);
+  }, [selectedAddress, useNewAddress, fullName, phone, city, district]);
 
   const applyCoupon = useCallback(
     (code: string) => {
@@ -141,6 +147,7 @@ export default function CheckoutScreen() {
     ]).start();
     setTimeout(() => {
       const orderNum = `SAQ-${Date.now().toString().slice(-6)}`;
+      setLastOrderNumber(orderNum);
       clearCart();
       scheduleOrderNotifications(orderNum);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -545,10 +552,16 @@ export default function CheckoutScreen() {
                     ]}
                     onPress={() => {
                       Haptics.selectionAsync();
-                      setSelectedAddress((prev) =>
-                        prev === addr.id ? "" : addr.id
-                      );
+                      const newId = selectedAddress === addr.id ? "" : addr.id;
+                      setSelectedAddress(newId);
+                      setUseNewAddress(false);
                       setFieldErrors({});
+                      if (newId) {
+                        setCity(addr.city);
+                        setDistrict(addr.district);
+                        setFullName(addr.fullName);
+                        setPhone(addr.phone);
+                      }
                     }}
                   >
                     <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6 }}>
@@ -574,11 +587,21 @@ export default function CheckoutScreen() {
               })}
             </View>
 
-            <View style={styles.orDivider}>
+            <TouchableOpacity
+              style={styles.orDivider}
+              onPress={() => {
+                setUseNewAddress(true);
+                setSelectedAddress("");
+                setFieldErrors({});
+              }}
+              activeOpacity={0.7}
+            >
               <View style={styles.orLine} />
-              <Text style={styles.orText}>أو أدخل عنواناً جديداً</Text>
+              <Text style={[styles.orText, useNewAddress && { color: colors.primary, fontFamily: "Cairo_600SemiBold" }]}>
+                أو أدخل عنواناً جديداً
+              </Text>
               <View style={styles.orLine} />
-            </View>
+            </TouchableOpacity>
 
             <Text style={styles.inputLabel}>الاسم الكامل</Text>
             <TextInput
@@ -1101,5 +1124,13 @@ export default function CheckoutScreen() {
         {renderStep()}
       </ScrollView>
     </View>
+  );
+}
+
+export default function CheckoutScreenWithBoundary() {
+  return (
+    <ErrorBoundary>
+      <CheckoutScreen />
+    </ErrorBoundary>
   );
 }

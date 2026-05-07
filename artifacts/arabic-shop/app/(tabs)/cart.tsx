@@ -1,4 +1,5 @@
 import React, { useRef, useMemo, useCallback, useState, useEffect } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import {
   View,
   Text,
@@ -229,7 +230,7 @@ function SwipeableCartItem({ item, onUpdate, onRemove, onSaveForLater }: Swipeab
 
 const FREE_SHIPPING_THRESHOLD = 500;
 
-export default function CartScreen() {
+function CartScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { showToast } = useAppToast();
@@ -500,7 +501,7 @@ export default function CartScreen() {
             </Text>
           </View>
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>خصم عضوية</Text>
+            <Text style={styles.summaryLabel}>خصم الولاء ٥٪</Text>
             <Text style={styles.discountValue}>-{discount.toLocaleString("ar-SA")} ر.س</Text>
           </View>
           {promoDiscount > 0 && (
@@ -611,5 +612,13 @@ export default function CartScreen() {
         )}
       </ScrollView>
     </View>
+  );
+}
+
+export default function CartScreenWithBoundary() {
+  return (
+    <ErrorBoundary>
+      <CartScreen />
+    </ErrorBoundary>
   );
 }

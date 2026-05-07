@@ -11,11 +11,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useColors } from "@/hooks/useColors";
+import { useOrder } from "@/context/OrderContext";
 
 export default function OrderSuccessScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { orderNumber: passedOrderNumber } = useLocalSearchParams<{ orderNumber?: string }>();
+  const { lastOrderNumber } = useOrder();
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(40)).current;
@@ -23,7 +25,7 @@ export default function OrderSuccessScreen() {
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
   const topPad = Platform.OS === "web" ? 67 : insets.top;
 
-  const orderNumber = passedOrderNumber ?? `SAQ-${Date.now().toString().slice(-6)}`;
+  const orderNumber = passedOrderNumber ?? lastOrderNumber ?? `SAQ-${Date.now().toString().slice(-6)}`;
 
   useEffect(() => {
     Animated.sequence([

@@ -5,6 +5,8 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import CompareModal from "@/components/CompareModal";
 import {
   View,
   Text,
@@ -202,7 +204,7 @@ function HighlightedText({ text, highlight, style }: { text: string; highlight: 
 }
 
 // ─── Main screen ───────────────────────────────────────────────────────────
-export default function SearchScreen() {
+function SearchScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { showToast } = useAppToast();
@@ -225,6 +227,8 @@ export default function SearchScreen() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [recentSearches, setRecentSearches] = useState<string[]>(["فستان سهرة", "حقيبة جلدية", "ساعة ذكية"]);
   const [refreshing, setRefreshing] = useState(false);
+  const [compareList, setCompareList] = useState<Product[]>([]);
+  const [compareVisible, setCompareVisible] = useState(false);
 
   const filterAnim = useRef(new Animated.Value(height)).current;
   const resultsOpacity = useRef(new Animated.Value(1)).current;
@@ -320,15 +324,34 @@ export default function SearchScreen() {
   };
 
   const handleClearHistory = () => {
-    const saved = [...recentSearches];
     setRecentSearches([]);
-    showToast("تم مسح السجل · تراجع", "info");
-    // Allow undo for 3 seconds is handled by the toast; we restore via a timeout approach
-    // We'll store the saved in a ref so the user could tap undo in a follow-up — for now toast only
-    setTimeout(() => {}, 3000);
-    // Note: full undo would require a separate button in the toast, simplified here
-    void saved;
+    showToast("تم مسح سجل البحث", "info");
   };
+
+  const handleCompareAdd = useCallback((product: Product) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setCompareList((prev) => {
+      if (prev.some((p) => p.id === product.id)) {
+        showToast("المنتج موجود في قائمة المقارنة", "info");
+        return prev;
+      }
+      if (prev.length >= 2) {
+        const next = [prev[1], product];
+        showToast("تمت إضافة منتج للمقارنة — اضغط للمشاهدة", "success");
+        setCompareVisible(true);
+        return next;
+      }
+      const next = [...prev, product];
+      if (next.length === 2) {
+        showToast("منتجان جاهزان للمقارنة — اضغط للمشاهدة", "success");
+        setCompareVisible(true);
+      } else {
+        showToast("اضغط مطولاً على منتج آخر لإكمال المقارنة", "info");
+        setCompareVisible(true);
+      }
+      return next;
+    });
+  }, [showToast]);
 
   const filteredProducts = useMemo(() => {
     let products = PRODUCTS;
@@ -782,7 +805,10 @@ export default function SearchScreen() {
           <View style={styles.grid}>
             {filteredProducts.map((product) => (
               <View key={product.id} style={styles.gridItem}>
-                <ProductCard product={product} />
+                <ProductCard
+                  product={product}
+                  onLongPress={() => handleCompareAdd(product)}
+                />
               </View>
             ))}
           </View>
@@ -795,6 +821,13 @@ export default function SearchScreen() {
 
       </View>
       {/* ── End content wrapper ── */}
+
+      <CompareModal
+        products={compareList}
+        visible={compareVisible}
+        onClose={() => setCompareVisible(false)}
+        onClear={() => { setCompareList([]); setCompareVisible(false); }}
+      />
 
       <VoiceSearch
         visible={voiceVisible}
@@ -938,5 +971,13 @@ export default function SearchScreen() {
         </TouchableOpacity>
       </Modal>
     </View>
+  );
+}
+
+export default function SearchScreenWithBoundary() {
+  return (
+    <ErrorBoundary>
+      <SearchScreen />
+    </ErrorBoundary>
   );
 }

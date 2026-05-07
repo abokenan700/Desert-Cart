@@ -6,12 +6,14 @@ import {
   TouchableOpacity,
   ScrollView,
   Platform,
+  Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
-import { MOCK_ORDERS } from "@/data/mockOrders";
+import { MOCK_ORDERS, Order } from "@/data/mockOrders";
+import { useAppToast } from "@/context/AppToastContext";
 
 const TABS = [
   { id: "all", label: "الكل" },
@@ -23,7 +25,20 @@ const TABS = [
 export default function OrderHistoryScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const { showToast } = useAppToast();
   const [activeTab, setActiveTab] = useState("all");
+
+  const handleReorder = (order: Order) => {
+    showToast(`تمت إضافة ${order.itemCount} منتج للسلة ✓`, "success");
+  };
+
+  const handleInvoice = (order: Order) => {
+    Alert.alert(
+      "فاتورة الطلب",
+      `رقم الطلب: ${order.number}\nالتاريخ: ${order.date}\nعدد المنتجات: ${order.itemCount}\nالإجمالي: ${order.total.toLocaleString("ar-SA")} ر.س`,
+      [{ text: "إغلاق", style: "cancel" }]
+    );
+  };
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
@@ -289,6 +304,8 @@ export default function OrderHistoryScreen() {
                     {order.status === "delivered" && (
                       <TouchableOpacity
                         style={[styles.actionBtn, { borderColor: colors.border }]}
+                        onPress={() => handleReorder(order)}
+                        accessibilityLabel="إعادة الطلب"
                       >
                         <Text style={[styles.actionBtnText, { color: colors.text }]}>
                           إعادة الطلب
@@ -298,6 +315,8 @@ export default function OrderHistoryScreen() {
                     {order.status !== "cancelled" && (
                       <TouchableOpacity
                         style={[styles.actionBtn, { borderColor: colors.border }]}
+                        onPress={() => handleInvoice(order)}
+                        accessibilityLabel="عرض الفاتورة"
                       >
                         <Text style={[styles.actionBtnText, { color: colors.mutedForeground }]}>
                           الفاتورة

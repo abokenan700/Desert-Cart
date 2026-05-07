@@ -238,13 +238,13 @@ export default function HomeScreen() {
           marginBottom: 2,
           borderRadius: 18,
           borderWidth: 2,
-          borderColor: "#E63946",
+          borderColor: colors.primary,
           backgroundColor: colors.card,
           overflow: "hidden",
           paddingBottom: 6,
           ...Platform.select({
             ios: {
-              shadowColor: "#E63946",
+              shadowColor: colors.primary,
               shadowOffset: { width: 0, height: 4 },
               shadowOpacity: 0.22,
               shadowRadius: 12,
@@ -290,12 +290,12 @@ export default function HomeScreen() {
           width: 8,
           height: 8,
           borderRadius: 4,
-          backgroundColor: "#E63946",
+          backgroundColor: colors.primary,
         },
         liveLabel: {
           fontSize: 10,
           fontFamily: "Cairo_700Bold",
-          color: "#E63946",
+          color: colors.primary,
         },
         liveRow: {
           flexDirection: "row-reverse",
@@ -312,10 +312,11 @@ export default function HomeScreen() {
           paddingBottom: 10,
         },
         todaysPicksGrid: {
-          flexDirection: "row-reverse",
-          flexWrap: "wrap",
           paddingHorizontal: 12,
+        },
+        gridColumnWrapper: {
           justifyContent: "space-between",
+          flexDirection: "row-reverse",
         },
         emptySection: {
           paddingHorizontal: 16,
@@ -536,13 +537,19 @@ export default function HomeScreen() {
             ))}
           </View>
         ) : (
-          <View style={styles.todaysPicksGrid}>
-            {todaysPicks.map((product) => (
-              <View key={product.id} style={styles.gridItem}>
-                <ProductCard product={product} />
+          <FlatList
+            data={todaysPicks}
+            numColumns={2}
+            scrollEnabled={false}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.todaysPicksGrid}
+            columnWrapperStyle={styles.gridColumnWrapper}
+            renderItem={({ item }) => (
+              <View style={[styles.gridItem, { flex: 1 }]}>
+                <ProductCard product={item} />
               </View>
-            ))}
-          </View>
+            )}
+          />
         )}
 
         <View style={styles.sectionDivider} />
@@ -565,13 +572,19 @@ export default function HomeScreen() {
             <Text style={styles.emptySectionText}>لا توجد منتجات في هذا القسم</Text>
           </View>
         ) : (
-          <View style={styles.productGrid}>
-            {filteredBestSellers.map((product) => (
-              <View key={product.id} style={styles.gridItem}>
-                <ProductCard product={product} />
+          <FlatList
+            data={filteredBestSellers}
+            numColumns={2}
+            scrollEnabled={false}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={{ paddingHorizontal: 12 }}
+            columnWrapperStyle={styles.gridColumnWrapper}
+            renderItem={({ item }) => (
+              <View style={[styles.gridItem, { flex: 1 }]}>
+                <ProductCard product={item} />
               </View>
-            ))}
-          </View>
+            )}
+          />
         )}
       </ScrollView>
 

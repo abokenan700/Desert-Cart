@@ -17,13 +17,14 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
-import { ReviewsProvider } from "@/context/ReviewsContext";
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { RecentlyViewedProvider } from "@/context/RecentlyViewedContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { AppToastProvider } from "@/context/AppToastContext";
-import ToastNotification from "@/components/ToastNotification";
 import AppToast from "@/components/AppToast";
+import { useNotifications } from "@/context/NotificationsContext";
+import { useAppToast } from "@/context/AppToastContext";
+import { OrderProvider } from "@/context/OrderContext";
 
 I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
@@ -40,17 +41,17 @@ function AppProviders({ children }: { children: React.ReactNode }) {
           <AppToastProvider>
             <QueryClientProvider client={queryClient}>
               <CartProvider>
-                <WishlistProvider>
-                  <ReviewsProvider>
+                <OrderProvider>
+                  <WishlistProvider>
                     <NotificationsProvider>
-                      <RecentlyViewedProvider>
-                        <GestureHandlerRootView>
-                          <KeyboardProvider>{children}</KeyboardProvider>
-                        </GestureHandlerRootView>
-                      </RecentlyViewedProvider>
-                    </NotificationsProvider>
-                  </ReviewsProvider>
-                </WishlistProvider>
+                        <RecentlyViewedProvider>
+                          <GestureHandlerRootView>
+                            <KeyboardProvider>{children}</KeyboardProvider>
+                          </GestureHandlerRootView>
+                        </RecentlyViewedProvider>
+                      </NotificationsProvider>
+                  </WishlistProvider>
+                </OrderProvider>
               </CartProvider>
             </QueryClientProvider>
           </AppToastProvider>
@@ -58,6 +59,27 @@ function AppProviders({ children }: { children: React.ReactNode }) {
       </ErrorBoundary>
     </SafeAreaProvider>
   );
+}
+
+function NotificationToastBridge() {
+  const { latestToast, dismissToast } = useNotifications();
+  const { showToast } = useAppToast();
+  const lastId = React.useRef<string | null>(null);
+
+  React.useEffect(() => {
+    if (!latestToast || latestToast.id === lastId.current) return;
+    lastId.current = latestToast.id;
+    const variant =
+      latestToast.type === "order"
+        ? "success"
+        : latestToast.type === "delivery"
+        ? "info"
+        : "warning";
+    showToast(latestToast.titleAr, variant);
+    dismissToast();
+  }, [latestToast?.id]);
+
+  return null;
 }
 
 function RootLayoutNav() {
@@ -95,7 +117,7 @@ function RootLayoutNav() {
           options={{ headerShown: false, presentation: "card" }}
         />
       </Stack>
-      <ToastNotification />
+      <NotificationToastBridge />
       <AppToast />
     </View>
   );

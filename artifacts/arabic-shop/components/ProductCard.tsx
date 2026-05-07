@@ -51,25 +51,27 @@ const ProductCard = React.memo(function ProductCard({
 
   useEffect(() => {
     if (!product.isNew) return;
-    const triggerPulse = () => {
-      pulseRingScale.setValue(1);
-      pulseRingOpacity.setValue(0.8);
-      Animated.parallel([
-        Animated.timing(pulseRingScale, {
-          toValue: 1.7,
-          duration: 700,
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulseRingOpacity, {
-          toValue: 0,
-          duration: 700,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    };
-    triggerPulse();
-    const id = setInterval(triggerPulse, 3000);
-    return () => clearInterval(id);
+    pulseRingScale.setValue(1);
+    pulseRingOpacity.setValue(0.8);
+    const pulse = Animated.loop(
+      Animated.sequence([
+        Animated.parallel([
+          Animated.timing(pulseRingScale, {
+            toValue: 1.7,
+            duration: 700,
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulseRingOpacity, {
+            toValue: 0,
+            duration: 700,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.delay(2300),
+      ])
+    );
+    pulse.start();
+    return () => pulse.stop();
   }, [product.isNew, pulseRingScale, pulseRingOpacity]);
 
   const handlePressIn = useCallback(() => {
@@ -457,7 +459,7 @@ const ProductCard = React.memo(function ProductCard({
           {product.isFlashSale && (
             <View style={styles.countdownChip}>
               <Text style={styles.countdownText}>
-                ⏱ {pad(flashTime.m)}:{pad(flashTime.s)}
+                ⏱ {pad(flashTime.h)}:{pad(flashTime.m)}:{pad(flashTime.s)}
               </Text>
             </View>
           )}

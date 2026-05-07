@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useMemo } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import {
   View,
   Text,
@@ -7,11 +8,16 @@ import {
   ScrollView,
   Animated,
   Platform,
+  Linking,
+  Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useColors } from "@/hooks/useColors";
+import { useOrder } from "@/context/OrderContext";
+
+const DRIVER_PHONE = "+966501234567";
 
 const TRACKING_STEPS = [
   {
@@ -49,10 +55,26 @@ const TRACKING_STEPS = [
   },
 ];
 
-export default function OrderTrackingScreen() {
+function OrderTrackingScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { orderNumber } = useLocalSearchParams<{ orderNumber?: string }>();
+  const { orderNumber: paramOrderNumber } = useLocalSearchParams<{ orderNumber?: string }>();
+  const { lastOrderNumber } = useOrder();
+  const orderNumber = paramOrderNumber ?? lastOrderNumber ?? undefined;
+
+  const handleCall = () => {
+    Linking.openURL(`tel:${DRIVER_PHONE}`).catch(() =>
+      Alert.alert("الاتصال بالمندوب", `رقم الهاتف: ${DRIVER_PHONE}`)
+    );
+  };
+
+  const handleChat = () => {
+    Alert.alert(
+      "الدردشة مع المندوب",
+      "سيتواصل معك المندوب محمد العمري خلال لحظات عبر رسالة نصية.",
+      [{ text: "حسناً", style: "default" }]
+    );
+  };
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
@@ -152,7 +174,7 @@ export default function OrderTrackingScreen() {
       marginBottom: 16,
       backgroundColor: colors.primaryLight,
       borderRadius: 18,
-      height: 120,
+      height: Platform.OS === "web" ? 200 : 120,
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 1,
@@ -317,8 +339,19 @@ export default function OrderTrackingScreen() {
         </View>
 
         <View style={styles.mapCard}>
-          <Ionicons name="map-outline" size={36} color={colors.primary} />
-          <Text style={styles.mapText}>خريطة التتبع المباشر</Text>
+          {Platform.OS === "web" ? (
+            React.createElement("iframe", {
+              src: "https://www.openstreetmap.org/export/embed.html?bbox=46.65,24.65,46.80,24.77&layer=mapnik&marker=24.7136,46.6753",
+              style: { width: "100%", height: "100%", border: "none" },
+              title: "خريطة التتبع المباشر",
+              loading: "lazy",
+            })
+          ) : (
+            <>
+              <Ionicons name="map-outline" size={36} color={colors.primary} />
+              <Text style={styles.mapText}>خريطة التتبع المباشر</Text>
+            </>
+          )}
         </View>
 
         <View style={styles.driverCard}>
@@ -329,10 +362,10 @@ export default function OrderTrackingScreen() {
             <Text style={styles.driverName}>محمد العمري</Text>
             <Text style={styles.driverRole}>مندوب التوصيل</Text>
           </View>
-          <TouchableOpacity style={styles.chatBtn}>
+          <TouchableOpacity style={styles.chatBtn} onPress={handleChat} accessibilityLabel="دردشة مع المندوب">
             <Ionicons name="chatbubble-outline" size={20} color={colors.primary} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.callBtn}>
+          <TouchableOpacity style={styles.callBtn} onPress={handleCall} accessibilityLabel="اتصال بالمندوب">
             <Ionicons name="call-outline" size={20} color={colors.success} />
           </TouchableOpacity>
         </View>
@@ -410,5 +443,13 @@ export default function OrderTrackingScreen() {
         </TouchableOpacity>
       </ScrollView>
     </View>
+  );
+}
+
+export default function OrderTrackingScreenWithBoundary() {
+  return (
+    <ErrorBoundary>
+      <OrderTrackingScreen />
+    </ErrorBoundary>
   );
 }

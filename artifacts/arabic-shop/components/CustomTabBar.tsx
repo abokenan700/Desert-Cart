@@ -89,11 +89,10 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
   useEffect(() => {
     const cx = (activeIdx + 0.5) * tabW;
 
-    const spring = (val: Animated.Value, to: number) =>
-      Animated.spring(val, { toValue: to, useNativeDriver: false, tension: 130, friction: 11 });
-
-    spring(notchCx, cx).start();
-    spring(circleLeft, cx - CIRCLE_R).start();
+    // Notch must use JS driver — it drives SVG path updates via addListener
+    Animated.spring(notchCx, { toValue: cx, useNativeDriver: false, tension: 130, friction: 11 }).start();
+    // Circle uses native driver via translateX for smooth 60fps
+    Animated.spring(circleLeft, { toValue: cx - CIRCLE_R, useNativeDriver: true, tension: 130, friction: 11 }).start();
 
     const id = notchCx.addListener(({ value }) =>
       setSvgPath(getBarPath(winW, BAR_H, value, safePad))
@@ -120,7 +119,8 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
         style={[
           styles.circleOuter,
           {
-            left: circleLeft,
+            left: 0,
+            transform: [{ translateX: circleLeft }],
             top: 0,
             width: CIRCLE_R * 2,
             height: CIRCLE_R * 2,

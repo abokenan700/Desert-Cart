@@ -24,6 +24,7 @@ import { useColors } from "@/hooks/useColors";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useReviews } from "@/context/ReviewsContext";
+import { ReviewsProvider } from "@/context/ReviewsContext";
 import { useRecentlyViewed } from "@/context/RecentlyViewedContext";
 import { useAppToast } from "@/context/AppToastContext";
 import RatingStars from "@/components/RatingStars";
@@ -33,6 +34,14 @@ import { PRODUCTS } from "@/data/mockData";
 
 const { width, height } = Dimensions.get("window");
 const IMAGE_HEIGHT = height * 0.50;
+
+export default function ProductDetailScreen() {
+  return (
+    <ReviewsProvider>
+      <ProductDetailInner />
+    </ReviewsProvider>
+  );
+}
 
 const TRUST_BADGES = [
   { icon: "refresh-outline" as const, label: "إرجاع ٧ أيام" },
@@ -79,7 +88,7 @@ function getQA(categoryId: string) {
   return QA_BY_CATEGORY[categoryId] ?? QA_BY_CATEGORY.default;
 }
 
-export default function ProductDetailScreen() {
+function ProductDetailInner() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const colors = useColors();
   const insets = useSafeAreaInsets();
@@ -95,8 +104,11 @@ export default function ProductDetailScreen() {
   const [reviewModalVisible, setReviewModalVisible] = useState(false);
   const [showAllReviews, setShowAllReviews] = useState(false);
 
-  // Phase 4 new state
-  const [viewingCount, setViewingCount] = useState(() => Math.floor(Math.random() * 16) + 5);
+  // Phase 4 new state — seeded from product ID so it's stable across renders
+  const [viewingCount, setViewingCount] = useState(() => {
+    const seed = (id ?? "").split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
+    return (seed % 16) + 5;
+  });
   const [sizeGuideVisible, setSizeGuideVisible] = useState(false);
   const [specsExpanded, setSpecsExpanded] = useState(false);
   const [qaVisible, setQaVisible] = useState(false);
@@ -119,10 +131,13 @@ export default function ProductDetailScreen() {
     if (product) addToRecentlyViewed(product);
   }, [product?.id]);
 
-  // Viewing count: refresh every 30s
+  // Viewing count: small ±1 drift every 30s so it feels live without jarring jumps
   useEffect(() => {
     const interval = setInterval(() => {
-      setViewingCount(Math.floor(Math.random() * 16) + 5);
+      setViewingCount((prev) => {
+        const delta = Math.random() < 0.5 ? -1 : 1;
+        return Math.max(5, Math.min(20, prev + delta));
+      });
     }, 30000);
     return () => clearInterval(interval);
   }, []);
