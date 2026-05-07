@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
-import { COUPONS } from "@/data/coupons";
+import { COUPONS, isCouponExpired } from "@/data/coupons";
 
 export default function MyCouponsScreen() {
   const colors = useColors();
@@ -195,54 +195,109 @@ export default function MyCouponsScreen() {
 
         {COUPONS.map((coupon) => {
           const isCopied = copiedCode === coupon.code;
-          const badgeColor = isCopied ? colors.success : colors.primary;
+          const expired = isCouponExpired(coupon);
+          const badgeColor = expired
+            ? colors.mutedForeground
+            : isCopied
+            ? colors.success
+            : colors.primary;
           return (
-            <View key={coupon.code} style={styles.couponCard}>
+            <View
+              key={coupon.code}
+              style={[styles.couponCard, expired && { opacity: 0.55 }]}
+            >
               <View style={styles.couponTop}>
-                <View style={[styles.iconBox, { backgroundColor: colors.purpleLight }]}>
-                  <Ionicons name="pricetag-outline" size={22} color={colors.purple} />
+                <View
+                  style={[
+                    styles.iconBox,
+                    { backgroundColor: expired ? colors.secondary : colors.purpleLight },
+                  ]}
+                >
+                  <Ionicons
+                    name={expired ? "time-outline" : "pricetag-outline"}
+                    size={22}
+                    color={expired ? colors.mutedForeground : colors.purple}
+                  />
                 </View>
                 <View style={styles.couponInfo}>
-                  <Text style={styles.couponDesc}>{coupon.descAr}</Text>
+                  <Text
+                    style={[
+                      styles.couponDesc,
+                      expired && { textDecorationLine: "line-through", color: colors.mutedForeground },
+                    ]}
+                  >
+                    {coupon.descAr}
+                  </Text>
                   <Text style={styles.couponMeta}>
                     {coupon.minOrder
-                      ? `الحد الأدنى للطلب: ${coupon.minOrder.toLocaleString("ar-SA")} ر.س · `
+                      ? `الحد الأدنى: ${coupon.minOrder.toLocaleString("ar-SA")} ر.س · `
                       : ""}
-                    ينتهي {coupon.expiry}
+                    {expired ? "انتهت الصلاحية: " : "ينتهي "}{coupon.expiry}
                   </Text>
                 </View>
                 <View
-                  style={[styles.discountBadge, { backgroundColor: colors.purple }]}
+                  style={[
+                    styles.discountBadge,
+                    { backgroundColor: expired ? colors.border : colors.purple },
+                  ]}
                 >
-                  <Text style={styles.discountText}>{coupon.discountLabel}</Text>
+                  <Text
+                    style={[
+                      styles.discountText,
+                      expired && { color: colors.mutedForeground },
+                    ]}
+                  >
+                    {coupon.discountLabel}
+                  </Text>
                 </View>
               </View>
 
               <View style={styles.dashed} />
 
               <View style={styles.couponBottom}>
-                <TouchableOpacity
-                  style={[
-                    styles.copyBtn,
-                    {
-                      backgroundColor: isCopied
-                        ? colors.successLight
-                        : colors.primaryLight,
-                    },
-                  ]}
-                  onPress={() => handleCopy(coupon.code)}
-                >
-                  <Text style={[styles.copyBtnText, { color: badgeColor }]}>
-                    {isCopied ? "تم النسخ!" : "نسخ الكود"}
-                  </Text>
-                  <Ionicons
-                    name={isCopied ? "checkmark-circle" : "copy-outline"}
-                    size={16}
-                    color={badgeColor}
-                  />
-                </TouchableOpacity>
+                {expired ? (
+                  <View
+                    style={[
+                      styles.copyBtn,
+                      { backgroundColor: colors.secondary },
+                    ]}
+                  >
+                    <Text style={[styles.copyBtnText, { color: colors.mutedForeground }]}>
+                      منتهي الصلاحية
+                    </Text>
+                    <Ionicons name="close-circle-outline" size={16} color={colors.mutedForeground} />
+                  </View>
+                ) : (
+                  <TouchableOpacity
+                    style={[
+                      styles.copyBtn,
+                      {
+                        backgroundColor: isCopied
+                          ? colors.successLight
+                          : colors.primaryLight,
+                      },
+                    ]}
+                    onPress={() => handleCopy(coupon.code)}
+                  >
+                    <Text style={[styles.copyBtnText, { color: badgeColor }]}>
+                      {isCopied ? "تم النسخ!" : "نسخ الكود"}
+                    </Text>
+                    <Ionicons
+                      name={isCopied ? "checkmark-circle" : "copy-outline"}
+                      size={16}
+                      color={badgeColor}
+                    />
+                  </TouchableOpacity>
+                )}
                 <View style={styles.codeBox}>
-                  <Text style={styles.codeText}>{coupon.code}</Text>
+                  <Text
+                    style={[
+                      styles.codeText,
+                      expired && { textDecorationLine: "line-through", color: colors.mutedForeground },
+                    ]}
+                  >
+                    {coupon.code}
+                  </Text>
                 </View>
               </View>
             </View>

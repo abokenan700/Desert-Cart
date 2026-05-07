@@ -21,16 +21,11 @@ import { useCart, CartItem } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useAppToast } from "@/context/AppToastContext";
 import { PRODUCTS } from "@/data/mockData";
+import { validateCoupon, COUPON_MAP } from "@/data/coupons";
 
 const DELETE_WIDTH = 80;
 const SAVE_WIDTH = 80;
 const SWIPE_THRESHOLD = 60;
-
-const VALID_CODES: Record<string, { pct: number; label: string }> = {
-  WELCOME10: { pct: 10, label: "خصم الترحيب ١٠٪" },
-  SAVE20: { pct: 20, label: "خصم خاص ٢٠٪" },
-  SUMMER15: { pct: 15, label: "خصم الصيف ١٥٪" },
-};
 
 interface SwipeableCartItemProps {
   item: CartItem;
@@ -257,8 +252,8 @@ export default function CartScreen() {
   const toFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
   const freeShippingPct = Math.min(1, subtotal / FREE_SHIPPING_THRESHOLD);
 
-  const promoDiscount = appliedCode && VALID_CODES[appliedCode]
-    ? Math.round(subtotal * VALID_CODES[appliedCode].pct / 100)
+  const promoDiscount = appliedCode && COUPON_MAP[appliedCode]
+    ? Math.round(subtotal * COUPON_MAP[appliedCode].discount)
     : 0;
   const displayTotal = Math.max(0, total - promoDiscount);
 
@@ -305,15 +300,15 @@ export default function CartScreen() {
   }, [clearCart, showToast]);
 
   const handleApplyPromo = () => {
-    const code = promoInput.trim().toUpperCase();
-    if (VALID_CODES[code]) {
-      setAppliedCode(code);
+    const result = validateCoupon(promoInput, subtotal);
+    if (result.valid) {
+      setAppliedCode(promoInput.trim().toUpperCase());
       setPromoError("");
       setPromoInput("");
-      showToast(`تم تطبيق الكوبون — ${VALID_CODES[code].label} ✓`, "success");
+      showToast(`تم تطبيق الكوبون — ${result.entry.label} ✓`, "success");
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } else {
-      setPromoError("كوبون غير صالح. جرّب: WELCOME10");
+      setPromoError(result.error);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     }
   };

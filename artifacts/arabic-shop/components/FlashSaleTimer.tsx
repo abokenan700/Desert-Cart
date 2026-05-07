@@ -1,23 +1,18 @@
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, { useEffect, useRef, useMemo } from "react";
 import { View, Text, StyleSheet, Animated } from "react-native";
 import { useColors } from "@/hooks/useColors";
-import { getFlashTimeLeft } from "@/constants/flashSale";
+import { useFlashSaleTimer } from "@/hooks/useFlashSaleTimer";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
 export default function FlashSaleTimer() {
   const colors = useColors();
-  const [time, setTime] = useState(getFlashTimeLeft);
+  const time = useFlashSaleTimer(true);
   const glowAnim = useRef(new Animated.Value(0.4)).current;
   const pulseScale = useRef(new Animated.Value(1)).current;
 
   const totalSeconds = time.h * 3600 + time.m * 60 + time.s;
   const isUrgent = totalSeconds < 60;
-
-  useEffect(() => {
-    const id = setInterval(() => setTime(getFlashTimeLeft()), 1000);
-    return () => clearInterval(id);
-  }, []);
 
   useEffect(() => {
     const pulse = Animated.loop(

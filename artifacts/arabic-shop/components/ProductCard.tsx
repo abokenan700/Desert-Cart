@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, useCallback, useEffect, useState } from "react";
+import React, { useRef, useMemo, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -16,7 +16,7 @@ import { useColors } from "@/hooks/useColors";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { Product } from "@/data/mockData";
-import { getFlashTimeLeft } from "@/constants/flashSale";
+import { useFlashSaleTimer } from "@/hooks/useFlashSaleTimer";
 
 const { width } = Dimensions.get("window");
 export const CARD_WIDTH = (width - 48) / 2;
@@ -47,13 +47,7 @@ const ProductCard = React.memo(function ProductCard({
 
   const wishlisted = isWishlisted(product.id);
 
-  const [flashTime, setFlashTime] = useState(getFlashTimeLeft);
-
-  useEffect(() => {
-    if (!product.isFlashSale) return;
-    const id = setInterval(() => setFlashTime(getFlashTimeLeft()), 1000);
-    return () => clearInterval(id);
-  }, [product.isFlashSale]);
+  const flashTime = useFlashSaleTimer(!!product.isFlashSale);
 
   useEffect(() => {
     if (!product.isNew) return;

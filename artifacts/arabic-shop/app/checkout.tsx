@@ -19,7 +19,7 @@ import * as Haptics from "expo-haptics";
 import { useColors } from "@/hooks/useColors";
 import { useCart } from "@/context/CartContext";
 import { useNotifications } from "@/context/NotificationsContext";
-import { COUPON_MAP, QUICK_COUPON_CODES } from "@/data/coupons";
+import { validateCoupon, QUICK_COUPON_CODES } from "@/data/coupons";
 
 const STEPS = ["العنوان", "الدفع", "المراجعة"];
 
@@ -98,14 +98,14 @@ export default function CheckoutScreen() {
 
   const applyCoupon = useCallback(
     (code: string) => {
-      const found = COUPON_MAP[code.trim().toUpperCase()];
-      if (found) {
-        setAppliedCoupon(found);
+      const result = validateCoupon(code, subtotal);
+      if (result.valid) {
+        setAppliedCoupon({ discount: result.entry.discount, label: result.entry.label });
         setCouponError("");
-        setCouponCode(code);
+        setCouponCode(code.trim().toUpperCase());
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       } else {
-        setCouponError("كود الخصم غير صحيح أو منتهي الصلاحية");
+        setCouponError(result.error);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         Animated.sequence([
           Animated.timing(couponShake, {
@@ -121,7 +121,7 @@ export default function CheckoutScreen() {
         ]).start();
       }
     },
-    [couponShake]
+    [couponShake, subtotal]
   );
 
   const handlePlaceOrder = useCallback(() => {
