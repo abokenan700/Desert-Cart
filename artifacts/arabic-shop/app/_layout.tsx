@@ -25,6 +25,7 @@ import AppToast from "@/components/AppToast";
 import { useNotifications } from "@/context/NotificationsContext";
 import { useAppToast } from "@/context/AppToastContext";
 import { OrderProvider } from "@/context/OrderContext";
+import { ReviewsProvider } from "@/context/ReviewsContext";
 
 I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
@@ -45,9 +46,11 @@ function AppProviders({ children }: { children: React.ReactNode }) {
                   <WishlistProvider>
                     <NotificationsProvider>
                         <RecentlyViewedProvider>
-                          <GestureHandlerRootView>
-                            <KeyboardProvider>{children}</KeyboardProvider>
-                          </GestureHandlerRootView>
+                          <ReviewsProvider>
+                            <GestureHandlerRootView>
+                              <KeyboardProvider>{children}</KeyboardProvider>
+                            </GestureHandlerRootView>
+                          </ReviewsProvider>
                         </RecentlyViewedProvider>
                       </NotificationsProvider>
                   </WishlistProvider>

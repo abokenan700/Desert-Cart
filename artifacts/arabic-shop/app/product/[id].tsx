@@ -24,7 +24,6 @@ import { useColors } from "@/hooks/useColors";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useReviews } from "@/context/ReviewsContext";
-import { ReviewsProvider } from "@/context/ReviewsContext";
 import { useRecentlyViewed } from "@/context/RecentlyViewedContext";
 import { useAppToast } from "@/context/AppToastContext";
 import RatingStars from "@/components/RatingStars";
@@ -36,11 +35,7 @@ const { width, height } = Dimensions.get("window");
 const IMAGE_HEIGHT = height * 0.50;
 
 export default function ProductDetailScreen() {
-  return (
-    <ReviewsProvider>
-      <ProductDetailInner />
-    </ReviewsProvider>
-  );
+  return <ProductDetailInner />;
 }
 
 const TRUST_BADGES = [
