@@ -77,3 +77,9 @@ id = "0eI__YOX2dwniVvAHLMnD"
 uri = "file://ecommerce-github-skills-report.md"
 type = "text"
 title = "أفضل مستودعات GitHub للتجارة الإلكترونية"
+
+[[outputs]]
+id = "g1p_ug1YchuZpNqe8_KIG"
+uri = "file://claude-code-analysis-report.md"
+type = "text"
+title = "تحليل مستودع anthropics/claude-code"
