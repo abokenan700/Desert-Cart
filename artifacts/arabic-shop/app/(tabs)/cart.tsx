@@ -34,8 +34,8 @@ const VALID_CODES: Record<string, { pct: number; label: string }> = {
 
 interface SwipeableCartItemProps {
   item: CartItem;
-  onUpdate: (id: string, qty: number) => void;
-  onRemove: (id: string) => void;
+  onUpdate: (cartKey: string, qty: number) => void;
+  onRemove: (cartKey: string) => void;
   onSaveForLater: (item: CartItem) => void;
 }
 
@@ -87,7 +87,7 @@ function SwipeableCartItem({ item, onUpdate, onRemove, onSaveForLater }: Swipeab
   const handleDelete = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
     Animated.timing(translateX, { toValue: -500, duration: 250, useNativeDriver: true }).start(() =>
-      onRemove(item.product.id)
+      onRemove(item.cartKey)
     );
   };
 
@@ -208,14 +208,14 @@ function SwipeableCartItem({ item, onUpdate, onRemove, onSaveForLater }: Swipeab
               <View style={styles.qtyRow}>
                 <TouchableOpacity
                   style={styles.qtyBtn}
-                  onPress={() => { Haptics.selectionAsync(); onUpdate(item.product.id, item.quantity + 1); }}
+                  onPress={() => { Haptics.selectionAsync(); onUpdate(item.cartKey, item.quantity + 1); }}
                 >
                   <Ionicons name="add" size={16} color={colors.primary} />
                 </TouchableOpacity>
                 <Text style={styles.qtyText}>{item.quantity}</Text>
                 <TouchableOpacity
                   style={styles.qtyBtn}
-                  onPress={() => { Haptics.selectionAsync(); onUpdate(item.product.id, item.quantity - 1); }}
+                  onPress={() => { Haptics.selectionAsync(); onUpdate(item.cartKey, item.quantity - 1); }}
                 >
                   <Ionicons
                     name={item.quantity === 1 ? "trash-outline" : "remove"}
@@ -292,7 +292,7 @@ export default function CartScreen() {
   const handleSaveForLater = useCallback(
     (item: CartItem) => {
       addToWishlist(item.product);
-      removeFromCart(item.product.id);
+      removeFromCart(item.cartKey);
       showToast("نُقل إلى المفضلة ❤️", "success");
     },
     [addToWishlist, removeFromCart, showToast]
@@ -466,7 +466,7 @@ export default function CartScreen() {
 
         {items.map((item) => (
           <SwipeableCartItem
-            key={`${item.product.id}-${item.selectedSize ?? ""}-${item.selectedColor ?? ""}`}
+            key={item.cartKey}
             item={item}
             onUpdate={updateQuantity}
             onRemove={handleRemove}

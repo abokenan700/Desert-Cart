@@ -7,6 +7,15 @@ export interface CartItem {
   quantity: number;
   selectedSize?: string;
   selectedColor?: string;
+  cartKey: string;
+}
+
+export function makeCartKey(
+  productId: string,
+  size?: string,
+  color?: string
+): string {
+  return `${productId}:${size ?? ""}:${color ?? ""}`;
 }
 
 interface CartContextType {
@@ -17,8 +26,8 @@ interface CartContextType {
   discount: number;
   total: number;
   addToCart: (product: Product, size?: string, color?: string) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  removeFromCart: (cartKey: string) => void;
+  updateQuantity: (cartKey: string, quantity: number) => void;
   clearCart: () => void;
   isInCart: (productId: string) => boolean;
   getItemCount: (productId: string) => number;
@@ -43,43 +52,43 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const addToCart = useCallback(
     (product: Product, size?: string, color?: string) => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      const key = makeCartKey(product.id, size, color);
       setItems((prev) => {
-        const existing = prev.find(
-          (item) =>
-            item.product.id === product.id &&
-            item.selectedSize === size &&
-            item.selectedColor === color
-        );
+        const existing = prev.find((item) => item.cartKey === key);
         if (existing) {
           return prev.map((item) =>
-            item.product.id === product.id &&
-            item.selectedSize === size &&
-            item.selectedColor === color
+            item.cartKey === key
               ? { ...item, quantity: item.quantity + 1 }
               : item
           );
         }
         return [
           ...prev,
-          { product, quantity: 1, selectedSize: size, selectedColor: color },
+          {
+            product,
+            quantity: 1,
+            selectedSize: size,
+            selectedColor: color,
+            cartKey: key,
+          },
         ];
       });
     },
     []
   );
 
-  const removeFromCart = useCallback((productId: string) => {
+  const removeFromCart = useCallback((cartKey: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setItems((prev) => prev.filter((item) => item.product.id !== productId));
+    setItems((prev) => prev.filter((item) => item.cartKey !== cartKey));
   }, []);
 
-  const updateQuantity = useCallback((productId: string, quantity: number) => {
+  const updateQuantity = useCallback((cartKey: string, quantity: number) => {
     if (quantity <= 0) {
-      setItems((prev) => prev.filter((item) => item.product.id !== productId));
+      setItems((prev) => prev.filter((item) => item.cartKey !== cartKey));
     } else {
       setItems((prev) =>
         prev.map((item) =>
-          item.product.id === productId ? { ...item, quantity } : item
+          item.cartKey === cartKey ? { ...item, quantity } : item
         )
       );
     }
@@ -96,8 +105,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const getItemCount = useCallback(
     (productId: string) => {
-      const item = items.find((i) => i.product.id === productId);
-      return item?.quantity ?? 0;
+      return items
+        .filter((i) => i.product.id === productId)
+        .reduce((sum, i) => sum + i.quantity, 0);
     },
     [items]
   );
