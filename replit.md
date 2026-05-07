@@ -53,22 +53,28 @@ An Arabic RTL e-commerce web app built with Expo/React Native for web, featuring
 
 ---
 
-## Agent Skills — Setup Instructions
+## Agent Skills — IMPORTANT (Read First on New Import)
 
-**On first import into a new Replit session, run:**
+> Replit gitignores `.agents/skills/` internally, so skills do NOT survive project export.
+> They are backed up in `project-skills/` (committed to git) and must be restored once per session.
+
+### Setup command (run once after importing to a new account):
+
 ```bash
 bash .agents/setup-repos.sh
 ```
 
-This clones source repositories used as references by the skills.
-The skill files themselves (`.agents/skills/`) are already included in the project.
+This script:
+1. Copies all skills from `project-skills/` → `.agents/skills/` (where Replit reads them)
+2. Copies hookify rules from `project-skills/hookify-rules/` → `.claude/`
+3. Clones source repos to `/tmp/` for reference browsing
 
-**Full skills documentation:** `.agents/SKILLS_REGISTRY.md`
+Full documentation: `project-skills/REGISTRY.md`
 
 ### Installed Skills
 
-| Skill | Source | Activates When... |
-|-------|--------|-------------------|
+| Skill | Source Repository | Activates When... |
+|-------|------------------|-------------------|
 | `frontend-design` | [anthropics/claude-code](https://github.com/anthropics/claude-code) | designing UI components or pages |
 | `feature-dev` | [anthropics/claude-code](https://github.com/anthropics/claude-code) | building a new feature |
 | `hookify` | [anthropics/claude-code](https://github.com/anthropics/claude-code) | creating behavior-prevention rules |
@@ -82,9 +88,9 @@ The skill files themselves (`.agents/skills/`) are already included in the proje
 
 | Rule | Protects Against |
 |------|----------------|
-| `cart-variant-key` | Deleting all product variants when removing one |
-| `no-setstate-in-animation` | 60fps re-renders in tab bar |
+| `cart-variant-key` | CF-01: Deleting all product variants when removing one |
+| `no-setstate-in-animation` | CF-05: 60fps re-renders in tab bar |
 | `no-raw-hex` | Hardcoded colors breaking dark mode |
-| `no-per-component-interval` | Per-card flash sale timer jank |
-| `checkout-guard` | Duplicate order submission on fast tap |
-| `no-virtualized-map` | Unvirtualized product grid rendering |
+| `no-per-component-interval` | CF-04: Per-card flash sale timer jank |
+| `checkout-guard` | CF-07: Duplicate order submission on fast tap |
+| `no-virtualized-map` | CF-06: Unvirtualized product grid rendering |
