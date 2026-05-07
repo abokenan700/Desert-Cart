@@ -90,10 +90,27 @@
 
 ---
 
+### ✅ [H-F02] Category L3 item taps have no product navigation
+- **الوصف في الخطة:** L3CircleCard `onPress` كانت دائماً تُنقل إلى `search?category=${selectedL1Id}` فقط — كل L3 item تفضي إلى نفس الصفحة بدون أي سياق عن القسم الفرعي الذي اختاره المستخدم.
+- **الإصلاح:**
+  - **`categories.tsx`**: L3 `onPress` يُمرِّر الآن ثلاثة باراميتر: `category=selectedL1Id` (للفلترة بالمنتجات)، `l2name=selectedL2.nameAr` (اسم القسم L2 للعرض)، `l3=item.nameAr` (اسم العنصر L3 للعرض)
+  - **`search.tsx`**:
+    - أُضيف `l3?: string; l2name?: string` لنوع `useLocalSearchParams`
+    - أُضيف state جديد `l3Context: { l2name: string; l3: string } | null`
+    - `resetAllFilters` يُصفِّر `l3Context`
+    - params `useEffect` يُعيِّن `l3Context` عند وصول `params.l3`
+    - **breadcrumb bar** جديد يظهر بين Active Chips وSort Chips: يعرض `ملابس نسائية › فساتين` (L2 › L3) مع زر ✕ لإزالة السياق
+    - أُضيفت أنماط: `l3BreadcrumbBar`, `l3BreadcrumbLeft`, `l3BreadcrumbText`, `l3BreadcrumbDismiss`
+- **الملفات المعدّلة:**
+  - `artifacts/arabic-shop/app/(tabs)/categories.tsx`
+  - `artifacts/arabic-shop/app/(tabs)/search.tsx`
+- **commit:** _(current session)_
+
+---
+
 ### ⏳ المرحلة الثانية المتبقية
 | ID | المهمة |
 |----|--------|
-| H-F02 | Category L3 item taps have no product navigation |
 | H-F03 | Saved addresses are hardcoded — create `AddressContext` |
 | H-D02 | Only 12 products across 6 shared images — expand catalog to 40+ |
 | H-D03 | Reviews recycled across products — create unique reviews per product |

@@ -695,7 +695,16 @@ export default function CategoriesScreen() {
                   item={item}
                   parentSub={selectedL2}
                   circleSize={circleSize}
-                  onPress={() => router.push(`/(tabs)/search?category=${selectedL1Id}` as any)}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/(tabs)/search",
+                      params: {
+                        category: selectedL1Id,
+                        l2name: selectedL2.nameAr,
+                        l3: item.nameAr,
+                      },
+                    } as any)
+                  }
                 />
               ))}
             </View>

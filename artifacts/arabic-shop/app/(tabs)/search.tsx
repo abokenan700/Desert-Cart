@@ -208,7 +208,7 @@ function SearchScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { showToast } = useAppToast();
-  const params = useLocalSearchParams<{ q?: string; brand?: string; category?: string; sale?: string; sort?: string }>();
+  const params = useLocalSearchParams<{ q?: string; brand?: string; category?: string; sale?: string; sort?: string; l2name?: string; l3?: string }>();
 
   const [query, setQuery] = useState(params.q ?? "");
   const [debouncedQuery, setDebouncedQuery] = useState(params.q ?? "");
@@ -229,6 +229,7 @@ function SearchScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [compareList, setCompareList] = useState<Product[]>([]);
   const [compareVisible, setCompareVisible] = useState(false);
+  const [l3Context, setL3Context] = useState<{ l2name: string; l3: string } | null>(null);
 
   const filterAnim = useRef(new Animated.Value(height)).current;
   const resultsOpacity = useRef(new Animated.Value(1)).current;
@@ -246,7 +247,12 @@ function SearchScreen() {
     if (params.category) setSelectedCategory(params.category);
     if (params.sale === "true") setFlashSaleOnly(true);
     if (params.sort) setSortBy(params.sort);
-  }, [params.q, params.brand, params.category, params.sale, params.sort]);
+    if (params.l3) {
+      setL3Context({ l2name: params.l2name ?? "", l3: params.l3 });
+    } else {
+      setL3Context(null);
+    }
+  }, [params.q, params.brand, params.category, params.sale, params.sort, params.l3, params.l2name]);
 
   // Debounce query → debouncedQuery
   useEffect(() => {
@@ -305,6 +311,7 @@ function SearchScreen() {
     setMinRating(0);
     setDeliverySpeed("any");
     setFilterBrands([]);
+    setL3Context(null);
   };
 
   const commitSearch = useCallback((q: string) => {
@@ -490,6 +497,27 @@ function SearchScreen() {
         activeChipsRow: { flexDirection: "row-reverse", paddingHorizontal: 16, paddingVertical: 8, gap: 8, backgroundColor: colors.card, borderBottomWidth: 1, borderBottomColor: colors.border },
         activeChip: { flexDirection: "row-reverse", alignItems: "center", gap: 5, backgroundColor: `${colors.primary}18`, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, borderWidth: 1, borderColor: `${colors.primary}40` },
         activeChipText: { fontSize: 12, fontFamily: "Cairo_600SemiBold", color: colors.primary },
+        // L3 breadcrumb bar
+        l3BreadcrumbBar: {
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          justifyContent: "space-between",
+          paddingHorizontal: 14,
+          paddingVertical: 8,
+          backgroundColor: `${colors.primary}10`,
+          borderBottomWidth: 1,
+          borderBottomColor: `${colors.primary}25`,
+        },
+        l3BreadcrumbLeft: { flexDirection: "row-reverse", alignItems: "center", gap: 6, flex: 1 },
+        l3BreadcrumbText: { fontSize: 12, fontFamily: "Cairo_600SemiBold", color: colors.primary, textAlign: "right" },
+        l3BreadcrumbDismiss: {
+          width: 22,
+          height: 22,
+          borderRadius: 11,
+          backgroundColor: `${colors.primary}20`,
+          alignItems: "center",
+          justifyContent: "center",
+        },
         // Sort chips
         sortChipsScroll: { backgroundColor: colors.card, borderBottomWidth: 1, borderBottomColor: colors.border },
         sortChipsContent: { paddingHorizontal: 16, paddingVertical: 10, flexDirection: "row-reverse", gap: 8 },
@@ -716,6 +744,26 @@ function SearchScreen() {
             <Text style={[styles.activeChipText, { color: colors.destructive }]}>مسح الكل</Text>
           </TouchableOpacity>
         </ScrollView>
+      )}
+
+      {/* ── L3 breadcrumb bar ── */}
+      {l3Context && !showSuggestions && !showAutocomplete && (
+        <View style={styles.l3BreadcrumbBar}>
+          <View style={styles.l3BreadcrumbLeft}>
+            <Ionicons name="layers-outline" size={14} color={colors.primary} />
+            <Text style={styles.l3BreadcrumbText} numberOfLines={1}>
+              {l3Context.l2name ? `${l3Context.l2name} › ${l3Context.l3}` : l3Context.l3}
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={styles.l3BreadcrumbDismiss}
+            onPress={() => setL3Context(null)}
+            hitSlop={8}
+            accessibilityLabel="إزالة التصفية"
+          >
+            <Ionicons name="close" size={13} color={colors.primary} />
+          </TouchableOpacity>
+        </View>
       )}
 
       {/* ── Sort chips ── */}
