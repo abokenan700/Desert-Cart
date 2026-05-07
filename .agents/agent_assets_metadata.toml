@@ -66,23 +66,6 @@ uri = "file://artifacts/arabic-shop/assets/logo.png"
 type = "image"
 title = "Luxury fashion e-commerce phone app logo"
 
-[[outputs]]
-id = "gSo5rR8QOYmIWJBtNUha_"
-uri = "file://development-master-plan.md"
-type = "text"
-title = "Master Audit & Transformation Plan (L4)"
-
-[[outputs]]
-id = "0eI__YOX2dwniVvAHLMnD"
-uri = "file://ecommerce-github-skills-report.md"
-type = "text"
-title = "أفضل مستودعات GitHub للتجارة الإلكترونية"
-
-[[outputs]]
-id = "g1p_ug1YchuZpNqe8_KIG"
-uri = "file://claude-code-analysis-report.md"
-type = "text"
-title = "تحليل مستودع anthropics/claude-code"
 
 # ─── claude-code plugins ───────────────────────────────────────────────────
 [[skills]]
