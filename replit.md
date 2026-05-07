@@ -50,3 +50,41 @@ An Arabic RTL e-commerce web app built with Expo/React Native for web, featuring
 - The tsconfig previously had a broken `references` to `../../lib/api-client-react` (removed during migration)
 - `useNativeDriver` warnings in browser console are harmless — React Native web falls back to JS animations
 - Build takes ~30-60 seconds due to Expo bundling
+
+---
+
+## Agent Skills — Setup Instructions
+
+**On first import into a new Replit session, run:**
+```bash
+bash .agents/setup-repos.sh
+```
+
+This clones source repositories used as references by the skills.
+The skill files themselves (`.agents/skills/`) are already included in the project.
+
+**Full skills documentation:** `.agents/SKILLS_REGISTRY.md`
+
+### Installed Skills
+
+| Skill | Source | Activates When... |
+|-------|--------|-------------------|
+| `frontend-design` | [anthropics/claude-code](https://github.com/anthropics/claude-code) | designing UI components or pages |
+| `feature-dev` | [anthropics/claude-code](https://github.com/anthropics/claude-code) | building a new feature |
+| `hookify` | [anthropics/claude-code](https://github.com/anthropics/claude-code) | creating behavior-prevention rules |
+| `code-review` | [anthropics/claude-code](https://github.com/anthropics/claude-code) | reviewing code changes or PRs |
+| `commit-commands` | [anthropics/claude-code](https://github.com/anthropics/claude-code) | committing / pushing / creating PRs |
+| `storefront-ui` | [vuestorefront/storefront-ui](https://github.com/vuestorefront/storefront-ui) | building e-commerce UI components |
+| `medusa-patterns` | [medusajs/medusa](https://github.com/medusajs/medusa) | designing cart, coupon, or order models |
+| `ui-ux-pro-max` | Replit (pre-installed) | any UI/UX design work |
+
+### Active Hookify Rules (auto-enforce on every edit)
+
+| Rule | Protects Against |
+|------|----------------|
+| `cart-variant-key` | Deleting all product variants when removing one |
+| `no-setstate-in-animation` | 60fps re-renders in tab bar |
+| `no-raw-hex` | Hardcoded colors breaking dark mode |
+| `no-per-component-interval` | Per-card flash sale timer jank |
+| `checkout-guard` | Duplicate order submission on fast tap |
+| `no-virtualized-map` | Unvirtualized product grid rendering |
