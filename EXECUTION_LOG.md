@@ -71,10 +71,28 @@
 
 ---
 
+### ✅ [H-U04] Banner CTA always goes to search — Add per-banner route field
+- **الوصف في الخطة:** `handleCtaPress` in `BannerCarousel.tsx` always calls `router.push("/(tabs)/search")` regardless of which banner is active. All three banners navigate to the generic search screen with no context.
+- **الإصلاح:**
+  - أُضيف `BannerRoute` interface و`ctaRoute` field للـ `Banner` interface في `mockData.ts`
+  - حُدِّد `ctaRoute` صريح لكل بانر:
+    - **b1 — تخفيضات الصيف** → `{ pathname: "/(tabs)/search", params: { sale: "true", category: "fashion" } }` (تخفيضات ملابس)
+    - **b2 — وصل حديثاً** → `{ pathname: "/(tabs)/search", params: { sort: "newest" } }` (مرتّب بالأحدث أولاً)
+    - **b3 — عروض فلاش** → `{ pathname: "/(tabs)/search", params: { sale: "true" } }` (منتجات فلاش فقط)
+  - حُوِّل `handleCtaPress` في `BannerCarousel.tsx` إلى `handleBannerPress(banner)` يأخذ البانر كوسيط ويستخدم `banner.ctaRoute`
+  - أُضيف `sort?: string` لـ `useLocalSearchParams` في `search.tsx` وتزامن في params `useEffect`
+  - أُضيف `accessibilityLabel` لكل بانر يجمع العنوان والـ CTA
+- **الملفات المعدّلة:**
+  - `artifacts/arabic-shop/data/mockData.ts` — `BannerRoute` interface + `ctaRoute` لكل بانر
+  - `artifacts/arabic-shop/components/BannerCarousel.tsx` — per-banner handler
+  - `artifacts/arabic-shop/app/(tabs)/search.tsx` — `sort` param support
+- **commit:** _(current session)_
+
+---
+
 ### ⏳ المرحلة الثانية المتبقية
 | ID | المهمة |
 |----|--------|
-| H-U04 | Banner CTA always navigates to search regardless of banner content |
 | H-F02 | Category L3 item taps have no product navigation |
 | H-F03 | Saved addresses are hardcoded — create `AddressContext` |
 | H-D02 | Only 12 products across 6 shared images — expand catalog to 40+ |

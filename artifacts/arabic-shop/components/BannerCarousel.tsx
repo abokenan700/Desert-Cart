@@ -55,9 +55,15 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
     [activeIndex, banners.length, startTimer]
   );
 
-  const handleCtaPress = useCallback(() => {
+  // Per-banner navigation — uses ctaRoute.pathname + ctaRoute.params from data
+  const handleBannerPress = useCallback((banner: Banner) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    router.push("/(tabs)/search");
+    const { pathname, params } = banner.ctaRoute;
+    if (params && Object.keys(params).length > 0) {
+      router.push({ pathname, params } as any);
+    } else {
+      router.push(pathname as any);
+    }
   }, []);
 
   const styles = useMemo(
@@ -99,7 +105,9 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
             key={banner.id}
             activeOpacity={0.97}
             style={styles.slide}
-            onPress={handleCtaPress}
+            onPress={() => handleBannerPress(banner)}
+            accessibilityLabel={`${banner.titleAr} — ${banner.ctaAr}`}
+            accessibilityRole="button"
           >
             <Image source={banner.image} style={styles.image} />
           </TouchableOpacity>

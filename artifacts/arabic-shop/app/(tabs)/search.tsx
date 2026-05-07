@@ -208,14 +208,14 @@ function SearchScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { showToast } = useAppToast();
-  const params = useLocalSearchParams<{ q?: string; brand?: string; category?: string; sale?: string }>();
+  const params = useLocalSearchParams<{ q?: string; brand?: string; category?: string; sale?: string; sort?: string }>();
 
   const [query, setQuery] = useState(params.q ?? "");
   const [debouncedQuery, setDebouncedQuery] = useState(params.q ?? "");
   const [brandFilter, setBrandFilter] = useState(params.brand ?? "");
   const [inputFocused, setInputFocused] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(params.category ?? "all");
-  const [sortBy, setSortBy] = useState("popular");
+  const [sortBy, setSortBy] = useState(params.sort ?? "popular");
   const [filterVisible, setFilterVisible] = useState(false);
   const [voiceVisible, setVoiceVisible] = useState(false);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
@@ -239,13 +239,14 @@ function SearchScreen() {
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
-  // Params sync
+  // Params sync — fires when navigating here with URL params (e.g. from banner CTAs)
   useEffect(() => {
     if (params.q) setQuery(params.q);
     if (params.brand) setBrandFilter(params.brand);
     if (params.category) setSelectedCategory(params.category);
     if (params.sale === "true") setFlashSaleOnly(true);
-  }, [params.q, params.brand, params.category, params.sale]);
+    if (params.sort) setSortBy(params.sort);
+  }, [params.q, params.brand, params.category, params.sale, params.sort]);
 
   // Debounce query → debouncedQuery
   useEffect(() => {

@@ -33,6 +33,11 @@ export interface Category {
   bgColor: string;
 }
 
+export interface BannerRoute {
+  pathname: string;
+  params?: Record<string, string>;
+}
+
 export interface Banner {
   id: string;
   titleAr: string;
@@ -41,6 +46,8 @@ export interface Banner {
   image: ImageSourcePropType;
   bgGradient: [string, string];
   textColor: string;
+  /** Per-banner navigation destination for the CTA tap */
+  ctaRoute: BannerRoute;
 }
 
 export interface Review {
@@ -72,6 +79,10 @@ export const BANNERS: Banner[] = [
     image: require("../assets/images/banner1.png"),
     bgGradient: ["#E63946", "#C1121F"],
     textColor: "#FFFFFF",
+    ctaRoute: {
+      pathname: "/(tabs)/search",
+      params: { sale: "true", category: "fashion" },
+    },
   },
   {
     id: "b2",
@@ -81,6 +92,10 @@ export const BANNERS: Banner[] = [
     image: require("../assets/images/banner2.png"),
     bgGradient: ["#1D2D50", "#0D1B3E"],
     textColor: "#FFFFFF",
+    ctaRoute: {
+      pathname: "/(tabs)/search",
+      params: { sort: "newest" },
+    },
   },
   {
     id: "b3",
@@ -90,6 +105,10 @@ export const BANNERS: Banner[] = [
     image: require("../assets/images/banner3.png"),
     bgGradient: ["#F5A623", "#D4850A"],
     textColor: "#1D2D50",
+    ctaRoute: {
+      pathname: "/(tabs)/search",
+      params: { sale: "true" },
+    },
   },
 ];
 
