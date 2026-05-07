@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
-import { REVIEWS, Review } from "@/data/mockData";
+import { Review } from "@/data/mockData";
+import { PRODUCT_REVIEWS } from "@/data/reviewsData";
 
 interface ReviewsContextType {
   getReviews: (productId: string) => Review[];
@@ -13,14 +14,11 @@ const ReviewsContext = createContext<ReviewsContextType | null>(null);
 type ReviewMap = Record<string, Review[]>;
 
 function buildInitialMap(): ReviewMap {
-  return {
-    prod1: [...REVIEWS],
-    prod2: [REVIEWS[1], REVIEWS[2]],
-    prod3: [REVIEWS[0], REVIEWS[2]],
-    prod4: [REVIEWS[1]],
-    prod5: [REVIEWS[0], REVIEWS[1], REVIEWS[2]],
-    prod6: [REVIEWS[2]],
-  };
+  const map: ReviewMap = {};
+  for (const [productId, reviews] of Object.entries(PRODUCT_REVIEWS)) {
+    map[productId] = reviews.map((r) => ({ ...r }));
+  }
+  return map;
 }
 
 export function ReviewsProvider({ children }: { children: React.ReactNode }) {
