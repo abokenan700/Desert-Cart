@@ -37,6 +37,16 @@ import CategoryRow from "@/components/CategoryRow";
 import VoiceSearch from "@/components/VoiceSearch";
 import RatingStars from "@/components/RatingStars";
 import { PRODUCTS, CATEGORIES, Product } from "@/data/mockData";
+import { CATEGORY_TREE } from "@/data/categoryData";
+
+/* ── L3 keyword lookup map (id → search terms) ── */
+const L3_KEYWORDS_MAP: Record<string, string[]> = Object.fromEntries(
+  CATEGORY_TREE.flatMap((l1) =>
+    l1.subCategories.flatMap((l2) =>
+      l2.items.map((item) => [item.id, item.searchKeywords])
+    )
+  )
+);
 
 const SORT_OPTIONS = [
   { id: "popular", label: "الأكثر شعبية", icon: "flame-outline" as const },
@@ -207,7 +217,7 @@ function SearchScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { showToast } = useAppToast();
-  const params = useLocalSearchParams<{ q?: string; brand?: string; category?: string; sale?: string; sort?: string; l2name?: string; l3?: string }>();
+  const params = useLocalSearchParams<{ q?: string; brand?: string; category?: string; sale?: string; sort?: string; l2name?: string; l3?: string; l3id?: string }>();
 
   const [query, setQuery] = useState(params.q ?? "");
   const [debouncedQuery, setDebouncedQuery] = useState(params.q ?? "");
@@ -228,7 +238,7 @@ function SearchScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [compareList, setCompareList] = useState<Product[]>([]);
   const [compareVisible, setCompareVisible] = useState(false);
-  const [l3Context, setL3Context] = useState<{ l2name: string; l3: string } | null>(null);
+  const [l3Context, setL3Context] = useState<{ l2name: string; l3: string; l3id: string } | null>(null);
 
   const filterAnim = useRef(new Animated.Value(height)).current;
   const resultsOpacity = useRef(new Animated.Value(1)).current;
@@ -247,11 +257,11 @@ function SearchScreen() {
     if (params.sale === "true") setFlashSaleOnly(true);
     if (params.sort) setSortBy(params.sort);
     if (params.l3) {
-      setL3Context({ l2name: params.l2name ?? "", l3: params.l3 });
+      setL3Context({ l2name: params.l2name ?? "", l3: params.l3, l3id: params.l3id ?? "" });
     } else {
       setL3Context(null);
     }
-  }, [params.q, params.brand, params.category, params.sale, params.sort, params.l3, params.l2name]);
+  }, [params.q, params.brand, params.category, params.sale, params.sort, params.l3, params.l2name, params.l3id]);
 
   // Debounce query → debouncedQuery
   useEffect(() => {
@@ -282,8 +292,9 @@ function SearchScreen() {
     if (minRating > 0) n++;
     if (deliverySpeed !== "any") n++;
     if (filterBrands.length > 0) n++;
+    if (l3Context) n++;
     return n;
-  }, [priceRange, flashSaleOnly, inStockOnly, sortBy, minRating, deliverySpeed, filterBrands]);
+  }, [priceRange, flashSaleOnly, inStockOnly, sortBy, minRating, deliverySpeed, filterBrands, l3Context]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -387,6 +398,20 @@ function SearchScreen() {
     if (deliverySpeed === "1day") products = products.filter((p) => p.deliveryDays === 1);
     if (deliverySpeed === "2-3days") products = products.filter((p) => (p.deliveryDays ?? 99) <= 3);
 
+    if (l3Context?.l3id) {
+      const keywords = L3_KEYWORDS_MAP[l3Context.l3id] ?? [];
+      if (keywords.length > 0) {
+        products = products.filter((p) =>
+          keywords.some(
+            (kw) =>
+              p.tags.some((tag) => tag.includes(kw)) ||
+              p.nameAr.includes(kw) ||
+              p.category.includes(kw)
+          )
+        );
+      }
+    }
+
     switch (sortBy) {
       case "price_asc": return [...products].sort((a, b) => a.price - b.price);
       case "price_desc": return [...products].sort((a, b) => b.price - a.price);
@@ -395,7 +420,7 @@ function SearchScreen() {
       case "discount": return [...products].sort((a, b) => (b.discount ?? 0) - (a.discount ?? 0));
       default: return [...products].sort((a, b) => (b.soldCount ?? 0) - (a.soldCount ?? 0));
     }
-  }, [debouncedQuery, brandFilter, filterBrands, selectedCategory, sortBy, priceRange, flashSaleOnly, inStockOnly, minRating, deliverySpeed]);
+  }, [debouncedQuery, brandFilter, filterBrands, selectedCategory, sortBy, priceRange, flashSaleOnly, inStockOnly, minRating, deliverySpeed, l3Context]);
 
   const autocompleteSuggestions = useMemo(() => {
     if (query.trim().length < 2) return [];

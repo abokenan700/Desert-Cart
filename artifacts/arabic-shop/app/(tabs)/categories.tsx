@@ -702,6 +702,7 @@ export default function CategoriesScreen() {
                         category: selectedL1Id,
                         l2name: selectedL2.nameAr,
                         l3: item.nameAr,
+                        l3id: item.id,
                       },
                     } as any)
                   }

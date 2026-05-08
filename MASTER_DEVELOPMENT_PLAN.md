@@ -690,12 +690,12 @@ These significantly affect the perceived quality and usability of the app.
 
 | ID | Issue | Fix |
 |----|-------|-----|
-| H-U01 | Cart not accessible from most screens | Add persistent cart access |
-| H-U02 | Profile stats are fake | Wire to real context values |
-| H-U04 | Banner CTA always goes to search | Add per-banner route field |
-| H-F02 | Category L3 taps do nothing | Navigate to filtered search |
-| H-F03 | Saved addresses are hardcoded | Create `AddressContext` |
-| H-D02 | Only 12 products, 6 shared images | Expand catalog to 40+ |
+| H-U01 | Cart not accessible from most screens | Add persistent cart access | ✅ Done |
+| H-U02 | Profile stats are fake | Wire to real context values | ✅ Done |
+| H-U04 | Banner CTA always goes to search | Add per-banner route field | ✅ Done |
+| H-F02 | Category L3 taps do nothing | Navigate to filtered search | ✅ Done |
+| H-F03 | Saved addresses are hardcoded | Create `AddressContext` | ✅ Done |
+| H-D02 | Only 12 products, 6 shared images | Expand catalog to 40+ | ✅ Done |
 | H-D03 | Reviews recycled across products | Create unique reviews per product | ✅ Done |
 | H-A02 | Window resize breaks card widths | Use `useWindowDimensions()` | ✅ Done |
 | H-P01 | `StyleSheet.create` in `useMemo` | Hoist static styles to module level |
