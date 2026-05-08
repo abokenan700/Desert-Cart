@@ -702,6 +702,7 @@ function CheckoutScreen() {
                 if (fieldErrors.fullName)
                   setFieldErrors((e) => ({ ...e, fullName: "" }));
               }}
+              accessibilityHint="أدخل اسمك الكامل كما يظهر في الهوية"
             />
             {!!fieldErrors.fullName && (
               <Text style={styles.fieldError}>✕ {fieldErrors.fullName}</Text>
@@ -722,6 +723,7 @@ function CheckoutScreen() {
                 if (fieldErrors.phone)
                   setFieldErrors((e) => ({ ...e, phone: "" }));
               }}
+              accessibilityHint="يبدأ بـ 05 ويتكون من 10 أرقام"
             />
             {!!fieldErrors.phone && (
               <Text style={styles.fieldError}>✕ {fieldErrors.phone}</Text>
@@ -741,6 +743,7 @@ function CheckoutScreen() {
                 if (fieldErrors.city)
                   setFieldErrors((e) => ({ ...e, city: "" }));
               }}
+              accessibilityHint="مثال: الرياض أو جدة أو مكة المكرمة"
             />
             {!!fieldErrors.city && (
               <Text style={styles.fieldError}>✕ {fieldErrors.city}</Text>
@@ -762,6 +765,7 @@ function CheckoutScreen() {
                     if (fieldErrors.district)
                       setFieldErrors((e) => ({ ...e, district: "" }));
                   }}
+                  accessibilityHint="اسم الحي أو المنطقة داخل المدينة"
                 />
                 {!!fieldErrors.district && (
                   <Text style={styles.fieldError}>✕ {fieldErrors.district}</Text>
@@ -777,6 +781,7 @@ function CheckoutScreen() {
                   textAlign="right"
                   value={postalCode}
                   onChangeText={setPostalCode}
+                  accessibilityHint="الرمز البريدي المكون من 5 أرقام"
                 />
               </View>
             </View>
@@ -792,6 +797,7 @@ function CheckoutScreen() {
               textAlign="right"
               value={addressDetail}
               onChangeText={setAddressDetail}
+              accessibilityHint="رقم المبنى والشارع والمعالم القريبة"
             />
 
             {useNewAddress && (

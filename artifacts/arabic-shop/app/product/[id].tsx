@@ -122,7 +122,7 @@ function ProductDetailInner() {
   const sizeGuideAnim = useRef(new Animated.Value(height)).current;
   const qaAnim = useRef(new Animated.Value(height)).current;
 
-  const { getReviews, addReview, markHelpful, hasReviewed } = useReviews();
+  const { getReviews, addReview, markHelpful, hasReviewed, hasMarkedHelpful } = useReviews();
 
   const product = PRODUCTS.find((p) => p.id === id);
 
@@ -743,10 +743,25 @@ function ProductDetailInner() {
               <RatingStars rating={review.rating} size={13} />
               <Text style={[styles.reviewComment, { marginTop: 8 }]}>{review.commentAr}</Text>
               <View style={styles.helpfulRow}>
-                <TouchableOpacity style={styles.helpfulBtn} onPress={() => markHelpful(product.id, review.id)}>
-                  <Text style={styles.helpfulText}>مفيد ({review.helpful})</Text>
-                  <Ionicons name="thumbs-up-outline" size={12} color={colors.mutedForeground} />
-                </TouchableOpacity>
+                {(() => {
+                  const voted = hasMarkedHelpful(product.id, review.id);
+                  return (
+                    <TouchableOpacity
+                      style={styles.helpfulBtn}
+                      onPress={() => markHelpful(product.id, review.id)}
+                      accessibilityLabel={`وجد ${review.helpful} شخصاً هذه المراجعة مفيدة`}
+                      accessibilityHint={voted ? "لقد صوّت بالفعل على هذه المراجعة" : "اضغط للإشارة بأن هذه المراجعة مفيدة"}
+                      accessibilityState={{ checked: voted }}
+                    >
+                      <Text style={styles.helpfulText}>مفيد ({review.helpful})</Text>
+                      <Ionicons
+                        name={voted ? "thumbs-up" : "thumbs-up-outline"}
+                        size={12}
+                        color={voted ? colors.primary : colors.mutedForeground}
+                      />
+                    </TouchableOpacity>
+                  );
+                })()}
               </View>
             </View>
           ))}

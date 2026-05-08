@@ -91,8 +91,10 @@ export default function FlashSaleTimer() {
   return (
     <Animated.View
       style={[baseStyles.row, isUrgent && { transform: [{ scale: pulseScale }] }]}
+      accessibilityLabel={`ينتهي بعد ${time.h} ساعة و${time.m} دقيقة و${time.s} ثانية`}
+      accessibilityRole="timer"
     >
-      <Text style={styles.label}>ينتهي بعد:</Text>
+      <Text style={styles.label} importantForAccessibility="no">ينتهي بعد:</Text>
       <Animated.View style={[baseStyles.glowWrapper, { opacity: glowAnim }]}>
         <View style={styles.block}>
           <Text style={[baseStyles.digit, isUrgent && baseStyles.digitUrgent]}>

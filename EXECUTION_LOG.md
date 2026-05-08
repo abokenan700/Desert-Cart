@@ -586,6 +586,122 @@ EXPO_NO_TELEMETRY=1 pnpm exec expo export --platform web --output-dir dist
 
 ---
 
+### ✅ [M-AC03 / M-AC04 / M-AC05 / M-AC06 / H-AC02 / L-AC07 / L-AC08] Accessibility gap batch
+
+**تاريخ التنفيذ:** 8 مايو 2026
+
+#### المشاكل الموصوفة في الخطة (7 مشاكل)
+
+| ID | الملف | المشكلة |
+|----|-------|---------|
+| M-AC03 | FlashSaleTimer.tsx | العدّ التنازلي يُقرأ بالشاشة كـ "⏱ 00:05:23" — أرقام بلا سياق |
+| M-AC04 | ProductCard.tsx | `<Image>` بدون `accessibilityLabel` — لا نص بديل للصورة |
+| M-AC05 | ProductCard.tsx | نقاط الألوان بدون تسمية — المستخدم الضرير لا يعرف اللون |
+| M-AC06 | checkout.tsx | 6 حقول TextInput بدون `accessibilityHint` |
+| H-AC02 | CompareModal.tsx | `<Modal>` بدون `accessibilityViewIsModal` — الشاشة تقرأ المحتوى خلف الـ modal |
+| L-AC07 | CompareModal.tsx | `activeOpacity={1}` على overlay — لا تغذية بصرية عند الضغط |
+| L-AC08 | ReviewsContext + product/[id].tsx | زر "مفيد" بدون `accessibilityState` يعكس حالة التصويت |
+
+#### التعديلات المُنفَّذة
+
+**M-AC03 — FlashSaleTimer.tsx:**
+```tsx
+<Animated.View
+  accessibilityLabel={`ينتهي بعد ${time.h} ساعة و${time.m} دقيقة و${time.s} ثانية`}
+  accessibilityRole="timer"
+>
+  <Text importantForAccessibility="no">ينتهي بعد:</Text>
+```
+- `accessibilityRole="timer"` يُخبر الـ screen reader بطبيعة العنصر
+- `importantForAccessibility="no"` على نص "ينتهي بعد:" يمنع التكرار مع الـ label
+
+**M-AC04 — ProductCard.tsx:**
+```tsx
+<Image
+  source={product.image}
+  style={baseStyles.image}
+  resizeMode="cover"
+  accessibilityLabel={product.nameAr}
+/>
+```
+
+**M-AC05 — ProductCard.tsx + utils/colorNames.ts (جديد):**
+```typescript
+// utils/colorNames.ts — 50+ لون معرَّف بالعربية
+const HEX_COLOR_NAMES: Record<string, string> = {
+  "#ffc0cb": "وردي فاتح",
+  "#1a237e": "كحلي غامق",
+  "#000000": "أسود",
+  "#ffffff": "أبيض",
+  // ...
+};
+export function getColorName(hex: string): string {
+  return HEX_COLOR_NAMES[hex.toLowerCase()] ?? hex;
+}
+
+// في ProductCard:
+<View
+  accessibilityLabel={getColorName(c)}
+  accessibilityRole="image"
+/>
+```
+
+**M-AC06 — checkout.tsx:**
+| الحقل | accessibilityHint |
+|-------|-------------------|
+| الاسم الكامل | "أدخل اسمك الكامل كما يظهر في الهوية" |
+| رقم الجوال | "يبدأ بـ 05 ويتكون من 10 أرقام" |
+| المدينة | "مثال: الرياض أو جدة أو مكة المكرمة" |
+| الحي | "اسم الحي أو المنطقة داخل المدينة" |
+| الرمز البريدي | "الرمز البريدي المكون من 5 أرقام" |
+| العنوان التفصيلي | "رقم المبنى والشارع والمعالم القريبة" |
+
+**H-AC02 + L-AC07 — CompareModal.tsx:**
+```tsx
+<Modal accessibilityViewIsModal>           // H-AC02
+<TouchableOpacity activeOpacity={0.9}>    // L-AC07 (كان 1)
+```
+
+**L-AC08 — ReviewsContext.tsx + product/[id].tsx:**
+
+*ReviewsContext:* أُضيف `helpfulVoted: Set<string>` مع مفاتيح مُركَّبة `"productId:reviewId"`:
+```typescript
+const hasMarkedHelpful = useCallback(
+  (productId: string, reviewId: string) =>
+    helpfulVoted.has(`${productId}:${reviewId}`),
+  [helpfulVoted]
+);
+```
+`markHelpful` مُحدَّث لإضافة المفتاح إلى `helpfulVoted` أيضاً (idempotent — لا يُضاف مرتين).
+
+*product/[id].tsx:* زر "مفيد" مُحدَّث بالكامل:
+```tsx
+<TouchableOpacity
+  accessibilityLabel={`وجد ${review.helpful} شخصاً هذه المراجعة مفيدة`}
+  accessibilityHint={voted ? "لقد صوّت بالفعل" : "اضغط للإشارة بأنها مفيدة"}
+  accessibilityState={{ checked: voted }}
+>
+  <Ionicons name={voted ? "thumbs-up" : "thumbs-up-outline"} />
+```
+الأيقونة تتغير بصرياً أيضاً عند التصويت (مملوءة vs مخططة).
+
+#### التحقق
+```
+pnpm exec tsc --noEmit --skipLibCheck → 0 أخطاء جديدة ✅
+expo export --platform web → ✅ 3.32 MB bundle
+```
+
+#### الملفات المعدّلة
+- `utils/colorNames.ts` — **جديد** (80 سطر، خريطة 50+ لون عربي)
+- `components/FlashSaleTimer.tsx` — M-AC03
+- `components/ProductCard.tsx` — M-AC04 + M-AC05
+- `app/checkout.tsx` — M-AC06
+- `components/CompareModal.tsx` — H-AC02 + L-AC07
+- `context/ReviewsContext.tsx` — L-AC08 (hasMarkedHelpful)
+- `app/product/[id].tsx` — L-AC08 (accessibilityState على زر مفيد)
+
+---
+
 ### ✅ المرحلة الثانية — مكتملة بالكامل
 جميع مهام Phase 2 من MASTER_DEVELOPMENT_PLAN.md منجزة:
 

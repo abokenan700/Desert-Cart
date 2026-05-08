@@ -15,6 +15,7 @@ import { router } from "expo-router";
 import type { Href } from "expo-router";
 import { webShadow } from "@/utils/webStyles";
 import { useColors } from "@/hooks/useColors";
+import { getColorName } from "@/utils/colorNames";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { Product } from "@/data/mockData";
@@ -392,6 +393,7 @@ const ProductCard = React.memo(function ProductCard({
             source={product.image}
             style={baseStyles.image}
             resizeMode="cover"
+            accessibilityLabel={product.nameAr}
           />
 
           {/* Wishlist button with heart bounce */}
@@ -476,7 +478,12 @@ const ProductCard = React.memo(function ProductCard({
             {!compact && visibleColors.length > 0 && (
               <View style={baseStyles.swatchRow}>
                 {visibleColors.map((c, i) => (
-                  <View key={i} style={[baseStyles.swatch, { backgroundColor: c }]} />
+                  <View
+                    key={i}
+                    style={[baseStyles.swatch, { backgroundColor: c }]}
+                    accessibilityLabel={getColorName(c)}
+                    accessibilityRole="image"
+                  />
                 ))}
                 {extraColors > 0 && (
                   <Text style={styles.swatchMore}>+{extraColors}</Text>

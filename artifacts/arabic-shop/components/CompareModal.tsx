@@ -282,8 +282,8 @@ export default function CompareModal({ products, visible, onClose, onClear }: Co
   if (!visible) return null;
 
   return (
-    <Modal transparent visible={visible} animationType="slide" statusBarTranslucent onRequestClose={onClose}>
-      <TouchableOpacity style={baseStyles.overlay} activeOpacity={1} onPress={onClose}>
+    <Modal transparent visible={visible} animationType="slide" statusBarTranslucent onRequestClose={onClose} accessibilityViewIsModal>
+      <TouchableOpacity style={baseStyles.overlay} activeOpacity={0.9} onPress={onClose}>
         <TouchableOpacity activeOpacity={1} style={styles.sheet}>
           <View style={styles.handle} />
 

@@ -7,11 +7,21 @@ interface ReviewsContextType {
   addReview: (productId: string, review: Omit<Review, "id" | "helpful" | "date">) => void;
   markHelpful: (productId: string, reviewId: string) => void;
   hasReviewed: (productId: string) => boolean;
+  /**
+   * Returns true if the current session has already voted this review helpful.
+   * Used to set `accessibilityState={{ checked }}` on the helpful button (L-AC08).
+   */
+  hasMarkedHelpful: (productId: string, reviewId: string) => boolean;
 }
 
 const ReviewsContext = createContext<ReviewsContextType | null>(null);
 
 type ReviewMap = Record<string, Review[]>;
+
+/** Composite key for helpful-vote tracking: "${productId}:${reviewId}" */
+function helpfulKey(productId: string, reviewId: string): string {
+  return `${productId}:${reviewId}`;
+}
 
 function buildInitialMap(): ReviewMap {
   const map: ReviewMap = {};
@@ -24,6 +34,8 @@ function buildInitialMap(): ReviewMap {
 export function ReviewsProvider({ children }: { children: React.ReactNode }) {
   const [reviewMap, setReviewMap] = useState<ReviewMap>(buildInitialMap);
   const [reviewed, setReviewed] = useState<Set<string>>(new Set());
+  /** Tracks which reviews the user has voted as helpful this session. */
+  const [helpfulVoted, setHelpfulVoted] = useState<Set<string>>(new Set());
 
   const getReviews = useCallback(
     (productId: string): Review[] => reviewMap[productId] ?? [],
@@ -52,6 +64,11 @@ export function ReviewsProvider({ children }: { children: React.ReactNode }) {
   );
 
   const markHelpful = useCallback((productId: string, reviewId: string) => {
+    const key = helpfulKey(productId, reviewId);
+    setHelpfulVoted((prev) => {
+      if (prev.has(key)) return prev;
+      return new Set(prev).add(key);
+    });
     setReviewMap((prev) => ({
       ...prev,
       [productId]: (prev[productId] ?? []).map((r) =>
@@ -65,8 +82,16 @@ export function ReviewsProvider({ children }: { children: React.ReactNode }) {
     [reviewed]
   );
 
+  const hasMarkedHelpful = useCallback(
+    (productId: string, reviewId: string) =>
+      helpfulVoted.has(helpfulKey(productId, reviewId)),
+    [helpfulVoted]
+  );
+
   return (
-    <ReviewsContext.Provider value={{ getReviews, addReview, markHelpful, hasReviewed }}>
+    <ReviewsContext.Provider
+      value={{ getReviews, addReview, markHelpful, hasReviewed, hasMarkedHelpful }}
+    >
       {children}
     </ReviewsContext.Provider>
   );
