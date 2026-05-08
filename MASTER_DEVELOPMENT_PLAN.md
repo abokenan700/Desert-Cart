@@ -709,7 +709,7 @@ These turn the MVP into a believable production application.
 
 | ID | Issue | Fix |
 |----|-------|-----|
-| H-F04 | Voice search is a stub | Integrate Web Speech API |
+| H-F04 | Voice search is a stub | Integrate Web Speech API | ✅ Done |
 | H-F05 | Wishlist collections have no UI | Build collections UI |
 | M-F10 | No profile edit | Add Edit Profile screen |
 | M-F07 | No pagination | Implement cursor pagination |

@@ -324,6 +324,138 @@
 
 ---
 
+## المرحلة الثالثة — Feature Completeness
+
+### ✅ [H-F04] Voice search is a stub — Integrate Web Speech API
+
+**تاريخ التنفيذ:** 8 مايو 2026
+
+#### المشكلة الموصوفة في الخطة
+كان `VoiceSearch.tsx` "stub" بالمعنى الهندسي — يحتوي على واجهة Web Speech API لكن مع ثلاث مشاكل بنيوية تجعله لا يعمل بشكل احترافي:
+
+| # | الخلل | التأثير |
+|---|-------|---------|
+| 1 | **Stale closure في `onend`** | `recognition.onend` يقرأ `status` من closure مُجمَّدة على قيمة `"idle"`، فلا يُنفَّذ أي منطق عند انتهاء الاستماع |
+| 2 | **نوع خاطئ لـ `demoTimerRef`** | مُعرَّف كـ `ReturnType<typeof setTimeout>` لكن يُمسك `setInterval` → تسريب ذاكرة عند `clearTimeout` |
+| 3 | **أخطاء صامتة بدون UI** | أي خطأ (رفض إذن، لا شبكة، لا صوت) يُسقط فوراً إلى demo animation دون إخبار المستخدم بالسبب |
+| 4 | **لا حالة "طلب الإذن"** | المستخدم يرى الـ mic يبدأ مباشرة، بدون أي تغذية راجعة عن حالة طلب إذن الميكروفون |
+| 5 | **لا زرّ إعادة المحاولة** | عند حدوث خطأ قابل للتعافي (لا صوت، خطأ شبكة) يجب إغلاق الـ modal وإعادة فتحه |
+| 6 | **لا حالة "غير مدعوم"** | متصفحات بدون `SpeechRecognition` تحصل على demo صامت — المستخدم يعتقد أن التطبيق يستمع حقاً |
+
+#### الحل المُنفَّذ — آلة حالات (State Machine) كاملة
+
+```
+idle ──► requesting ──► listening ──► processing ──► done
+           │                │                          │
+           └────────────────┴──────────► error ◄───────┘
+```
+
+**الحالات الست:**
+- `idle` — الـ modal مفتوح، في انتظار البدء (chips تظهر هنا)
+- `requesting` — طُلب الميكروفون من المتصفح، نقطة نبض تنتظر الإذن
+- `listening` — الميكروفون نشط، تظهر موجات الصوت الحلقية
+- `processing` — وصل نص نهائي، يجري المعالجة
+- `done` — تم التعرف، يظهر transcript + شارة الدقة ثم يُغلق بعد 900ms
+- `error` — فشل، يظهر رسالة عربية + زرّ إعادة المحاولة أو إغلاق
+
+**أنواع الأخطاء السبعة مع رسائل عربية:**
+
+| الكود | الرسالة | قابل للتعافي |
+|-------|---------|--------------|
+| `not-supported` | "المتصفح لا يدعم البحث الصوتي" | ❌ |
+| `permission-denied` | "تم رفض إذن الميكروفون" | ❌ |
+| `no-speech` | "لم يتم سماع أي صوت" | ✅ زرّ إعادة |
+| `network` | "خطأ في الشبكة" | ✅ زرّ إعادة |
+| `aborted` | "تم إلغاء الاستماع" | ✅ زرّ إعادة |
+| `unknown` | "حدث خطأ غير متوقع" | ✅ زرّ إعادة |
+
+#### الإصلاحات التقنية التفصيلية
+
+**1. Stale closure — الحل بـ refs ثلاثية:**
+```typescript
+const statusRef    = useRef<Status>("idle");
+const transcriptRef = useRef("");
+const isInterimRef  = useRef(false);
+
+// sync على كل تغيير state
+useEffect(() => { statusRef.current    = status;     }, [status]);
+useEffect(() => { transcriptRef.current = transcript; }, [transcript]);
+useEffect(() => { isInterimRef.current  = isInterim;  }, [isInterim]);
+```
+الـ `onend` callback يقرأ الآن `statusRef.current` / `transcriptRef.current` / `isInterimRef.current` — قيم حيّة دائماً.
+
+**2. نوع الـ demo timer:**
+```typescript
+// قبل (خطأ):
+const demoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+// بعد (صحيح):
+const demoIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+```
+
+**3. تعريفات TypeScript كاملة للـ Web Speech API:**
+```typescript
+interface ISpeechRecognition extends EventTarget { ... }
+interface ISpeechRecognitionEvent extends Event { ... }
+interface ISpeechRecognitionErrorEvent extends Event { ... }
+declare global {
+  interface Window {
+    SpeechRecognition: { new(): ISpeechRecognition } | undefined;
+    webkitSpeechRecognition: { new(): ISpeechRecognition } | undefined;
+  }
+}
+```
+
+**4. تحسين دقة التعرف — أفضل alternative:**
+```typescript
+recognition.maxAlternatives = 3;
+// في onresult: نختار الـ alternative ذي أعلى confidence
+let bestAlt = result[0];
+for (let j = 1; j < result.length; j++) {
+  if (result[j].confidence > bestAlt.confidence) bestAlt = result[j];
+}
+```
+
+**5. Interim transcript — نص زرمادي أثناء الاستماع:**
+- `isInterim: true` → نص رمادي حجم 16 + "..."
+- `isInterim: false` → نص أسود/أبيض حجم 22 عريض
+
+**6. شارة دقة التعرف (Confidence Badge):**
+```
+✓ دقة 87%   ← badge خضراء تظهر فقط عند confidence > 0
+```
+
+**7. Quick-pick chips في حالة idle:**
+الكلمات الشائعة ("فستان"، "ساعة ذكية"، ...) قابلة للنقر مباشرة كبديل عن الكلام — تُنفّذ `handleResult(s, 1)` بدقة 100%.
+
+**8. Styles pattern — H-P01:**
+- الأنماط الثابتة (55 style) → `const S = StyleSheet.create({...})` على مستوى الوحدة
+- الأنماط التي تعتمد على `colors` (26 style) → `const D = useMemo(() => StyleSheet.create({...}), [colors])`
+
+#### التكامل مع search.tsx و index.tsx
+لم يتغير أي شيء في الملفات المستخدِمة — الـ API (`visible`, `onResult`, `onClose`) لا يزال كما هو، لكن أُضيف prop اختياري `suggestions?: string[]` يُمرَّر من search.tsx إن أُريد تخصيص الـ chips.
+
+#### التحقق
+```
+pnpm exec tsc --noEmit --skipLibCheck → ✅ 0 أخطاء في VoiceSearch.tsx
+EXPO_NO_TELEMETRY=1 pnpm exec expo export → ✅ نجح (3.28 MB bundle)
+```
+
+#### الملفات المعدّلة
+- `artifacts/arabic-shop/components/VoiceSearch.tsx` — إعادة كتابة احترافية كاملة (600 → 1090 سطر مع توثيق)
+
+#### التأثير على المستخدم
+| السيناريو | قبل | بعد |
+|-----------|-----|-----|
+| Chrome (مدعوم + إذن ممنوح) | يعمل لكن بدون رسائل خطأ واضحة | يعمل + interim text + confidence |
+| Chrome (رفض إذن) | يُشغّل demo صامت | رسالة عربية واضحة + تعليمات منح الإذن |
+| Firefox / Safari (لا دعم) | يُشغّل demo → المستخدم يظن أنه يعمل | رسالة "المتصفح لا يدعم" + اقتراح بديل |
+| لا صوت بعد 5 ثواني | يُغلق بدون شيء | رسالة "لم يُسمع صوت" + زرّ إعادة المحاولة |
+| خطأ شبكة | يُسقط لـ demo | رسالة "خطأ في الشبكة" + زرّ إعادة |
+
+- **commit:** _(current session)_
+
+---
+
 ### ✅ المرحلة الثانية — مكتملة بالكامل
 جميع مهام Phase 2 من MASTER_DEVELOPMENT_PLAN.md منجزة:
 
@@ -340,3 +472,4 @@
 | H-E01 | Error boundaries missing | ✅ Done |
 | H-AC01 | Tab bar not screen-reader accessible | ✅ Done |
 | H-R01 | Color swatches render LTR | ✅ Done |
+| H-F04 | Voice search is a stub | ✅ Done |
