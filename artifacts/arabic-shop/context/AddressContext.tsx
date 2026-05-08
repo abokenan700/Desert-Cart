@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const STORAGE_KEY = "@al_ostora_addresses_v1";
+const STORAGE_KEY = "@al-ostora/addresses";
 
 export type SavedAddress = {
   id: string;

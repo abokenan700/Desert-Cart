@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
 import { Platform } from "react-native";
 
-const STORAGE_KEY = "lastOrderNumber";
+const STORAGE_KEY = "@al-ostora/last-order-number";
 
 function readStored(): string | null {
   if (Platform.OS === "web" && typeof window !== "undefined") {

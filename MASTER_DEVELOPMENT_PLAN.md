@@ -716,11 +716,11 @@ These turn the MVP into a believable production application.
 | M-S06 | Collections API has no UI | Either build or remove | ✅ Done |
 | M-U07 | Fake urgency/viewing count removed in Phase 1 | — |
 | M-U08 | Category L3 taps addressed in Phase 2 | — |
-| M-D04 | CATEGORIES and CATEGORY_TREE not linked | Derive from single source |
-| M-D06 | Sports/Kids have zero products | Add 2+ per empty category |
-| M-SEC06 | localStorage key namespace | Update to `@al-ostora/` prefix |
-| L-SEC07 | AsyncStorage key inconsistency | Standardize namespace |
-| M-U05 | AppToast hardcoded hex | Use design tokens |
+| M-D04 | CATEGORIES and CATEGORY_TREE not linked | Derive from single source | ✅ Done |
+| M-D06 | Sports/Kids have zero products | Add 2+ per empty category | ✅ Done |
+| M-SEC06 | localStorage key namespace | Update to `@al-ostora/` prefix | ✅ Done |
+| L-SEC07 | AsyncStorage key inconsistency | Standardize namespace | ✅ Done |
+| M-U05 | AppToast hardcoded hex | Use design tokens | ✅ Done |
 
 ### Phase 4 — Polish & Production Readiness (2–3 weeks)
 These are correctness, accessibility, and code quality improvements.

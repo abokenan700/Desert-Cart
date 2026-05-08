@@ -6,7 +6,7 @@ interface ThemeContextType {
   toggleTheme: () => void;
 }
 
-const THEME_KEY = "@souk_theme";
+const THEME_KEY = "@al-ostora/theme";
 
 const ThemeContext = createContext<ThemeContextType>({
   isDark: false,

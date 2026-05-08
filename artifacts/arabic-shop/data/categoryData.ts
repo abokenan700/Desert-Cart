@@ -24,6 +24,27 @@ export interface Level1Category {
   subCategories: Level2Category[];
 }
 
+// ─── Flat category filter shape (used in tab filter rows) ────────────────────
+export interface Category {
+  id: string;
+  nameAr: string;
+  icon: string;
+  color: string;
+  bgColor: string;
+}
+
+// Short display names for the horizontal filter row.
+// These are intentionally shorter than the full L1 nameAr.
+const CATEGORY_FILTER_NAMES: Record<string, string> = {
+  fashion:     "ملابس",
+  electronics: "إلكترونيات",
+  home:        "المنزل",
+  beauty:      "جمال",
+  accessories: "إكسسوارات",
+  sports:      "رياضة",
+  kids:        "أطفال",
+};
+
 export const CATEGORY_TREE: Level1Category[] = [
   {
     id: "fashion",
@@ -644,4 +665,19 @@ export const CATEGORY_TREE: Level1Category[] = [
       },
     ],
   },
+];
+
+// ─── CATEGORIES: derived from CATEGORY_TREE — single source of truth ─────────
+// The "all" entry is a UI-only convenience filter (shows every product).
+// All other entries are generated from CATEGORY_TREE L1 nodes so that adding
+// a new L1 automatically appears in every filter row without manual duplication.
+export const CATEGORIES: Category[] = [
+  { id: "all", nameAr: "الكل", icon: "apps", color: "#E63946", bgColor: "#FFF0F1" },
+  ...CATEGORY_TREE.map((l1) => ({
+    id:      l1.id,
+    nameAr:  CATEGORY_FILTER_NAMES[l1.id] ?? l1.nameAr,
+    icon:    l1.icon,
+    color:   l1.color,
+    bgColor: l1.bgColor,
+  })),
 ];

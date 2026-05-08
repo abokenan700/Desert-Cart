@@ -10,7 +10,7 @@ interface RecentlyViewedContextType {
 const RecentlyViewedContext = createContext<RecentlyViewedContextType | null>(null);
 
 const MAX_ITEMS = 10;
-const STORAGE_KEY = "@souq_recently_viewed";
+const STORAGE_KEY = "@al-ostora/recently-viewed";
 
 export function RecentlyViewedProvider({ children }: { children: React.ReactNode }) {
   const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);

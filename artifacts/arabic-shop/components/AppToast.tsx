@@ -10,40 +10,49 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useAppToast, ToastVariant } from "@/context/AppToastContext";
+import { useColors } from "@/hooks/useColors";
 
-const VARIANT_CONFIG: Record<
-  ToastVariant,
-  { icon: string; bg: string; textColor: string; borderColor: string }
-> = {
-  success: {
-    icon: "checkmark-circle",
-    bg: "#2DC653",
-    textColor: "#fff",
-    borderColor: "#22a348",
-  },
-  error: {
-    icon: "close-circle",
-    bg: "#EF4444",
-    textColor: "#fff",
-    borderColor: "#dc2626",
-  },
-  info: {
-    icon: "information-circle",
-    bg: "#3B82F6",
-    textColor: "#fff",
-    borderColor: "#2563eb",
-  },
-  warning: {
-    icon: "warning",
-    bg: "#F5A623",
-    textColor: "#fff",
-    borderColor: "#d48a0e",
-  },
+type VariantConfig = {
+  icon: string;
+  bg: string;
+  textColor: string;
+  borderColor: string;
 };
+
+function useVariantConfig(): Record<ToastVariant, VariantConfig> {
+  const colors = useColors();
+  return {
+    success: {
+      icon: "checkmark-circle",
+      bg: colors.success,
+      textColor: "#fff",
+      borderColor: colors.successLight,
+    },
+    error: {
+      icon: "close-circle",
+      bg: colors.destructive,
+      textColor: colors.destructiveForeground,
+      borderColor: colors.destructiveLight,
+    },
+    info: {
+      icon: "information-circle",
+      bg: colors.info,
+      textColor: "#fff",
+      borderColor: colors.infoLight,
+    },
+    warning: {
+      icon: "warning",
+      bg: colors.warning,
+      textColor: "#fff",
+      borderColor: colors.warningLight,
+    },
+  };
+}
 
 export default function AppToast() {
   const insets = useSafeAreaInsets();
   const { toast, hideToast } = useAppToast();
+  const variantConfig = useVariantConfig();
   const translateY = useRef(new Animated.Value(-100)).current;
   const opacity = useRef(new Animated.Value(0)).current;
   const toastId = useRef<string | null>(null);
@@ -90,7 +99,7 @@ export default function AppToast() {
 
   if (!toast) return null;
 
-  const cfg = VARIANT_CONFIG[toast.variant];
+  const cfg = variantConfig[toast.variant];
 
   return (
     <Animated.View
