@@ -285,8 +285,58 @@
 
 ---
 
-### ⏳ المرحلة الثانية المتبقية
-| ID | المهمة |
-|----|--------|
-| H-P01 | `StyleSheet.create` inside `useMemo` — recreates on every theme toggle |
-| H-R01 | Color swatches in `ProductCard` render LTR — should be RTL |
+### ✅ [H-R01] Color swatches in ProductCard render LTR
+- **الوصف في الخطة:** ألوان المنتج في `ProductCard` كانت تُرسم من اليسار لليمين (`flexDirection: "row"`) بينما التطبيق كله RTL — يعني أول لون يظهر على اليسار بدلاً من اليمين.
+- **الإصلاح:**
+  - `components/ProductCard.tsx` ← `baseStyles.swatchRow.flexDirection`: `"row"` → `"row-reverse"`
+  - الآن اللون الأول يظهر على اليمين (بداية القراءة في العربية)، وتعداد الألوان الزائدة `"+N"` يظهر على اليسار (نهاية الصف).
+  - الحاوية الأب `brandSwatchRow` كانت بالفعل `row-reverse` — الآن `swatchRow` داخلها متسق معها.
+- **الملفات المعدّلة:** `artifacts/arabic-shop/components/ProductCard.tsx`
+- **commit:** _(current session)_
+
+---
+
+### ✅ [H-P01] StyleSheet.create inside useMemo — recreates on every theme toggle
+- **الوصف في الخطة:** عند تبديل الثيم (فاتح/داكن)، كل مكوّن يحتوي على `useMemo(() => StyleSheet.create({...}), [colors])` يُعيد إنشاء جميع كائنات الأنماط — بما فيها الأنماط الثابتة التي لا تعتمد على ألوان الثيم. لمكوّن مثل `SectionHeader` المُرسوم 6+ مرات في الشاشة الرئيسية، يعني ذلك إنشاء عشرات StyleSheet IDs جديدة عند كل toggle.
+- **الإصلاح — المكوّنات المشتركة (أعلى تأثيراً):**
+
+  **`components/SectionHeader.tsx`** (مُرسوم 6+ مرات في الشاشة الرئيسية):
+  - استُخرج إلى `baseStyles` ثابت على مستوى الوحدة: `leftSide`, `badgeText`, `badgeShadow`
+  - بقي في `useMemo`: `row` (يستخدم `colors.border`)، `title` (يستخدم `colors.text`)، `badge` (يستخدم `colors.primary`)، `seeAll` (يستخدم `colors.primary`)
+  - **النتيجة**: عند toggle الثيم، 3 objects ثابتة لا تُعاد (بدلاً من 6)
+
+  **`components/FlashSaleTimer.tsx`**:
+  - استُخرج إلى `baseStyles` ثابت: `row`, `glowWrapper`, `digit`, `digitUrgent`
+  - بقي في `useMemo`: `block` (`colors.primary`)، `sep` (`colors.primary`)، `label` (`colors.mutedForeground`)
+  - **النتيجة**: 4 objects ثابتة لا تُعاد (بدلاً من 7)
+
+  **`components/CategoryRow.tsx`**:
+  - استُخرج إلى `baseStyles` ثابت على مستوى الوحدة: `contentContainer`, `categoryItem`, `tile`, `label` — جميعها ثابتة تماماً
+  - أُلغيت `buildStyles()` بالكامل واستُبدلت بـ `scrollStyle = useMemo(() => ({ backgroundColor: colors.card }), [colors.card])` — dep واحدة بدلاً من كامل object الألوان
+  - `CategoryItem` بُسِّطت: بدلاً من تمرير `styles` كاملاً، تتلقى فقط `textColor` كـ primitive prop
+  - **النتيجة**: 4 objects ثابتة لا تُعاد عند toggle، وإعادة render `CategoryItem` مقيّدة بتغيّر `textColor` فعلياً
+
+- **الملفات المعدّلة:**
+  - `artifacts/arabic-shop/components/SectionHeader.tsx`
+  - `artifacts/arabic-shop/components/FlashSaleTimer.tsx`
+  - `artifacts/arabic-shop/components/CategoryRow.tsx`
+- **commit:** _(current session)_
+
+---
+
+### ✅ المرحلة الثانية — مكتملة بالكامل
+جميع مهام Phase 2 من MASTER_DEVELOPMENT_PLAN.md منجزة:
+
+| ID | المهمة | الحالة |
+|----|--------|--------|
+| H-F01 | Cart loses items on reload | ✅ Done |
+| H-F02 | Coupon code always accepts | ✅ Done |
+| H-F03 | Saved addresses hardcoded | ✅ Done |
+| H-D02 | Only 12 products, 6 shared images | ✅ Done |
+| H-D03 | Reviews recycled across products | ✅ Done |
+| H-A02 | Window resize breaks card widths | ✅ Done |
+| H-P01 | StyleSheet.create in useMemo | ✅ Done |
+| H-P02 | Nested FlatLists kill virtualization | ✅ Done |
+| H-E01 | Error boundaries missing | ✅ Done |
+| H-AC01 | Tab bar not screen-reader accessible | ✅ Done |
+| H-R01 | Color swatches render LTR | ✅ Done |

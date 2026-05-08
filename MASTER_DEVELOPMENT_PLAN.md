@@ -698,11 +698,11 @@ These significantly affect the perceived quality and usability of the app.
 | H-D02 | Only 12 products, 6 shared images | Expand catalog to 40+ | ✅ Done |
 | H-D03 | Reviews recycled across products | Create unique reviews per product | ✅ Done |
 | H-A02 | Window resize breaks card widths | Use `useWindowDimensions()` | ✅ Done |
-| H-P01 | `StyleSheet.create` in `useMemo` | Hoist static styles to module level |
+| H-P01 | `StyleSheet.create` in `useMemo` | Hoist static styles to module level | ✅ Done |
 | H-P02 | Nested FlatLists kill virtualization | Migrate to `FlashList` | ✅ Done |
 | H-E01 | Error boundaries missing on most screens | Wrap all tab screens | ✅ Done |
 | H-AC01 | Tab bar not screen-reader accessible | Add `accessibilityRole="tab"` | ✅ Done |
-| H-R01 | Color swatches render LTR | Fix `flexDirection` |
+| H-R01 | Color swatches render LTR | Fix `flexDirection` | ✅ Done |
 
 ### Phase 3 — Feature Completeness (1–2 weeks)
 These turn the MVP into a believable production application.

@@ -117,7 +117,7 @@ const baseStyles = StyleSheet.create({
     justifyContent: "space-between",
   },
   swatchRow: {
-    flexDirection: "row",
+    flexDirection: "row-reverse",
     alignItems: "center",
     gap: 4,
   },
