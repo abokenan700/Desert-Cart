@@ -2,7 +2,6 @@ import React, { useState, useMemo, useCallback, useRef, useEffect } from "react"
 import {
   View,
   Text,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
   FlatList,
@@ -38,26 +37,37 @@ import {
   PRODUCTS,
   FLASH_SALE_PRODUCTS,
   NEW_ARRIVALS,
-  FEATURED_PRODUCTS,
 } from "@/data/mockData";
 
 // ─── Module-level static styles (no color tokens, no runtime values) ─────────
 const baseStyles = StyleSheet.create({
-  scroll: { flex: 1 },
   horizontalList: { paddingHorizontal: 12, gap: 8 },
-  productGrid: {
-    flexDirection: "row-reverse",
-    flexWrap: "wrap",
-    paddingHorizontal: 12,
+  // Grid column wrapper for the top-level FlatList (Best Sellers)
+  // paddingHorizontal here replaces the old contentContainerStyle padding
+  gridColumnWrapper: {
     justifyContent: "space-between",
-  },
-  skeletonGrid: {
     flexDirection: "row-reverse",
-    flexWrap: "wrap",
     paddingHorizontal: 12,
-    justifyContent: "space-between",
   },
   gridItem: { paddingHorizontal: 4 },
+  // Today's Picks — plain View + flexWrap (4 items, no nested FlatList)
+  todaysPicksWrap: {
+    flexDirection: "row-reverse",
+    flexWrap: "wrap",
+    paddingHorizontal: 12,
+    justifyContent: "space-between",
+  },
+  todaysPicksItem: {
+    width: "50%",
+    paddingHorizontal: 4,
+    marginBottom: 8,
+  },
+  skeletonWrap: {
+    flexDirection: "row-reverse",
+    flexWrap: "wrap",
+    paddingHorizontal: 12,
+    justifyContent: "space-between",
+  },
   promoRow: {
     flexDirection: "row-reverse",
     marginHorizontal: 16,
@@ -96,7 +106,6 @@ const baseStyles = StyleSheet.create({
     fontSize: 11,
     fontFamily: "Cairo_600SemiBold",
   },
-  flashSaleTopAccent: { height: 4, width: "100%" },
   flashSaleHeader: {
     flexDirection: "row-reverse",
     alignItems: "center",
@@ -110,26 +119,9 @@ const baseStyles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
   },
-  flashBadgeText: {
-    color: "#fff",
-    fontSize: 11,
-    fontFamily: "Cairo_700Bold",
-  },
-  liveRow: {
-    flexDirection: "row-reverse",
-    alignItems: "center",
-    gap: 4,
-  },
-  todaysPicksGrid: { paddingHorizontal: 12 },
-  gridColumnWrapper: {
-    justifyContent: "space-between",
-    flexDirection: "row-reverse",
-  },
-  emptySection: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
+  flashBadgeText: { color: "#fff", fontSize: 11, fontFamily: "Cairo_700Bold" },
+  liveRow: { flexDirection: "row-reverse", alignItems: "center", gap: 4 },
+  emptySection: { paddingHorizontal: 16, paddingVertical: 12, alignItems: "center" },
 });
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -143,7 +135,7 @@ export default function HomeScreen() {
   const [voiceVisible, setVoiceVisible] = useState(false);
   const [notificationsVisible, setNotificationsVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const { notifications, markAllRead, unreadCount } = useNotifications();
+  const { notifications, markAllRead } = useNotifications();
   const { recentlyViewed } = useRecentlyViewed();
 
   const liveDotScale = useRef(new Animated.Value(1)).current;
@@ -151,16 +143,8 @@ export default function HomeScreen() {
   useEffect(() => {
     const anim = Animated.loop(
       Animated.sequence([
-        Animated.timing(liveDotScale, {
-          toValue: 1.4,
-          duration: 600,
-          useNativeDriver: true,
-        }),
-        Animated.timing(liveDotScale, {
-          toValue: 1,
-          duration: 600,
-          useNativeDriver: true,
-        }),
+        Animated.timing(liveDotScale, { toValue: 1.4, duration: 600, useNativeDriver: true }),
+        Animated.timing(liveDotScale, { toValue: 1, duration: 600, useNativeDriver: true }),
       ])
     );
     anim.start();
@@ -171,9 +155,7 @@ export default function HomeScreen() {
     () =>
       selectedCategory === "all"
         ? FLASH_SALE_PRODUCTS
-        : PRODUCTS.filter(
-            (p) => p.isFlashSale && p.categoryId === selectedCategory
-          ),
+        : PRODUCTS.filter((p) => p.isFlashSale && p.categoryId === selectedCategory),
     [selectedCategory]
   );
 
@@ -181,22 +163,11 @@ export default function HomeScreen() {
     () =>
       selectedCategory === "all"
         ? NEW_ARRIVALS
-        : PRODUCTS.filter(
-            (p) => p.isNew && p.categoryId === selectedCategory
-          ),
+        : PRODUCTS.filter((p) => p.isNew && p.categoryId === selectedCategory),
     [selectedCategory]
   );
 
-  const filteredFeatured = useMemo(
-    () =>
-      selectedCategory === "all"
-        ? FEATURED_PRODUCTS
-        : PRODUCTS.filter(
-            (p) => p.isFeatured && p.categoryId === selectedCategory
-          ),
-    [selectedCategory]
-  );
-
+  // Best Sellers — the data source for the top-level FlatList (true virtualization)
   const filteredBestSellers = useMemo(
     () =>
       selectedCategory === "all"
@@ -205,6 +176,7 @@ export default function HomeScreen() {
     [selectedCategory]
   );
 
+  // Today's Picks — 4 items rendered as plain View+map inside ListHeaderComponent
   const todaysPicks = useMemo(
     () => PRODUCTS.filter((p) => p.isFeatured).slice(0, 4),
     []
@@ -221,20 +193,14 @@ export default function HomeScreen() {
   }, [showToast]);
 
   const handleBrandPress = useCallback((brandNameAr: string) => {
-    router.push({
-      pathname: "/(tabs)/search",
-      params: { brand: brandNameAr },
-    } as any);
+    router.push({ pathname: "/(tabs)/search", params: { brand: brandNameAr } } as any);
   }, []);
 
   const handleCollectionPress = useCallback((categoryId: string) => {
-    router.push({
-      pathname: "/(tabs)/search",
-      params: { category: categoryId },
-    } as any);
+    router.push({ pathname: "/(tabs)/search", params: { category: categoryId } } as any);
   }, []);
 
-  // Only color-token-dependent or runtime-value-dependent styles here
+  // Dynamic styles (depend on color tokens or runtime values)
   const styles = useMemo(
     () =>
       StyleSheet.create({
@@ -292,37 +258,15 @@ export default function HomeScreen() {
             web: { boxShadow: "0 4px 16px rgba(230,57,70,0.22)" } as any,
           }),
         },
-        flashTitle: {
-          fontSize: 17,
-          fontFamily: "Cairo_700Bold",
-          color: colors.text,
-        },
+        flashTitle: { fontSize: 17, fontFamily: "Cairo_700Bold", color: colors.text },
         flashBadge: {
           backgroundColor: colors.primary,
           borderRadius: 10,
           paddingHorizontal: 8,
           paddingVertical: 2,
         },
-        liveDot: {
-          width: 8,
-          height: 8,
-          borderRadius: 4,
-          backgroundColor: colors.primary,
-        },
-        liveLabel: {
-          fontSize: 10,
-          fontFamily: "Cairo_700Bold",
-          color: colors.primary,
-        },
-        sectionLabel: {
-          fontSize: 13,
-          fontFamily: "Cairo_600SemiBold",
-          color: colors.mutedForeground,
-          textAlign: "right",
-          paddingHorizontal: 16,
-          paddingTop: 16,
-          paddingBottom: 10,
-        },
+        liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.primary },
+        liveLabel: { fontSize: 10, fontFamily: "Cairo_700Bold", color: colors.primary },
         emptySectionText: {
           fontSize: 12,
           fontFamily: "Cairo_400Regular",
@@ -332,24 +276,14 @@ export default function HomeScreen() {
     [colors, width]
   );
 
-  return (
-    <View style={styles.container}>
-      <AnnouncementBar />
-      <HomeHeader onPressNotifications={() => setNotificationsVisible(true)} />
-
-      <ScrollView
-        style={baseStyles.scroll}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 80 + bottomPad }}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={colors.primary}
-            colors={[colors.primary]}
-          />
-        }
-      >
+  // ─── ListHeaderComponent ───────────────────────────────────────────────────
+  // Contains everything above "Best Sellers" items.
+  // Using useMemo so it only re-creates when relevant state changes,
+  // preventing unnecessary re-renders of the entire header on list scroll.
+  const listHeader = useMemo(
+    () => (
+      <View>
+        {/* Search bar */}
         <TouchableOpacity
           style={styles.searchBar}
           onPress={() => router.push("/(tabs)/search")}
@@ -366,17 +300,20 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </TouchableOpacity>
 
+        {/* Category filter row */}
         <CategoryRow
           categories={CATEGORIES}
           selected={selectedCategory}
           onSelect={setSelectedCategory}
         />
 
+        {/* Banner carousel */}
         <BannerCarousel banners={BANNERS} />
 
+        {/* Brand strip */}
         <BrandStrip onBrandPress={handleBrandPress} />
 
-        {/* Flash Sale Section */}
+        {/* ── Flash Sale section ── */}
         <View style={styles.flashSaleContainer}>
           <View style={baseStyles.flashSaleHeader}>
             <View style={baseStyles.flashSaleLeft}>
@@ -386,10 +323,7 @@ export default function HomeScreen() {
               </View>
               <View style={baseStyles.liveRow}>
                 <Animated.View
-                  style={[
-                    styles.liveDot,
-                    { transform: [{ scale: liveDotScale }] },
-                  ]}
+                  style={[styles.liveDot, { transform: [{ scale: liveDotScale }] }]}
                 />
                 <Text style={styles.liveLabel}>LIVE</Text>
               </View>
@@ -406,31 +340,31 @@ export default function HomeScreen() {
               <Text style={styles.emptySectionText}>لا توجد عروض في هذا القسم</Text>
             </View>
           ) : (
+            // Horizontal FlatList — OK to nest in vertical list (different scroll axis)
             <FlatList
               data={filteredFlashSale}
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={baseStyles.horizontalList}
               style={Platform.OS === "web" ? ({ direction: "rtl" } as any) : undefined}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item) => `flash-${item.id}`}
               renderItem={({ item }) => (
                 <ProductCard product={item} style={styles.horizontalCard} compact />
               )}
-              scrollEnabled={filteredFlashSale.length > 0}
             />
           )}
         </View>
 
         <View style={styles.sectionDivider} />
 
+        {/* Collections & social proof */}
         <SectionHeader title="أبرز المجموعات" showSeeAll={false} />
         <StoryStrip onCollectionPress={handleCollectionPress} />
-
-        {/* Social Proof Bar */}
         <SocialProofBar />
 
         <View style={styles.sectionDivider} />
 
+        {/* Promo cards */}
         <View style={baseStyles.promoRow}>
           <TouchableOpacity
             style={[baseStyles.promoCard, { backgroundColor: colors.purple }]}
@@ -474,7 +408,7 @@ export default function HomeScreen() {
 
         <View style={styles.sectionDivider} />
 
-        {/* New Arrivals */}
+        {/* ── New Arrivals — horizontal FlatList (different axis, OK) ── */}
         <SectionHeader
           title="وصل حديثاً"
           onSeeAll={() => router.push("/(tabs)/search")}
@@ -494,17 +428,14 @@ export default function HomeScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={baseStyles.horizontalList}
             style={Platform.OS === "web" ? ({ direction: "rtl" } as any) : undefined}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <ProductCard product={item} />
-            )}
-            scrollEnabled={filteredNewArrivals.length > 0}
+            keyExtractor={(item) => `new-${item.id}`}
+            renderItem={({ item }) => <ProductCard product={item} />}
           />
         )}
 
         <View style={styles.sectionDivider} />
 
-        {/* Recently Viewed */}
+        {/* ── Recently Viewed — horizontal FlatList (different axis, OK) ── */}
         {recentlyViewed.length > 0 && (
           <>
             <SectionHeader title="شاهدته مؤخراً" showSeeAll={false} />
@@ -514,22 +445,22 @@ export default function HomeScreen() {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={baseStyles.horizontalList}
               style={Platform.OS === "web" ? ({ direction: "rtl" } as any) : undefined}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <ProductCard product={item} />
-              )}
+              keyExtractor={(item) => `recent-${item.id}`}
+              renderItem={({ item }) => <ProductCard product={item} />}
             />
             <View style={styles.sectionDivider} />
           </>
         )}
 
-        {/* Today's Picks */}
+        {/* ── Today's Picks — View+map grid (4 items, no nested FlatList) ──
+            Replaces the former scrollEnabled={false} FlatList.
+            4 items is trivially small; flexWrap layout is cheaper here. */}
         <SectionHeader
           title="اختيارات اليوم ✨"
           onSeeAll={() => router.push("/(tabs)/search")}
         />
         {refreshing ? (
-          <View style={baseStyles.skeletonGrid}>
+          <View style={baseStyles.skeletonWrap}>
             {[1, 2, 3, 4].map((k) => (
               <View key={k} style={baseStyles.gridItem}>
                 <ProductCardSkeleton />
@@ -537,56 +468,105 @@ export default function HomeScreen() {
             ))}
           </View>
         ) : (
-          <FlatList
-            data={todaysPicks}
-            numColumns={2}
-            scrollEnabled={false}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={baseStyles.todaysPicksGrid}
-            columnWrapperStyle={baseStyles.gridColumnWrapper}
-            renderItem={({ item }) => (
-              <View style={[baseStyles.gridItem, { flex: 1 }]}>
+          <View style={baseStyles.todaysPicksWrap}>
+            {todaysPicks.map((item) => (
+              <View key={item.id} style={baseStyles.todaysPicksItem}>
                 <ProductCard product={item} />
               </View>
-            )}
-          />
+            ))}
+          </View>
         )}
 
         <View style={styles.sectionDivider} />
 
-        {/* Best Sellers */}
+        {/* ── Best Sellers header (items rendered by top-level FlatList) ── */}
         <SectionHeader
           title="الأكثر مبيعاً"
           onSeeAll={() => router.push("/(tabs)/search")}
         />
-        {refreshing ? (
-          <View style={baseStyles.skeletonGrid}>
+
+        {/* Skeleton shown during refresh (FlatList data is [] during refresh) */}
+        {refreshing && (
+          <View style={baseStyles.skeletonWrap}>
             {[1, 2, 3, 4].map((k) => (
               <View key={k} style={baseStyles.gridItem}>
                 <ProductCardSkeleton />
               </View>
             ))}
           </View>
-        ) : filteredBestSellers.length === 0 ? (
+        )}
+
+        {/* Empty state when no products match the selected category */}
+        {!refreshing && filteredBestSellers.length === 0 && (
           <View style={baseStyles.emptySection}>
             <Text style={styles.emptySectionText}>لا توجد منتجات في هذا القسم</Text>
           </View>
-        ) : (
-          <FlatList
-            data={filteredBestSellers}
-            numColumns={2}
-            scrollEnabled={false}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={{ paddingHorizontal: 12 }}
-            columnWrapperStyle={baseStyles.gridColumnWrapper}
-            renderItem={({ item }) => (
-              <View style={[baseStyles.gridItem, { flex: 1 }]}>
-                <ProductCard product={item} />
-              </View>
-            )}
-          />
         )}
-      </ScrollView>
+      </View>
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      styles,
+      colors,
+      selectedCategory,
+      filteredFlashSale,
+      filteredNewArrivals,
+      filteredBestSellers.length,
+      todaysPicks,
+      recentlyViewed,
+      refreshing,
+      liveDotScale,
+      totalCount,
+      handleBrandPress,
+      handleCollectionPress,
+    ]
+  );
+
+  return (
+    <View style={styles.container}>
+      <AnnouncementBar />
+      <HomeHeader onPressNotifications={() => setNotificationsVisible(true)} />
+
+      {/*
+       * Single top-level FlatList — provides true virtualization for the
+       * "Best Sellers" product grid (46+ items).
+       *
+       * [H-P02] Fix: Replaced the ScrollView + two nested FlatList(scrollEnabled=false)
+       * pattern with a single virtualized FlatList.
+       *   • Best Sellers → rendered via renderItem (virtualized ✓)
+       *   • Today's Picks → View + map in ListHeaderComponent (4 items, trivial ✓)
+       *   • Horizontal lists → separate axis, no virtualization conflict ✓
+       *
+       * columnWrapperStyle.paddingHorizontal replaces the former
+       * contentContainerStyle.paddingHorizontal on the nested FlatList.
+       */}
+      <FlatList
+        data={refreshing ? [] : filteredBestSellers}
+        numColumns={2}
+        keyExtractor={(item) => item.id}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 80 + bottomPad }}
+        columnWrapperStyle={baseStyles.gridColumnWrapper}
+        ListHeaderComponent={listHeader}
+        renderItem={({ item }) => (
+          <View style={[baseStyles.gridItem, { flex: 1 }]}>
+            <ProductCard product={item} />
+          </View>
+        )}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
+          />
+        }
+        // Performance tuning
+        initialNumToRender={6}
+        maxToRenderPerBatch={8}
+        windowSize={5}
+        removeClippedSubviews={Platform.OS !== "web"}
+      />
 
       <VoiceSearch
         visible={voiceVisible}

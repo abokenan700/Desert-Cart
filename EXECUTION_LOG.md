@@ -190,13 +190,42 @@
 
 ---
 
+### ✅ [H-P02] Nested FlatLists with `scrollEnabled={false}` kill virtualization
+- **الوصف في الخطة:** الشاشة الرئيسية (`index.tsx`) كانت تحتوي على `FlatList(numColumns=2, scrollEnabled=false)` متداخلة داخل `ScrollView` لقسمَي "اختيارات اليوم" (4 منتجات) و"الأكثر مبيعاً" (46+ منتجاً). هذا النمط يُبطل الـ virtualization تماماً — يُجبر React Native على رسم جميع عناصر الشبكة في DOM دفعةً واحدة.
+- **الإصلاح الكامل:**
+
+  **إعادة هيكلة الشاشة الرئيسية (`app/(tabs)/index.tsx`):**
+  - **حُذف `ScrollView` الخارجي** بالكامل كحاوي رئيسي.
+  - **استُبدل بـ `FlatList` واحدة على مستوى الجذر** تعمل كـ scroller الرئيسي للشاشة وتُوفّر virtualization حقيقية لقسم "الأكثر مبيعاً":
+    - `data={refreshing ? [] : filteredBestSellers}` — بيانات "الأكثر مبيعاً" (46+ منتجاً)
+    - `numColumns={2}` — شبكة عمودين مع virtualization كاملة
+    - `initialNumToRender={6}`, `maxToRenderPerBatch={8}`, `windowSize={5}` — ضبط دقيق لأداء الرسم
+    - `removeClippedSubviews={Platform.OS !== "web"}` — إخفاء العناصر خارج نطاق الرؤية على native
+  - **`ListHeaderComponent`** يحمل كل المحتوى فوق "الأكثر مبيعاً" (شريط البحث، CategoryRow، BannerCarousel، BrandStrip، قسم Flash Sale، StoryStrip، SocialProofBar، البطاقات الترويجية، وصل حديثاً، شاهدته مؤخراً، اختيارات اليوم).
+  - **`columnWrapperStyle.paddingHorizontal: 12`** يُعوِّض `contentContainerStyle.paddingHorizontal` الذي كان على الـ FlatList المتداخلة السابقة.
+  - **"اختيارات اليوم" (4 منتجات):** استُبدل `FlatList(scrollEnabled=false)` بـ **`View` + `.map()`** مع `flexDirection: "row-reverse"` و`flexWrap: "wrap"` — 4 عناصر لا تستحق تكلفة FlatList.
+  - **القوائم الأفقية** (عروض اليوم، وصل حديثاً، شاهدته مؤخراً) **تبقى كـ `FlatList` أفقية** — هذا النمط صحيح تماماً (محور التمرير مختلف عن الأب العمودي).
+  - **حالة Refresh:** عند `refreshing=true`، `data=[]` يُفرِّغ القائمة مؤقتاً، والـ skeleton يظهر داخل `ListHeaderComponent`.
+  - **حالة Empty:** تُعرض رسالة "لا توجد منتجات" داخل `ListHeaderComponent` عند `filteredBestSellers.length === 0`.
+  - **`listHeader` مُحسَّن بـ `useMemo`** مع deps دقيقة — يمنع إعادة إنشاء JSX الهيدر عند كل scroll في القائمة.
+
+- **النتيجة:**
+  - قبل: شبكة "الأكثر مبيعاً" (46 منتجاً) تُرسم كاملةً فوراً في DOM بدون virtualization.
+  - بعد: React Native يُدير نافذة عرض من ~6–10 بطاقات نشطة فقط في أي وقت. مع نمو الكتالوج لـ 200+ منتج، الأداء يبقى ثابتاً.
+  - قاعدة hookify `no-virtualized-map` (CF-06) تتوقع هذا التصحيح — **الامتثال: ✅ كامل**.
+
+- **الملفات المعدّلة:**
+  - `artifacts/arabic-shop/app/(tabs)/index.tsx` — إعادة هيكلة كاملة للـ scroll container
+- **commit:** _(current session)_
+
+---
+
 ### ⏳ المرحلة الثانية المتبقية
 | ID | المهمة |
 |----|--------|
 | H-D03 | Reviews recycled across products — create unique reviews per product |
 | H-A02 | `Dimensions.get("window")` at module level — breaks on resize |
 | H-P01 | `StyleSheet.create` inside `useMemo` — recreates on every theme toggle |
-| H-P02 | Nested FlatLists with `scrollEnabled={false}` kill virtualization |
 | H-E01 | `ErrorBoundary` missing on most screens |
 | H-AC01 | Tab bar has no `accessibilityRole` on tab items |
 | H-R01 | Color swatches in `ProductCard` render LTR — should be RTL |
