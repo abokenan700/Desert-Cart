@@ -28,6 +28,24 @@ const DELETE_WIDTH = 80;
 const SAVE_WIDTH = 80;
 const SWIPE_THRESHOLD = 60;
 
+// ─── Module-level static styles for SwipeableCartItem ────────────────────────
+const swipeableBaseStyles = StyleSheet.create({
+  wrapper: { marginHorizontal: 16, marginTop: 12 },
+  saveArea: {
+    position: "absolute", top: 0, bottom: 0, left: 0, width: SAVE_WIDTH,
+    borderRadius: 16, alignItems: "center", justifyContent: "center",
+    backgroundColor: "#3B82F6",
+  },
+  actionLabel: { color: "#fff", fontSize: 10, fontFamily: "Cairo_600SemiBold", marginTop: 3 },
+  itemInfo: { flex: 1 },
+  topRow: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 2 },
+  flashBadgeText: { color: "#fff", fontSize: 9, fontFamily: "Cairo_700Bold" },
+  variantRow: { flexDirection: "row-reverse", alignItems: "center", gap: 6, marginBottom: 6 },
+  itemPriceRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", marginTop: 4 },
+  qtyBtn: { width: 32, height: 32, alignItems: "center", justifyContent: "center" },
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
 interface SwipeableCartItemProps {
   item: CartItem;
   onUpdate: (cartKey: string, qty: number) => void;
@@ -97,18 +115,11 @@ function SwipeableCartItem({ item, onUpdate, onRemove, onSaveForLater }: Swipeab
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        wrapper: { marginHorizontal: 16, marginTop: 12 },
         deleteArea: {
           position: "absolute", top: 0, bottom: 0, right: 0, width: DELETE_WIDTH,
           borderRadius: 16, alignItems: "center", justifyContent: "center",
           backgroundColor: colors.destructive,
         },
-        saveArea: {
-          position: "absolute", top: 0, bottom: 0, left: 0, width: SAVE_WIDTH,
-          borderRadius: 16, alignItems: "center", justifyContent: "center",
-          backgroundColor: "#3B82F6",
-        },
-        actionLabel: { color: "#fff", fontSize: 10, fontFamily: "Cairo_600SemiBold", marginTop: 3 },
         card: {
           backgroundColor: colors.card, borderRadius: 16, padding: 14,
           flexDirection: "row-reverse", gap: 12,
@@ -119,38 +130,32 @@ function SwipeableCartItem({ item, onUpdate, onRemove, onSaveForLater }: Swipeab
           }),
         },
         productImage: { width: 90, height: 112, borderRadius: 12, backgroundColor: colors.secondary },
-        itemInfo: { flex: 1 },
-        topRow: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 2 },
         itemBrand: { fontSize: 10, fontFamily: "Cairo_400Regular", color: colors.mutedForeground },
         flashBadge: { backgroundColor: colors.primary, borderRadius: 8, paddingHorizontal: 7, paddingVertical: 2 },
-        flashBadgeText: { color: "#fff", fontSize: 9, fontFamily: "Cairo_700Bold" },
         itemName: { fontSize: 14, fontFamily: "Cairo_600SemiBold", color: colors.text, textAlign: "right", writingDirection: "rtl", lineHeight: 21, marginBottom: 4 },
-        variantRow: { flexDirection: "row-reverse", alignItems: "center", gap: 6, marginBottom: 6 },
         colorSwatch: { width: 14, height: 14, borderRadius: 7, borderWidth: 1, borderColor: `${colors.border}80` },
         sizePill: { backgroundColor: colors.secondary, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2, borderWidth: 1, borderColor: colors.border },
         sizePillText: { fontSize: 10, fontFamily: "Cairo_600SemiBold", color: colors.text },
-        itemPriceRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", marginTop: 4 },
         itemPrice: { fontSize: 16, fontFamily: "Cairo_700Bold", color: colors.primary },
         unitPrice: { fontSize: 10, fontFamily: "Cairo_400Regular", color: colors.mutedForeground, textAlign: "right" },
         qtyRow: { flexDirection: "row-reverse", alignItems: "center", gap: 2, backgroundColor: colors.secondary, borderRadius: 10, paddingHorizontal: 2, borderWidth: 1, borderColor: colors.border },
-        qtyBtn: { width: 32, height: 32, alignItems: "center", justifyContent: "center" },
         qtyText: { fontSize: 14, fontFamily: "Cairo_700Bold", color: colors.text, minWidth: 22, textAlign: "center" },
       }),
     [colors]
   );
 
   return (
-    <View style={styles.wrapper}>
+    <View style={swipeableBaseStyles.wrapper}>
       {/* Save for later (left side, right swipe) */}
-      <TouchableOpacity style={styles.saveArea} onPress={handleSaveForLater} activeOpacity={0.85}>
+      <TouchableOpacity style={swipeableBaseStyles.saveArea} onPress={handleSaveForLater} activeOpacity={0.85}>
         <Ionicons name="heart" size={22} color="#fff" />
-        <Text style={styles.actionLabel}>حفظ لاحقاً</Text>
+        <Text style={swipeableBaseStyles.actionLabel}>حفظ لاحقاً</Text>
       </TouchableOpacity>
 
       {/* Delete (right side, left swipe) */}
       <TouchableOpacity style={styles.deleteArea} onPress={handleDelete} activeOpacity={0.85}>
         <Ionicons name="trash" size={22} color="#fff" />
-        <Text style={styles.actionLabel}>حذف</Text>
+        <Text style={swipeableBaseStyles.actionLabel}>حذف</Text>
       </TouchableOpacity>
 
       <Animated.View
@@ -169,12 +174,12 @@ function SwipeableCartItem({ item, onUpdate, onRemove, onSaveForLater }: Swipeab
           }}
         >
           <Image source={item.product.image} style={styles.productImage} resizeMode="cover" />
-          <View style={styles.itemInfo}>
-            <View style={styles.topRow}>
+          <View style={swipeableBaseStyles.itemInfo}>
+            <View style={swipeableBaseStyles.topRow}>
               <Text style={styles.itemBrand}>{item.product.brand}</Text>
               {item.product.isFlashSale && (
                 <View style={styles.flashBadge}>
-                  <Text style={styles.flashBadgeText}>عرض محدود 🔥</Text>
+                  <Text style={swipeableBaseStyles.flashBadgeText}>عرض محدود 🔥</Text>
                 </View>
               )}
             </View>
@@ -182,7 +187,7 @@ function SwipeableCartItem({ item, onUpdate, onRemove, onSaveForLater }: Swipeab
 
             {/* Variant display with color swatch + size pill */}
             {(item.selectedSize || item.selectedColor) && (
-              <View style={styles.variantRow}>
+              <View style={swipeableBaseStyles.variantRow}>
                 {item.selectedColor && (
                   <View style={[styles.colorSwatch, { backgroundColor: item.selectedColor }]} />
                 )}
@@ -197,20 +202,20 @@ function SwipeableCartItem({ item, onUpdate, onRemove, onSaveForLater }: Swipeab
             <Text style={styles.unitPrice}>
               {item.product.price.toLocaleString("ar-SA")} ر.س / قطعة
             </Text>
-            <View style={styles.itemPriceRow}>
+            <View style={swipeableBaseStyles.itemPriceRow}>
               <Text style={styles.itemPrice}>
                 {(item.product.price * item.quantity).toLocaleString("ar-SA")} ر.س
               </Text>
               <View style={styles.qtyRow}>
                 <TouchableOpacity
-                  style={styles.qtyBtn}
+                  style={swipeableBaseStyles.qtyBtn}
                   onPress={() => { Haptics.selectionAsync(); onUpdate(item.cartKey, item.quantity + 1); }}
                 >
                   <Ionicons name="add" size={16} color={colors.primary} />
                 </TouchableOpacity>
                 <Text style={styles.qtyText}>{item.quantity}</Text>
                 <TouchableOpacity
-                  style={styles.qtyBtn}
+                  style={swipeableBaseStyles.qtyBtn}
                   onPress={() => { Haptics.selectionAsync(); onUpdate(item.cartKey, item.quantity - 1); }}
                 >
                   <Ionicons
@@ -227,6 +232,31 @@ function SwipeableCartItem({ item, onUpdate, onRemove, onSaveForLater }: Swipeab
     </View>
   );
 }
+
+// ─── Module-level static styles for CartScreen ───────────────────────────────
+const cartBaseStyles = StyleSheet.create({
+  headerLeft: { flexDirection: "row-reverse", alignItems: "center", gap: 8 },
+  headerCountText: { color: "#fff", fontSize: 12, fontFamily: "Cairo_700Bold" },
+  confirmRow: { flexDirection: "row-reverse", gap: 8, alignItems: "center" },
+  cancelBtn: { borderRadius: 10, paddingHorizontal: 10, paddingVertical: 6 },
+  confirmBtnText: { color: "#fff", fontSize: 12, fontFamily: "Cairo_600SemiBold" },
+  shippingBannerRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", marginBottom: 8 },
+  shippingFill: { height: "100%", borderRadius: 3 },
+  summaryRow: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", marginBottom: 10 },
+  promoToggleLeft: { flexDirection: "row-reverse", alignItems: "center", gap: 6 },
+  promoRow: { flexDirection: "row-reverse", alignItems: "center", gap: 10, marginTop: 12 },
+  promoBtnText: { color: "#fff", fontSize: 13, fontFamily: "Cairo_700Bold" },
+  checkoutGrad: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 10, paddingVertical: 18 },
+  checkoutText: { color: "#fff", fontSize: 17, fontFamily: "Cairo_700Bold" },
+  swipeHint: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 8, marginBottom: 4 },
+  crossSellSection: { marginHorizontal: 16, marginTop: 20, marginBottom: 4 },
+  crossSellInfo: { padding: 10 },
+  crossSellBottom: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", marginTop: 8 },
+  emptyContainer: { flex: 1, alignItems: "center", justifyContent: "center", gap: 14, paddingHorizontal: 32 },
+  shopGrad: { paddingHorizontal: 36, paddingVertical: 14, alignItems: "center" },
+  shopBtnText: { color: "#fff", fontSize: 15, fontFamily: "Cairo_700Bold" },
+});
+// ─────────────────────────────────────────────────────────────────────────────
 
 const FREE_SHIPPING_THRESHOLD = 500;
 
@@ -323,28 +353,20 @@ function CartScreen() {
           paddingHorizontal: 16, flexDirection: "row-reverse", alignItems: "center",
           justifyContent: "space-between", borderBottomWidth: 1, borderBottomColor: colors.border,
         },
-        headerLeft: { flexDirection: "row-reverse", alignItems: "center", gap: 8 },
         headerTitle: { fontSize: 20, fontFamily: "Cairo_800ExtraBold", color: colors.text },
         headerCount: { backgroundColor: colors.primary, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 2 },
-        headerCountText: { color: "#fff", fontSize: 12, fontFamily: "Cairo_700Bold" },
         clearBtn: { flexDirection: "row-reverse", alignItems: "center", gap: 4, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, borderWidth: 1, borderColor: colors.destructive },
         clearText: { fontSize: 12, fontFamily: "Cairo_600SemiBold", color: colors.destructive },
-        confirmRow: { flexDirection: "row-reverse", gap: 8, alignItems: "center" },
         confirmBtn: { backgroundColor: colors.destructive, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6 },
-        confirmBtnText: { color: "#fff", fontSize: 12, fontFamily: "Cairo_600SemiBold" },
-        cancelBtn: { borderRadius: 10, paddingHorizontal: 10, paddingVertical: 6 },
         cancelBtnText: { fontSize: 12, fontFamily: "Cairo_400Regular", color: colors.mutedForeground },
         // Shipping banner
         shippingBanner: { marginHorizontal: 16, marginTop: 12, backgroundColor: colors.card, borderRadius: 14, padding: 14, borderWidth: 1, borderColor: colors.border },
-        shippingBannerRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", marginBottom: 8 },
         shippingBannerText: { flex: 1, fontSize: 12, fontFamily: "Cairo_600SemiBold", color: colors.text, textAlign: "right", marginRight: 8 },
         shippingAmount: { fontSize: 13, fontFamily: "Cairo_700Bold", color: colors.primary },
         shippingTrack: { height: 6, backgroundColor: colors.secondary, borderRadius: 3, overflow: "hidden" },
-        shippingFill: { height: "100%", borderRadius: 3 },
         // Summary
         summaryCard: { backgroundColor: colors.card, marginHorizontal: 16, marginTop: 16, borderRadius: 16, padding: 18, borderWidth: 1, borderColor: `${colors.border}50` },
         summaryTitle: { fontSize: 16, fontFamily: "Cairo_700Bold", color: colors.text, textAlign: "right", marginBottom: 14, borderBottomWidth: 1, borderBottomColor: colors.border, paddingBottom: 10 },
-        summaryRow: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", marginBottom: 10 },
         summaryLabel: { fontSize: 14, fontFamily: "Cairo_400Regular", color: colors.mutedForeground },
         summaryValue: { fontSize: 14, fontFamily: "Cairo_600SemiBold", color: colors.text },
         discountValue: { fontSize: 14, fontFamily: "Cairo_600SemiBold", color: colors.success },
@@ -355,12 +377,9 @@ function CartScreen() {
         freeShipText: { fontSize: 13, fontFamily: "Cairo_600SemiBold", color: colors.success, textAlign: "right" },
         // Promo code
         promoToggle: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.border },
-        promoToggleLeft: { flexDirection: "row-reverse", alignItems: "center", gap: 6 },
         promoToggleText: { fontSize: 13, fontFamily: "Cairo_600SemiBold", color: colors.primary },
-        promoRow: { flexDirection: "row-reverse", alignItems: "center", gap: 10, marginTop: 12 },
         promoInput: { flex: 1, backgroundColor: colors.secondary, borderRadius: 12, borderWidth: 1.5, borderColor: colors.border, paddingHorizontal: 14, paddingVertical: 10, fontSize: 13, fontFamily: "Cairo_400Regular", color: colors.text, textAlign: "right" },
         promoBtn: { backgroundColor: colors.primary, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 10 },
-        promoBtnText: { color: "#fff", fontSize: 13, fontFamily: "Cairo_700Bold" },
         promoError: { fontSize: 11, fontFamily: "Cairo_400Regular", color: colors.destructive, textAlign: "right", marginTop: 6 },
         promoApplied: { flexDirection: "row-reverse", alignItems: "center", gap: 6, backgroundColor: colors.successLight, borderRadius: 10, padding: 10, marginTop: 12 },
         promoAppliedText: { fontSize: 12, fontFamily: "Cairo_600SemiBold", color: colors.success },
@@ -373,29 +392,20 @@ function CartScreen() {
             web: { boxShadow: `0 4px 12px ${colors.primary}55` } as any,
           }),
         },
-        checkoutGrad: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 10, paddingVertical: 18 },
-        checkoutText: { color: "#fff", fontSize: 17, fontFamily: "Cairo_700Bold" },
-        swipeHint: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 8, marginBottom: 4 },
         swipeHintText: { fontSize: 11, fontFamily: "Cairo_400Regular", color: colors.mutedForeground },
         // Cross-sell
-        crossSellSection: { marginHorizontal: 16, marginTop: 20, marginBottom: 4 },
         crossSellTitle: { fontSize: 16, fontFamily: "Cairo_700Bold", color: colors.text, textAlign: "right", marginBottom: 12 },
         crossSellCard: { width: 150, backgroundColor: colors.card, borderRadius: 14, overflow: "hidden", borderWidth: 1, borderColor: colors.border, marginLeft: 10 },
         crossSellImg: { width: 150, height: 120 },
-        crossSellInfo: { padding: 10 },
         crossSellBrand: { fontSize: 10, fontFamily: "Cairo_400Regular", color: colors.mutedForeground, textAlign: "right" },
         crossSellName: { fontSize: 12, fontFamily: "Cairo_600SemiBold", color: colors.text, textAlign: "right", writingDirection: "rtl", marginTop: 2 },
-        crossSellBottom: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", marginTop: 8 },
         crossSellPrice: { fontSize: 13, fontFamily: "Cairo_700Bold", color: colors.primary },
         crossSellAddBtn: { width: 28, height: 28, borderRadius: 9, backgroundColor: colors.primary, alignItems: "center", justifyContent: "center" },
         // Empty
-        emptyContainer: { flex: 1, alignItems: "center", justifyContent: "center", gap: 14, paddingHorizontal: 32 },
         emptyBag: { width: 120, height: 120, borderRadius: 60, backgroundColor: `${colors.primary}12`, alignItems: "center", justifyContent: "center" },
         emptyTitle: { fontSize: 22, fontFamily: "Cairo_700Bold", color: colors.text },
         emptyText: { fontSize: 14, fontFamily: "Cairo_400Regular", color: colors.mutedForeground, textAlign: "center" },
         shopBtnWrapper: { borderRadius: 14, overflow: "hidden", marginTop: 8 },
-        shopGrad: { paddingHorizontal: 36, paddingVertical: 14, alignItems: "center" },
-        shopBtnText: { color: "#fff", fontSize: 15, fontFamily: "Cairo_700Bold" },
       }),
     [colors, topPad, bottomPad]
   );
@@ -409,16 +419,16 @@ function CartScreen() {
           </View>
           <Text style={{ fontSize: 13, color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }}>فارغة</Text>
         </View>
-        <View style={styles.emptyContainer}>
+        <View style={cartBaseStyles.emptyContainer}>
           <View style={styles.emptyBag}>
             <Ionicons name="bag-outline" size={56} color={colors.primary} />
           </View>
           <Text style={styles.emptyTitle}>سلتك فارغة</Text>
           <Text style={styles.emptyText}>أضف منتجات لتبدأ تجربة تسوق رائعة</Text>
           <View style={styles.shopBtnWrapper}>
-            <LinearGradient colors={["#E63946", "#C1121F"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.shopGrad}>
+            <LinearGradient colors={["#E63946", "#C1121F"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={cartBaseStyles.shopGrad}>
               <TouchableOpacity onPress={() => router.push("/(tabs)/" as any)} activeOpacity={0.85}>
-                <Text style={styles.shopBtnText}>ابدأ التسوق</Text>
+                <Text style={cartBaseStyles.shopBtnText}>ابدأ التسوق</Text>
               </TouchableOpacity>
             </LinearGradient>
           </View>
@@ -430,18 +440,18 @@ function CartScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.headerLeft}>
+        <View style={cartBaseStyles.headerLeft}>
           <Text style={styles.headerTitle}>سلتي</Text>
           <View style={styles.headerCount}>
-            <Text style={styles.headerCountText}>{totalCount}</Text>
+            <Text style={cartBaseStyles.headerCountText}>{totalCount}</Text>
           </View>
         </View>
         {confirmClear ? (
-          <View style={styles.confirmRow}>
+          <View style={cartBaseStyles.confirmRow}>
             <TouchableOpacity style={styles.confirmBtn} onPress={handleClearCart}>
-              <Text style={styles.confirmBtnText}>نعم، امسح</Text>
+              <Text style={cartBaseStyles.confirmBtnText}>نعم، امسح</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.cancelBtn} onPress={() => setConfirmClear(false)}>
+            <TouchableOpacity style={cartBaseStyles.cancelBtn} onPress={() => setConfirmClear(false)}>
               <Text style={styles.cancelBtnText}>إلغاء</Text>
             </TouchableOpacity>
           </View>
@@ -455,7 +465,7 @@ function CartScreen() {
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 16 + bottomPad }}>
         {Platform.OS !== "web" && (
-          <View style={styles.swipeHint}>
+          <View style={cartBaseStyles.swipeHint}>
             <Text style={styles.swipeHintText}>← اسحب لحذف · اسحب → لحفظ لاحقاً ❤️</Text>
           </View>
         )}
@@ -472,7 +482,7 @@ function CartScreen() {
 
         {/* Free shipping progress */}
         <View style={styles.shippingBanner}>
-          <View style={styles.shippingBannerRow}>
+          <View style={cartBaseStyles.shippingBannerRow}>
             <Text style={styles.shippingBannerText}>
               {toFreeShipping > 0 ? (
                 <>أضف{" "}<Text style={styles.shippingAmount}>{toFreeShipping.toLocaleString("ar-SA")} ر.س</Text>{" "}للحصول على شحن مجاني 🚚</>
@@ -483,29 +493,29 @@ function CartScreen() {
             <Ionicons name="car-outline" size={18} color={toFreeShipping > 0 ? colors.mutedForeground : colors.success} />
           </View>
           <View style={styles.shippingTrack}>
-            <View style={[styles.shippingFill, { width: `${freeShippingPct * 100}%`, backgroundColor: toFreeShipping === 0 ? colors.success : colors.primary }]} />
+            <View style={[cartBaseStyles.shippingFill, { width: `${freeShippingPct * 100}%`, backgroundColor: toFreeShipping === 0 ? colors.success : colors.primary }]} />
           </View>
         </View>
 
         {/* Order Summary */}
         <View style={styles.summaryCard}>
           <Text style={styles.summaryTitle}>ملخص الطلب</Text>
-          <View style={styles.summaryRow}>
+          <View style={cartBaseStyles.summaryRow}>
             <Text style={styles.summaryLabel}>المجموع الجزئي</Text>
             <Text style={styles.summaryValue}>{subtotal.toLocaleString("ar-SA")} ر.س</Text>
           </View>
-          <View style={styles.summaryRow}>
+          <View style={cartBaseStyles.summaryRow}>
             <Text style={styles.summaryLabel}>رسوم التوصيل</Text>
             <Text style={delivery === 0 ? styles.discountValue : styles.summaryValue}>
               {delivery === 0 ? "مجاني ✓" : `${delivery.toLocaleString("ar-SA")} ر.س`}
             </Text>
           </View>
-          <View style={styles.summaryRow}>
+          <View style={cartBaseStyles.summaryRow}>
             <Text style={styles.summaryLabel}>خصم الولاء ٥٪</Text>
             <Text style={styles.discountValue}>-{discount.toLocaleString("ar-SA")} ر.س</Text>
           </View>
           {promoDiscount > 0 && (
-            <View style={styles.summaryRow}>
+            <View style={cartBaseStyles.summaryRow}>
               <Text style={styles.summaryLabel}>كوبون الخصم</Text>
               <Text style={styles.discountValue}>-{promoDiscount.toLocaleString("ar-SA")} ر.س</Text>
             </View>
@@ -538,7 +548,7 @@ function CartScreen() {
               style={styles.promoToggle}
               onPress={() => { setShowPromo((v) => !v); Haptics.selectionAsync(); }}
             >
-              <View style={styles.promoToggleLeft}>
+              <View style={cartBaseStyles.promoToggleLeft}>
                 <Ionicons name="pricetag-outline" size={16} color={colors.primary} />
                 <Text style={styles.promoToggleText}>
                   {showPromo ? "إخفاء الكوبون" : "لديك كوبون خصم؟ أضفه هنا"}
@@ -550,7 +560,7 @@ function CartScreen() {
 
           {showPromo && !appliedCode && (
             <>
-              <View style={styles.promoRow}>
+              <View style={cartBaseStyles.promoRow}>
                 <TextInput
                   style={styles.promoInput}
                   value={promoInput}
@@ -563,7 +573,7 @@ function CartScreen() {
                   onSubmitEditing={handleApplyPromo}
                 />
                 <TouchableOpacity style={styles.promoBtn} onPress={handleApplyPromo}>
-                  <Text style={styles.promoBtnText}>تطبيق</Text>
+                  <Text style={cartBaseStyles.promoBtnText}>تطبيق</Text>
                 </TouchableOpacity>
               </View>
               {promoError !== "" && <Text style={styles.promoError}>{promoError}</Text>}
@@ -575,19 +585,19 @@ function CartScreen() {
         <View style={styles.checkoutBtnWrapper}>
           <LinearGradient colors={["#E63946", "#C1121F"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
             <TouchableOpacity
-              style={styles.checkoutGrad}
+              style={cartBaseStyles.checkoutGrad}
               onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); router.push("/checkout"); }}
               activeOpacity={0.9}
             >
               <Ionicons name="arrow-back" size={20} color="#fff" />
-              <Text style={styles.checkoutText}>إتمام الشراء — {displayTotal.toLocaleString("ar-SA")} ر.س</Text>
+              <Text style={cartBaseStyles.checkoutText}>إتمام الشراء — {displayTotal.toLocaleString("ar-SA")} ر.س</Text>
             </TouchableOpacity>
           </LinearGradient>
         </View>
 
         {/* Cross-sell section */}
         {crossSellProducts.length > 0 && (
-          <View style={styles.crossSellSection}>
+          <View style={cartBaseStyles.crossSellSection}>
             <Text style={styles.crossSellTitle}>قد يعجبك أيضاً ✨</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 4 }}>
               {crossSellProducts.map((p) => (
@@ -598,10 +608,10 @@ function CartScreen() {
                   activeOpacity={0.88}
                 >
                   <Image source={p.image} style={styles.crossSellImg} resizeMode="cover" />
-                  <View style={styles.crossSellInfo}>
+                  <View style={cartBaseStyles.crossSellInfo}>
                     <Text style={styles.crossSellBrand}>{p.brand}</Text>
                     <Text style={styles.crossSellName} numberOfLines={2}>{p.nameAr}</Text>
-                    <View style={styles.crossSellBottom}>
+                    <View style={cartBaseStyles.crossSellBottom}>
                       <Text style={styles.crossSellPrice}>{p.price.toLocaleString("ar-SA")} ر.س</Text>
                     </View>
                   </View>

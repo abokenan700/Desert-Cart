@@ -75,6 +75,18 @@ const ROWS: CompareRow[] = [
   },
 ];
 
+// ─── Module-level static styles (no color tokens) ────────────────────────────
+const baseStyles = StyleSheet.create({
+  overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.65)", justifyContent: "flex-end" },
+  productCol: { flex: 1, alignItems: "center", gap: 6 },
+  addBtnGrad: { paddingVertical: 9, alignItems: "center" },
+  addBtnText: { color: "#fff", fontSize: 12, fontFamily: "Cairo_700Bold" },
+  dividerCol: { width: 28, alignItems: "center", justifyContent: "center" },
+  tableBody: { paddingHorizontal: 8, paddingBottom: 32 },
+  rowCell: { flex: 1, alignItems: "center", justifyContent: "center", padding: 8 },
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function CompareModal({ products, visible, onClose, onClear }: CompareModalProps) {
   const { width, height } = useWindowDimensions();
   const colors = useColors();
@@ -84,11 +96,6 @@ export default function CompareModal({ products, visible, onClose, onClear }: Co
   const [a, b] = products;
 
   const styles = useMemo(() => StyleSheet.create({
-    overlay: {
-      flex: 1,
-      backgroundColor: "rgba(0,0,0,0.65)",
-      justifyContent: "flex-end",
-    },
     sheet: {
       backgroundColor: colors.background,
       borderTopLeftRadius: 28,
@@ -146,11 +153,6 @@ export default function CompareModal({ products, visible, onClose, onClear }: Co
       borderBottomColor: colors.border,
       backgroundColor: colors.card,
     },
-    productCol: {
-      flex: 1,
-      alignItems: "center",
-      gap: 6,
-    },
     productImg: {
       width: (width - 80) / 2,
       height: ((width - 80) / 2) * 1.3,
@@ -174,28 +176,10 @@ export default function CompareModal({ products, visible, onClose, onClear }: Co
       borderRadius: 10,
       overflow: "hidden",
     },
-    addBtnGrad: {
-      paddingVertical: 9,
-      alignItems: "center",
-    },
-    addBtnText: {
-      color: "#fff",
-      fontSize: 12,
-      fontFamily: "Cairo_700Bold",
-    },
-    dividerCol: {
-      width: 28,
-      alignItems: "center",
-      justifyContent: "center",
-    },
     vsText: {
       fontSize: 13,
       fontFamily: "Cairo_800ExtraBold",
       color: colors.mutedForeground,
-    },
-    tableBody: {
-      paddingHorizontal: 8,
-      paddingBottom: 32,
     },
     tableRow: {
       flexDirection: "row-reverse",
@@ -213,12 +197,6 @@ export default function CompareModal({ products, visible, onClose, onClear }: Co
       fontSize: 11,
       fontFamily: "Cairo_600SemiBold",
       color: colors.mutedForeground,
-    },
-    rowCell: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-      padding: 8,
     },
     rowCellText: {
       fontSize: 13,
@@ -286,7 +264,7 @@ export default function CompareModal({ products, visible, onClose, onClear }: Co
       isLoser = result !== "same" && result !== side;
     }
     return (
-      <View style={[styles.rowCell, isWinner && styles.winnerCell]}>
+      <View style={[baseStyles.rowCell, isWinner && styles.winnerCell]}>
         {typeof row.render(product) === "string" ? (
           <Text style={[styles.rowCellText, isWinner && styles.winnerText, isLoser && styles.loserText]}>
             {row.render(product) as string}
@@ -305,7 +283,7 @@ export default function CompareModal({ products, visible, onClose, onClear }: Co
 
   return (
     <Modal transparent visible={visible} animationType="slide" statusBarTranslucent onRequestClose={onClose}>
-      <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={onClose}>
+      <TouchableOpacity style={baseStyles.overlay} activeOpacity={1} onPress={onClose}>
         <TouchableOpacity activeOpacity={1} style={styles.sheet}>
           <View style={styles.handle} />
 
@@ -346,11 +324,11 @@ export default function CompareModal({ products, visible, onClose, onClear }: Co
                   {[b, a].map((product, idx) => (
                     <React.Fragment key={product.id}>
                       {idx === 1 && (
-                        <View style={styles.dividerCol}>
+                        <View style={baseStyles.dividerCol}>
                           <Text style={styles.vsText}>VS</Text>
                         </View>
                       )}
-                      <View style={styles.productCol}>
+                      <View style={baseStyles.productCol}>
                         <Image source={product.image} style={styles.productImg} resizeMode="cover" />
                         <Text style={styles.productBrand}>{product.brand}</Text>
                         <Text style={styles.productName} numberOfLines={2}>{product.nameAr}</Text>
@@ -359,9 +337,9 @@ export default function CompareModal({ products, visible, onClose, onClear }: Co
                             colors={[colors.primary, colors.navy ?? colors.primary]}
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 0 }}
-                            style={styles.addBtnGrad}
+                            style={baseStyles.addBtnGrad}
                           >
-                            <Text style={styles.addBtnText}>أضف للسلة</Text>
+                            <Text style={baseStyles.addBtnText}>أضف للسلة</Text>
                           </LinearGradient>
                         </TouchableOpacity>
                       </View>
@@ -369,7 +347,7 @@ export default function CompareModal({ products, visible, onClose, onClear }: Co
                   ))}
                 </View>
 
-                <View style={styles.tableBody}>
+                <View style={baseStyles.tableBody}>
                   {ROWS.map((row) => (
                     <View key={row.label} style={styles.tableRow}>
                       {renderCell(row, b, "b")}

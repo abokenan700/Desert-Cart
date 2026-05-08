@@ -55,6 +55,27 @@ const TRACKING_STEPS = [
   },
 ];
 
+// ─── Module-level static styles (no color tokens) ────────────────────────────
+const baseStyles = StyleSheet.create({
+  stepRow: {
+    flexDirection: "row-reverse",
+    gap: 14,
+    marginBottom: 4,
+  },
+  stepLeft: {
+    alignItems: "center",
+    width: 40,
+  },
+  stepContent: { flex: 1, paddingBottom: 24 },
+  driverInfo: { flex: 1 },
+  bottomBarText: {
+    color: "#fff",
+    fontSize: 16,
+    fontFamily: "Cairo_700Bold",
+  },
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
 function OrderTrackingScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
@@ -103,6 +124,7 @@ function OrderTrackingScreen() {
     Animated.stagger(150, animations).start();
   }, []);
 
+  // Only color-token-dependent or runtime-value-dependent styles here
   const styles = useMemo(() => StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
     header: {
@@ -206,15 +228,6 @@ function OrderTrackingScreen() {
       borderBottomColor: colors.border,
       paddingBottom: 10,
     },
-    stepRow: {
-      flexDirection: "row-reverse",
-      gap: 14,
-      marginBottom: 4,
-    },
-    stepLeft: {
-      alignItems: "center",
-      width: 40,
-    },
     stepIconWrap: {
       width: 40,
       height: 40,
@@ -229,7 +242,6 @@ function OrderTrackingScreen() {
       borderRadius: 1,
       marginVertical: 4,
     },
-    stepContent: { flex: 1, paddingBottom: 24 },
     stepTitle: {
       fontSize: 15,
       fontFamily: "Cairo_700Bold",
@@ -270,7 +282,6 @@ function OrderTrackingScreen() {
       alignItems: "center",
       justifyContent: "center",
     },
-    driverInfo: { flex: 1 },
     driverName: {
       fontSize: 15,
       fontFamily: "Cairo_700Bold",
@@ -309,11 +320,6 @@ function OrderTrackingScreen() {
       flexDirection: "row-reverse",
       justifyContent: "center",
       gap: 8,
-    },
-    bottomBarText: {
-      color: "#fff",
-      fontSize: 16,
-      fontFamily: "Cairo_700Bold",
     },
   }), [colors, topPad, bottomPad]);
 
@@ -358,7 +364,7 @@ function OrderTrackingScreen() {
           <View style={styles.driverAvatar}>
             <Ionicons name="person" size={26} color="#fff" />
           </View>
-          <View style={styles.driverInfo}>
+          <View style={baseStyles.driverInfo}>
             <Text style={styles.driverName}>محمد العمري</Text>
             <Text style={styles.driverRole}>مندوب التوصيل</Text>
           </View>
@@ -380,8 +386,8 @@ function OrderTrackingScreen() {
                 transform: [{ translateY: slideAnims[i] }],
               }}
             >
-              <View style={styles.stepRow}>
-                <View style={styles.stepLeft}>
+              <View style={baseStyles.stepRow}>
+                <View style={baseStyles.stepLeft}>
                   <View
                     style={[
                       styles.stepIconWrap,
@@ -411,7 +417,7 @@ function OrderTrackingScreen() {
                     />
                   )}
                 </View>
-                <View style={styles.stepContent}>
+                <View style={baseStyles.stepContent}>
                   <Text
                     style={[
                       styles.stepTitle,
@@ -438,7 +444,7 @@ function OrderTrackingScreen() {
           style={styles.bottomBar}
           onPress={() => router.replace("/(tabs)/")}
         >
-          <Text style={styles.bottomBarText}>مواصلة التسوق</Text>
+          <Text style={baseStyles.bottomBarText}>مواصلة التسوق</Text>
           <Ionicons name="bag-outline" size={20} color="#fff" />
         </TouchableOpacity>
       </ScrollView>

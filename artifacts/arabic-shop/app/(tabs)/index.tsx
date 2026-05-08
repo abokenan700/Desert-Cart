@@ -41,6 +41,98 @@ import {
   FEATURED_PRODUCTS,
 } from "@/data/mockData";
 
+// ─── Module-level static styles (no color tokens, no runtime values) ─────────
+const baseStyles = StyleSheet.create({
+  scroll: { flex: 1 },
+  horizontalList: { paddingHorizontal: 12, gap: 8 },
+  productGrid: {
+    flexDirection: "row-reverse",
+    flexWrap: "wrap",
+    paddingHorizontal: 12,
+    justifyContent: "space-between",
+  },
+  skeletonGrid: {
+    flexDirection: "row-reverse",
+    flexWrap: "wrap",
+    paddingHorizontal: 12,
+    justifyContent: "space-between",
+  },
+  gridItem: { paddingHorizontal: 4 },
+  promoRow: {
+    flexDirection: "row-reverse",
+    marginHorizontal: 16,
+    gap: 10,
+    marginTop: 4,
+    marginBottom: 4,
+  },
+  promoCard: {
+    flex: 1,
+    borderRadius: 16,
+    padding: 14,
+    alignItems: "flex-end",
+    minHeight: 100,
+    justifyContent: "space-between",
+  },
+  promoTitle: {
+    color: "#fff",
+    fontSize: 14,
+    fontFamily: "Cairo_700Bold",
+    textAlign: "right",
+  },
+  promoSub: {
+    color: "rgba(255,255,255,0.85)",
+    fontSize: 11,
+    fontFamily: "Cairo_400Regular",
+    textAlign: "right",
+  },
+  promoBtn: {
+    backgroundColor: "rgba(255,255,255,0.25)",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  promoBtnText: {
+    color: "#fff",
+    fontSize: 11,
+    fontFamily: "Cairo_600SemiBold",
+  },
+  flashSaleTopAccent: { height: 4, width: "100%" },
+  flashSaleHeader: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 14,
+    paddingTop: 12,
+    marginBottom: 10,
+  },
+  flashSaleLeft: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 8,
+  },
+  flashBadgeText: {
+    color: "#fff",
+    fontSize: 11,
+    fontFamily: "Cairo_700Bold",
+  },
+  liveRow: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 4,
+  },
+  todaysPicksGrid: { paddingHorizontal: 12 },
+  gridColumnWrapper: {
+    justifyContent: "space-between",
+    flexDirection: "row-reverse",
+  },
+  emptySection: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function HomeScreen() {
   const { width } = useWindowDimensions();
   const colors = useColors();
@@ -142,11 +234,11 @@ export default function HomeScreen() {
     } as any);
   }, []);
 
+  // Only color-token-dependent or runtime-value-dependent styles here
   const styles = useMemo(
     () =>
       StyleSheet.create({
         container: { flex: 1, backgroundColor: colors.background },
-        scroll: { flex: 1 },
         searchBar: {
           marginHorizontal: 4,
           marginVertical: 3,
@@ -178,59 +270,7 @@ export default function HomeScreen() {
           backgroundColor: colors.secondary,
           marginVertical: 4,
         },
-        horizontalList: { paddingHorizontal: 12, gap: 8 },
         horizontalCard: { width: width * 0.32 },
-        productGrid: {
-          flexDirection: "row-reverse",
-          flexWrap: "wrap",
-          paddingHorizontal: 12,
-          justifyContent: "space-between",
-        },
-        skeletonGrid: {
-          flexDirection: "row-reverse",
-          flexWrap: "wrap",
-          paddingHorizontal: 12,
-          justifyContent: "space-between",
-        },
-        gridItem: { paddingHorizontal: 4 },
-        promoRow: {
-          flexDirection: "row-reverse",
-          marginHorizontal: 16,
-          gap: 10,
-          marginTop: 4,
-          marginBottom: 4,
-        },
-        promoCard: {
-          flex: 1,
-          borderRadius: 16,
-          padding: 14,
-          alignItems: "flex-end",
-          minHeight: 100,
-          justifyContent: "space-between",
-        },
-        promoTitle: {
-          color: "#fff",
-          fontSize: 14,
-          fontFamily: "Cairo_700Bold",
-          textAlign: "right",
-        },
-        promoSub: {
-          color: "rgba(255,255,255,0.85)",
-          fontSize: 11,
-          fontFamily: "Cairo_400Regular",
-          textAlign: "right",
-        },
-        promoBtn: {
-          backgroundColor: "rgba(255,255,255,0.25)",
-          borderRadius: 10,
-          paddingHorizontal: 12,
-          paddingVertical: 6,
-        },
-        promoBtnText: {
-          color: "#fff",
-          fontSize: 11,
-          fontFamily: "Cairo_600SemiBold",
-        },
         flashSaleContainer: {
           marginHorizontal: 4,
           marginTop: 10,
@@ -252,23 +292,6 @@ export default function HomeScreen() {
             web: { boxShadow: "0 4px 16px rgba(230,57,70,0.22)" } as any,
           }),
         },
-        flashSaleTopAccent: {
-          height: 4,
-          width: "100%",
-        },
-        flashSaleHeader: {
-          flexDirection: "row-reverse",
-          alignItems: "center",
-          justifyContent: "space-between",
-          paddingHorizontal: 14,
-          paddingTop: 12,
-          marginBottom: 10,
-        },
-        flashSaleLeft: {
-          flexDirection: "row-reverse",
-          alignItems: "center",
-          gap: 8,
-        },
         flashTitle: {
           fontSize: 17,
           fontFamily: "Cairo_700Bold",
@@ -279,11 +302,6 @@ export default function HomeScreen() {
           borderRadius: 10,
           paddingHorizontal: 8,
           paddingVertical: 2,
-        },
-        flashBadgeText: {
-          color: "#fff",
-          fontSize: 11,
-          fontFamily: "Cairo_700Bold",
         },
         liveDot: {
           width: 8,
@@ -296,11 +314,6 @@ export default function HomeScreen() {
           fontFamily: "Cairo_700Bold",
           color: colors.primary,
         },
-        liveRow: {
-          flexDirection: "row-reverse",
-          alignItems: "center",
-          gap: 4,
-        },
         sectionLabel: {
           fontSize: 13,
           fontFamily: "Cairo_600SemiBold",
@@ -309,18 +322,6 @@ export default function HomeScreen() {
           paddingHorizontal: 16,
           paddingTop: 16,
           paddingBottom: 10,
-        },
-        todaysPicksGrid: {
-          paddingHorizontal: 12,
-        },
-        gridColumnWrapper: {
-          justifyContent: "space-between",
-          flexDirection: "row-reverse",
-        },
-        emptySection: {
-          paddingHorizontal: 16,
-          paddingVertical: 12,
-          alignItems: "center",
         },
         emptySectionText: {
           fontSize: 12,
@@ -337,7 +338,7 @@ export default function HomeScreen() {
       <HomeHeader onPressNotifications={() => setNotificationsVisible(true)} />
 
       <ScrollView
-        style={styles.scroll}
+        style={baseStyles.scroll}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 80 + bottomPad }}
         refreshControl={
@@ -377,13 +378,13 @@ export default function HomeScreen() {
 
         {/* Flash Sale Section */}
         <View style={styles.flashSaleContainer}>
-          <View style={styles.flashSaleHeader}>
-            <View style={styles.flashSaleLeft}>
+          <View style={baseStyles.flashSaleHeader}>
+            <View style={baseStyles.flashSaleLeft}>
               <Text style={styles.flashTitle}>عروض اليوم</Text>
               <View style={styles.flashBadge}>
-                <Text style={styles.flashBadgeText}>يومي 🔥</Text>
+                <Text style={baseStyles.flashBadgeText}>يومي 🔥</Text>
               </View>
-              <View style={styles.liveRow}>
+              <View style={baseStyles.liveRow}>
                 <Animated.View
                   style={[
                     styles.liveDot,
@@ -401,7 +402,7 @@ export default function HomeScreen() {
               {[1, 2].map((k) => <ProductCardSkeleton key={k} />)}
             </View>
           ) : filteredFlashSale.length === 0 ? (
-            <View style={styles.emptySection}>
+            <View style={baseStyles.emptySection}>
               <Text style={styles.emptySectionText}>لا توجد عروض في هذا القسم</Text>
             </View>
           ) : (
@@ -409,7 +410,7 @@ export default function HomeScreen() {
               data={filteredFlashSale}
               horizontal
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.horizontalList}
+              contentContainerStyle={baseStyles.horizontalList}
               style={Platform.OS === "web" ? ({ direction: "rtl" } as any) : undefined}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
@@ -430,9 +431,9 @@ export default function HomeScreen() {
 
         <View style={styles.sectionDivider} />
 
-        <View style={styles.promoRow}>
+        <View style={baseStyles.promoRow}>
           <TouchableOpacity
-            style={[styles.promoCard, { backgroundColor: colors.purple }]}
+            style={[baseStyles.promoCard, { backgroundColor: colors.purple }]}
             activeOpacity={0.85}
             onPress={() =>
               router.push(
@@ -442,16 +443,16 @@ export default function HomeScreen() {
           >
             <Ionicons name="flash" size={24} color="rgba(255,255,255,0.7)" />
             <View>
-              <Text style={styles.promoTitle}>شحن مجاني</Text>
-              <Text style={styles.promoSub}>على طلبات +500 ر.س</Text>
+              <Text style={baseStyles.promoTitle}>شحن مجاني</Text>
+              <Text style={baseStyles.promoSub}>على طلبات +500 ر.س</Text>
             </View>
-            <View style={styles.promoBtn}>
-              <Text style={styles.promoBtnText}>تسوق الآن</Text>
+            <View style={baseStyles.promoBtn}>
+              <Text style={baseStyles.promoBtnText}>تسوق الآن</Text>
             </View>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.promoCard, { backgroundColor: colors.primary }]}
+            style={[baseStyles.promoCard, { backgroundColor: colors.primary }]}
             activeOpacity={0.85}
             onPress={() =>
               router.push({
@@ -462,11 +463,11 @@ export default function HomeScreen() {
           >
             <Ionicons name="gift" size={24} color="rgba(255,255,255,0.7)" />
             <View>
-              <Text style={styles.promoTitle}>عروض حصرية</Text>
-              <Text style={styles.promoSub}>خصم ٣٠٪ للأعضاء</Text>
+              <Text style={baseStyles.promoTitle}>عروض حصرية</Text>
+              <Text style={baseStyles.promoSub}>خصم ٣٠٪ للأعضاء</Text>
             </View>
-            <View style={styles.promoBtn}>
-              <Text style={styles.promoBtnText}>انضم الآن</Text>
+            <View style={baseStyles.promoBtn}>
+              <Text style={baseStyles.promoBtnText}>انضم الآن</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -483,7 +484,7 @@ export default function HomeScreen() {
             {[1, 2].map((k) => <ProductCardSkeleton key={k} />)}
           </View>
         ) : filteredNewArrivals.length === 0 ? (
-          <View style={styles.emptySection}>
+          <View style={baseStyles.emptySection}>
             <Text style={styles.emptySectionText}>لا توجد منتجات جديدة في هذا القسم</Text>
           </View>
         ) : (
@@ -491,7 +492,7 @@ export default function HomeScreen() {
             data={filteredNewArrivals}
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.horizontalList}
+            contentContainerStyle={baseStyles.horizontalList}
             style={Platform.OS === "web" ? ({ direction: "rtl" } as any) : undefined}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
@@ -511,7 +512,7 @@ export default function HomeScreen() {
               data={recentlyViewed}
               horizontal
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.horizontalList}
+              contentContainerStyle={baseStyles.horizontalList}
               style={Platform.OS === "web" ? ({ direction: "rtl" } as any) : undefined}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
@@ -528,9 +529,9 @@ export default function HomeScreen() {
           onSeeAll={() => router.push("/(tabs)/search")}
         />
         {refreshing ? (
-          <View style={styles.skeletonGrid}>
+          <View style={baseStyles.skeletonGrid}>
             {[1, 2, 3, 4].map((k) => (
-              <View key={k} style={styles.gridItem}>
+              <View key={k} style={baseStyles.gridItem}>
                 <ProductCardSkeleton />
               </View>
             ))}
@@ -541,10 +542,10 @@ export default function HomeScreen() {
             numColumns={2}
             scrollEnabled={false}
             keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.todaysPicksGrid}
-            columnWrapperStyle={styles.gridColumnWrapper}
+            contentContainerStyle={baseStyles.todaysPicksGrid}
+            columnWrapperStyle={baseStyles.gridColumnWrapper}
             renderItem={({ item }) => (
-              <View style={[styles.gridItem, { flex: 1 }]}>
+              <View style={[baseStyles.gridItem, { flex: 1 }]}>
                 <ProductCard product={item} />
               </View>
             )}
@@ -559,15 +560,15 @@ export default function HomeScreen() {
           onSeeAll={() => router.push("/(tabs)/search")}
         />
         {refreshing ? (
-          <View style={styles.skeletonGrid}>
+          <View style={baseStyles.skeletonGrid}>
             {[1, 2, 3, 4].map((k) => (
-              <View key={k} style={styles.gridItem}>
+              <View key={k} style={baseStyles.gridItem}>
                 <ProductCardSkeleton />
               </View>
             ))}
           </View>
         ) : filteredBestSellers.length === 0 ? (
-          <View style={styles.emptySection}>
+          <View style={baseStyles.emptySection}>
             <Text style={styles.emptySectionText}>لا توجد منتجات في هذا القسم</Text>
           </View>
         ) : (
@@ -577,9 +578,9 @@ export default function HomeScreen() {
             scrollEnabled={false}
             keyExtractor={(item) => item.id}
             contentContainerStyle={{ paddingHorizontal: 12 }}
-            columnWrapperStyle={styles.gridColumnWrapper}
+            columnWrapperStyle={baseStyles.gridColumnWrapper}
             renderItem={({ item }) => (
-              <View style={[styles.gridItem, { flex: 1 }]}>
+              <View style={[baseStyles.gridItem, { flex: 1 }]}>
                 <ProductCard product={item} />
               </View>
             )}

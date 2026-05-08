@@ -14,6 +14,114 @@ import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { COUPONS, isCouponExpired } from "@/data/coupons";
 
+// ─── Module-level static styles (no color tokens) ────────────────────────────
+const baseStyles = StyleSheet.create({
+  couponTop: {
+    flexDirection: "row-reverse",
+    padding: 16,
+    gap: 12,
+    alignItems: "flex-start",
+  },
+  iconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  couponInfo: { flex: 1 },
+  couponDesc: {
+    fontSize: 14,
+    fontFamily: "Cairo_700Bold",
+    textAlign: "right",
+  },
+  couponMeta: {
+    fontSize: 12,
+    fontFamily: "Cairo_400Regular",
+    textAlign: "right",
+    marginTop: 3,
+  },
+  discountBadge: {
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  discountText: {
+    fontSize: 18,
+    fontFamily: "Cairo_800ExtraBold",
+    color: "#fff",
+  },
+  couponBottom: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 14,
+  },
+  codeBox: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 8,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderStyle: "dashed",
+  },
+  codeText: {
+    fontSize: 14,
+    fontFamily: "Cairo_700Bold",
+    letterSpacing: 2,
+  },
+  copyBtn: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 5,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 10,
+  },
+  copyBtnText: {
+    fontSize: 13,
+    fontFamily: "Cairo_600SemiBold",
+  },
+  infoBar: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 8,
+    margin: 16,
+    borderRadius: 12,
+    padding: 12,
+  },
+  infoText: {
+    fontSize: 12,
+    fontFamily: "Cairo_400Regular",
+    textAlign: "right",
+    flex: 1,
+  },
+  headerRow: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 12,
+  },
+  backBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontFamily: "Cairo_700Bold",
+  },
+  dashed: {
+    marginHorizontal: 16,
+    borderStyle: "dashed",
+    borderTopWidth: 1.5,
+  },
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function MyCouponsScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
@@ -34,6 +142,7 @@ export default function MyCouponsScreen() {
     }
   };
 
+  // Only color-token-dependent or runtime-value-dependent styles here
   const styles = useMemo(
     () =>
       StyleSheet.create({
@@ -43,40 +152,8 @@ export default function MyCouponsScreen() {
           paddingTop: topPad + 8,
           paddingBottom: 14,
           paddingHorizontal: 16,
-          flexDirection: "row-reverse",
-          alignItems: "center",
-          gap: 12,
           borderBottomWidth: 1,
           borderBottomColor: colors.border,
-        },
-        backBtn: {
-          width: 38,
-          height: 38,
-          borderRadius: 12,
-          backgroundColor: colors.secondary,
-          alignItems: "center",
-          justifyContent: "center",
-        },
-        headerTitle: {
-          fontSize: 18,
-          fontFamily: "Cairo_700Bold",
-          color: colors.text,
-        },
-        infoBar: {
-          flexDirection: "row-reverse",
-          alignItems: "center",
-          gap: 8,
-          margin: 16,
-          backgroundColor: colors.navyLight,
-          borderRadius: 12,
-          padding: 12,
-        },
-        infoText: {
-          fontSize: 12,
-          fontFamily: "Cairo_400Regular",
-          color: colors.navy,
-          textAlign: "right",
-          flex: 1,
         },
         couponCard: {
           marginHorizontal: 16,
@@ -87,85 +164,6 @@ export default function MyCouponsScreen() {
           borderColor: colors.border,
           overflow: "hidden",
         },
-        couponTop: {
-          flexDirection: "row-reverse",
-          padding: 16,
-          gap: 12,
-          alignItems: "flex-start",
-        },
-        iconBox: {
-          width: 44,
-          height: 44,
-          borderRadius: 22,
-          alignItems: "center",
-          justifyContent: "center",
-        },
-        couponInfo: { flex: 1 },
-        couponDesc: {
-          fontSize: 14,
-          fontFamily: "Cairo_700Bold",
-          color: colors.text,
-          textAlign: "right",
-        },
-        couponMeta: {
-          fontSize: 12,
-          fontFamily: "Cairo_400Regular",
-          color: colors.mutedForeground,
-          textAlign: "right",
-          marginTop: 3,
-        },
-        discountBadge: {
-          borderRadius: 12,
-          paddingHorizontal: 10,
-          paddingVertical: 4,
-        },
-        discountText: {
-          fontSize: 18,
-          fontFamily: "Cairo_800ExtraBold",
-          color: "#fff",
-        },
-        dashed: {
-          marginHorizontal: 16,
-          borderStyle: "dashed",
-          borderTopWidth: 1.5,
-          borderTopColor: colors.border,
-        },
-        couponBottom: {
-          flexDirection: "row-reverse",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: 14,
-        },
-        codeBox: {
-          flexDirection: "row-reverse",
-          alignItems: "center",
-          gap: 8,
-          backgroundColor: colors.secondary,
-          borderRadius: 10,
-          paddingHorizontal: 14,
-          paddingVertical: 8,
-          borderWidth: 1,
-          borderColor: colors.border,
-          borderStyle: "dashed",
-        },
-        codeText: {
-          fontSize: 14,
-          fontFamily: "Cairo_700Bold",
-          color: colors.text,
-          letterSpacing: 2,
-        },
-        copyBtn: {
-          flexDirection: "row-reverse",
-          alignItems: "center",
-          gap: 5,
-          paddingHorizontal: 14,
-          paddingVertical: 8,
-          borderRadius: 10,
-        },
-        copyBtnText: {
-          fontSize: 13,
-          fontFamily: "Cairo_600SemiBold",
-        },
       }),
     [colors, topPad]
   );
@@ -173,23 +171,28 @@ export default function MyCouponsScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-          <Ionicons name="arrow-forward" size={20} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>كوبونات الخصم</Text>
+        <View style={baseStyles.headerRow}>
+          <TouchableOpacity
+            style={[baseStyles.backBtn, { backgroundColor: colors.secondary }]}
+            onPress={() => router.back()}
+          >
+            <Ionicons name="arrow-forward" size={20} color={colors.text} />
+          </TouchableOpacity>
+          <Text style={[baseStyles.headerTitle, { color: colors.text }]}>كوبونات الخصم</Text>
+        </View>
       </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 24 + bottomPad }}
       >
-        <View style={styles.infoBar}>
+        <View style={[baseStyles.infoBar, { backgroundColor: colors.navyLight }]}>
           <Ionicons
             name="information-circle-outline"
             size={18}
             color={colors.navy}
           />
-          <Text style={styles.infoText}>
+          <Text style={[baseStyles.infoText, { color: colors.navy }]}>
             انسخ الكود وأدخله في خطوة الدفع عند الشراء للحصول على الخصم
           </Text>
         </View>
@@ -207,10 +210,10 @@ export default function MyCouponsScreen() {
               key={coupon.code}
               style={[styles.couponCard, expired && { opacity: 0.55 }]}
             >
-              <View style={styles.couponTop}>
+              <View style={baseStyles.couponTop}>
                 <View
                   style={[
-                    styles.iconBox,
+                    baseStyles.iconBox,
                     { backgroundColor: expired ? colors.secondary : colors.purpleLight },
                   ]}
                 >
@@ -220,16 +223,17 @@ export default function MyCouponsScreen() {
                     color={expired ? colors.mutedForeground : colors.purple}
                   />
                 </View>
-                <View style={styles.couponInfo}>
+                <View style={baseStyles.couponInfo}>
                   <Text
                     style={[
-                      styles.couponDesc,
+                      baseStyles.couponDesc,
+                      { color: colors.text },
                       expired && { textDecorationLine: "line-through", color: colors.mutedForeground },
                     ]}
                   >
                     {coupon.descAr}
                   </Text>
-                  <Text style={styles.couponMeta}>
+                  <Text style={[baseStyles.couponMeta, { color: colors.mutedForeground }]}>
                     {coupon.minOrder
                       ? `الحد الأدنى: ${coupon.minOrder.toLocaleString("ar-SA")} ر.س · `
                       : ""}
@@ -238,13 +242,13 @@ export default function MyCouponsScreen() {
                 </View>
                 <View
                   style={[
-                    styles.discountBadge,
+                    baseStyles.discountBadge,
                     { backgroundColor: expired ? colors.border : colors.purple },
                   ]}
                 >
                   <Text
                     style={[
-                      styles.discountText,
+                      baseStyles.discountText,
                       expired && { color: colors.mutedForeground },
                     ]}
                   >
@@ -253,17 +257,17 @@ export default function MyCouponsScreen() {
                 </View>
               </View>
 
-              <View style={styles.dashed} />
+              <View style={[baseStyles.dashed, { borderTopColor: colors.border }]} />
 
-              <View style={styles.couponBottom}>
+              <View style={baseStyles.couponBottom}>
                 {expired ? (
                   <View
                     style={[
-                      styles.copyBtn,
+                      baseStyles.copyBtn,
                       { backgroundColor: colors.secondary },
                     ]}
                   >
-                    <Text style={[styles.copyBtnText, { color: colors.mutedForeground }]}>
+                    <Text style={[baseStyles.copyBtnText, { color: colors.mutedForeground }]}>
                       منتهي الصلاحية
                     </Text>
                     <Ionicons name="close-circle-outline" size={16} color={colors.mutedForeground} />
@@ -271,7 +275,7 @@ export default function MyCouponsScreen() {
                 ) : (
                   <TouchableOpacity
                     style={[
-                      styles.copyBtn,
+                      baseStyles.copyBtn,
                       {
                         backgroundColor: isCopied
                           ? colors.successLight
@@ -280,7 +284,7 @@ export default function MyCouponsScreen() {
                     ]}
                     onPress={() => handleCopy(coupon.code)}
                   >
-                    <Text style={[styles.copyBtnText, { color: badgeColor }]}>
+                    <Text style={[baseStyles.copyBtnText, { color: badgeColor }]}>
                       {isCopied ? "تم النسخ!" : "نسخ الكود"}
                     </Text>
                     <Ionicons
@@ -290,10 +294,11 @@ export default function MyCouponsScreen() {
                     />
                   </TouchableOpacity>
                 )}
-                <View style={styles.codeBox}>
+                <View style={[baseStyles.codeBox, { backgroundColor: colors.secondary, borderColor: colors.border }]}>
                   <Text
                     style={[
-                      styles.codeText,
+                      baseStyles.codeText,
+                      { color: colors.text },
                       expired && { textDecorationLine: "line-through", color: colors.mutedForeground },
                     ]}
                   >

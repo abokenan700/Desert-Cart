@@ -13,6 +13,124 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useOrder } from "@/context/OrderContext";
 
+// ─── Module-level static styles (no color tokens) ────────────────────────────
+const baseStyles = StyleSheet.create({
+  outerRing: {
+    width: 148,
+    height: 148,
+    borderRadius: 74,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 28,
+  },
+  successCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  title: {
+    fontSize: 28,
+    fontFamily: "Cairo_800ExtraBold",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 15,
+    fontFamily: "Cairo_400Regular",
+    textAlign: "center",
+    writingDirection: "rtl",
+    lineHeight: 24,
+    marginBottom: 28,
+  },
+  orderCard: {
+    borderRadius: 18,
+    padding: 20,
+    width: "100%",
+    alignItems: "center",
+    marginBottom: 28,
+    borderWidth: 1,
+  },
+  orderLabel: {
+    fontSize: 13,
+    fontFamily: "Cairo_400Regular",
+    marginBottom: 6,
+  },
+  orderNum: {
+    fontSize: 22,
+    fontFamily: "Cairo_800ExtraBold",
+    letterSpacing: 2,
+    marginBottom: 14,
+  },
+  infoRow: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 8,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  infoText: {
+    fontSize: 13,
+    fontFamily: "Cairo_600SemiBold",
+    textAlign: "right",
+  },
+  stepsRow: {
+    flexDirection: "row-reverse",
+    justifyContent: "space-around",
+    width: "100%",
+    marginBottom: 28,
+  },
+  stepItem: { alignItems: "center", gap: 6 },
+  stepIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  stepText: {
+    fontSize: 11,
+    fontFamily: "Cairo_400Regular",
+  },
+  stepConnector: {
+    width: 30,
+    height: 2,
+    marginTop: 21,
+  },
+  trackBtn: {
+    borderRadius: 16,
+    paddingVertical: 16,
+    width: "100%",
+    alignItems: "center",
+    marginBottom: 12,
+    flexDirection: "row-reverse",
+    justifyContent: "center",
+    gap: 8,
+  },
+  trackBtnText: {
+    color: "#fff",
+    fontSize: 16,
+    fontFamily: "Cairo_700Bold",
+  },
+  shopBtn: {
+    borderRadius: 16,
+    paddingVertical: 16,
+    width: "100%",
+    alignItems: "center",
+    flexDirection: "row-reverse",
+    justifyContent: "center",
+    gap: 8,
+  },
+  shopBtnText: {
+    color: "#fff",
+    fontSize: 16,
+    fontFamily: "Cairo_700Bold",
+  },
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function OrderSuccessScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
@@ -52,6 +170,7 @@ export default function OrderSuccessScreen() {
     ]).start();
   }, []);
 
+  // Only color-token-dependent or runtime-value-dependent styles here
   const styles = useMemo(() => StyleSheet.create({
     container: {
       flex: 1,
@@ -62,140 +181,12 @@ export default function OrderSuccessScreen() {
       paddingTop: topPad,
       paddingBottom: bottomPad,
     },
-    outerRing: {
-      width: 148,
-      height: 148,
-      borderRadius: 74,
-      backgroundColor: colors.successLight,
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: 28,
-    },
-    successCircle: {
-      width: 120,
-      height: 120,
-      borderRadius: 60,
-      backgroundColor: colors.success,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    title: {
-      fontSize: 28,
-      fontFamily: "Cairo_800ExtraBold",
-      color: colors.text,
-      textAlign: "center",
-      marginBottom: 10,
-    },
-    subtitle: {
-      fontSize: 15,
-      fontFamily: "Cairo_400Regular",
-      color: colors.mutedForeground,
-      textAlign: "center",
-      writingDirection: "rtl",
-      lineHeight: 24,
-      marginBottom: 28,
-    },
-    orderCard: {
-      backgroundColor: colors.card,
-      borderRadius: 18,
-      padding: 20,
-      width: "100%",
-      alignItems: "center",
-      marginBottom: 28,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    orderLabel: {
-      fontSize: 13,
-      fontFamily: "Cairo_400Regular",
-      color: colors.mutedForeground,
-      marginBottom: 6,
-    },
-    orderNum: {
-      fontSize: 22,
-      fontFamily: "Cairo_800ExtraBold",
-      color: colors.primary,
-      letterSpacing: 2,
-      marginBottom: 14,
-    },
-    infoRow: {
-      flexDirection: "row-reverse",
-      alignItems: "center",
-      gap: 8,
-      backgroundColor: colors.successLight,
-      borderRadius: 10,
-      paddingHorizontal: 14,
-      paddingVertical: 10,
-    },
-    infoText: {
-      fontSize: 13,
-      fontFamily: "Cairo_600SemiBold",
-      color: colors.success,
-      textAlign: "right",
-    },
-    stepsRow: {
-      flexDirection: "row-reverse",
-      justifyContent: "space-around",
-      width: "100%",
-      marginBottom: 28,
-    },
-    stepItem: { alignItems: "center", gap: 6 },
-    stepIcon: {
-      width: 44,
-      height: 44,
-      borderRadius: 22,
-      backgroundColor: colors.primary,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    stepText: {
-      fontSize: 11,
-      fontFamily: "Cairo_400Regular",
-      color: colors.mutedForeground,
-    },
-    stepConnector: {
-      width: 30,
-      height: 2,
-      backgroundColor: colors.border,
-      marginTop: 21,
-    },
-    trackBtn: {
-      backgroundColor: colors.navy,
-      borderRadius: 16,
-      paddingVertical: 16,
-      width: "100%",
-      alignItems: "center",
-      marginBottom: 12,
-      flexDirection: "row-reverse",
-      justifyContent: "center",
-      gap: 8,
-    },
-    trackBtnText: {
-      color: "#fff",
-      fontSize: 16,
-      fontFamily: "Cairo_700Bold",
-    },
-    shopBtn: {
-      backgroundColor: colors.primary,
-      borderRadius: 16,
-      paddingVertical: 16,
-      width: "100%",
-      alignItems: "center",
-      flexDirection: "row-reverse",
-      justifyContent: "center",
-      gap: 8,
-    },
-    shopBtnText: {
-      color: "#fff",
-      fontSize: 16,
-      fontFamily: "Cairo_700Bold",
-    },
   }), [colors, topPad, bottomPad]);
 
   return (
     <Animated.View style={[styles.container, { opacity: opacityAnim }]}>
-      <Animated.View style={[styles.outerRing, { transform: [{ scale: scaleAnim }] }]}>
-        <View style={styles.successCircle}>
+      <Animated.View style={[baseStyles.outerRing, { backgroundColor: colors.successLight, transform: [{ scale: scaleAnim }] }]}>
+        <View style={[baseStyles.successCircle, { backgroundColor: colors.success }]}>
           <Ionicons name="checkmark" size={56} color="#fff" />
         </View>
       </Animated.View>
@@ -207,21 +198,21 @@ export default function OrderSuccessScreen() {
           transform: [{ translateY: slideAnim }],
         }}
       >
-        <Text style={styles.title}>تم الطلب بنجاح!</Text>
-        <Text style={styles.subtitle}>
+        <Text style={[baseStyles.title, { color: colors.text }]}>تم الطلب بنجاح!</Text>
+        <Text style={[baseStyles.subtitle, { color: colors.mutedForeground }]}>
           شكراً لك على طلبك. سيتم توصيل طلبك في أقرب وقت ممكن.
         </Text>
 
-        <View style={styles.orderCard}>
-          <Text style={styles.orderLabel}>رقم الطلب</Text>
-          <Text style={styles.orderNum}>{orderNumber}</Text>
-          <View style={styles.infoRow}>
+        <View style={[baseStyles.orderCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <Text style={[baseStyles.orderLabel, { color: colors.mutedForeground }]}>رقم الطلب</Text>
+          <Text style={[baseStyles.orderNum, { color: colors.primary }]}>{orderNumber}</Text>
+          <View style={[baseStyles.infoRow, { backgroundColor: colors.successLight }]}>
             <Ionicons name="flash" size={16} color={colors.success} />
-            <Text style={styles.infoText}>التوصيل المتوقع: خلال ٢-٣ أيام عمل</Text>
+            <Text style={[baseStyles.infoText, { color: colors.success }]}>التوصيل المتوقع: خلال ٢-٣ أيام عمل</Text>
           </View>
         </View>
 
-        <View style={styles.stepsRow}>
+        <View style={baseStyles.stepsRow}>
           {[
             { icon: "checkmark-circle", label: "تأكيد الطلب" },
             { icon: "cube", label: "التحضير" },
@@ -229,12 +220,12 @@ export default function OrderSuccessScreen() {
             { icon: "home", label: "التسليم" },
           ].map((s, i) => (
             <React.Fragment key={i}>
-              {i > 0 && <View style={styles.stepConnector} />}
-              <View style={styles.stepItem}>
+              {i > 0 && <View style={[baseStyles.stepConnector, { backgroundColor: colors.border }]} />}
+              <View style={baseStyles.stepItem}>
                 <View
                   style={[
-                    styles.stepIcon,
-                    i > 0 && { backgroundColor: colors.border },
+                    baseStyles.stepIcon,
+                    i === 0 ? { backgroundColor: colors.primary } : { backgroundColor: colors.border },
                   ]}
                 >
                   <Ionicons
@@ -243,14 +234,14 @@ export default function OrderSuccessScreen() {
                     color={i === 0 ? "#fff" : colors.mutedForeground}
                   />
                 </View>
-                <Text style={styles.stepText}>{s.label}</Text>
+                <Text style={[baseStyles.stepText, { color: colors.mutedForeground }]}>{s.label}</Text>
               </View>
             </React.Fragment>
           ))}
         </View>
 
         <TouchableOpacity
-          style={styles.trackBtn}
+          style={[baseStyles.trackBtn, { backgroundColor: colors.navy }]}
           onPress={() =>
             router.push({
               pathname: "/order-tracking",
@@ -258,14 +249,14 @@ export default function OrderSuccessScreen() {
             } as any)
           }
         >
-          <Text style={styles.trackBtnText}>تتبع الطلب</Text>
+          <Text style={baseStyles.trackBtnText}>تتبع الطلب</Text>
           <Ionicons name="locate-outline" size={20} color="#fff" />
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.shopBtn}
+          style={[baseStyles.shopBtn, { backgroundColor: colors.primary }]}
           onPress={() => router.replace("/(tabs)/")}
         >
-          <Text style={styles.shopBtnText}>مواصلة التسوق</Text>
+          <Text style={baseStyles.shopBtnText}>مواصلة التسوق</Text>
           <Ionicons name="bag-outline" size={20} color="#fff" />
         </TouchableOpacity>
       </Animated.View>

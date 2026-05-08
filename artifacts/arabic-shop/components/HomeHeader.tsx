@@ -19,6 +19,31 @@ interface HomeHeaderProps {
   onPressNotifications: () => void;
 }
 
+// ─── Module-level static styles (no color tokens) ────────────────────────────
+const baseStyles = StyleSheet.create({
+  logoSection: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 8,
+  },
+  logoImage: {
+    width: 42,
+    height: 42,
+    resizeMode: "contain",
+  },
+  actions: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 6,
+  },
+  badgeText: {
+    color: "#fff",
+    fontSize: 9,
+    fontFamily: "Cairo_700Bold",
+  },
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
   const colors = useColors();
   const { isDark, toggleTheme } = useTheme();
@@ -28,6 +53,7 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
 
+  // Only color-token-dependent or isDark-dependent styles here
   const styles = useMemo(
     () =>
       StyleSheet.create({
@@ -47,16 +73,6 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
           shadowRadius: 3,
           elevation: 2,
         },
-        logoSection: {
-          flexDirection: "row-reverse",
-          alignItems: "center",
-          gap: 8,
-        },
-        logoImage: {
-          width: 42,
-          height: 42,
-          resizeMode: "contain",
-        },
         storeName: {
           fontSize: 18,
           fontFamily: "Cairo_800ExtraBold",
@@ -70,11 +86,6 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
           color: colors.mutedForeground,
           writingDirection: "rtl",
           marginTop: -2,
-        },
-        actions: {
-          flexDirection: "row-reverse",
-          alignItems: "center",
-          gap: 6,
         },
         iconBtn: {
           width: 40,
@@ -107,21 +118,16 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
           borderWidth: 1.5,
           borderColor: colors.card,
         },
-        badgeText: {
-          color: "#fff",
-          fontSize: 9,
-          fontFamily: "Cairo_700Bold",
-        },
       }),
-    [colors, topPad, isDark]
+    [colors, isDark]
   );
 
   return (
     <View style={styles.header}>
-      <View style={styles.logoSection}>
+      <View style={baseStyles.logoSection}>
         <Image
           source={require("@/assets/logo.png")}
-          style={styles.logoImage}
+          style={baseStyles.logoImage}
         />
         <View>
           <Text style={styles.storeName}>الأسطورة</Text>
@@ -129,7 +135,7 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
         </View>
       </View>
 
-      <View style={styles.actions}>
+      <View style={baseStyles.actions}>
         <TouchableOpacity
           style={styles.themeBtn}
           onPress={toggleTheme}
@@ -151,7 +157,7 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
           <Ionicons name="notifications-outline" size={20} color={colors.text} />
           {unreadCount > 0 && (
             <View style={styles.badge}>
-              <Text style={styles.badgeText}>{unreadCount > 9 ? "9+" : unreadCount}</Text>
+              <Text style={baseStyles.badgeText}>{unreadCount > 9 ? "9+" : unreadCount}</Text>
             </View>
           )}
         </TouchableOpacity>
@@ -164,7 +170,7 @@ export default function HomeHeader({ onPressNotifications }: HomeHeaderProps) {
           <Ionicons name="bag-outline" size={20} color={colors.text} />
           {totalCount > 0 && (
             <View style={styles.badge}>
-              <Text style={styles.badgeText}>{totalCount > 9 ? "9+" : totalCount}</Text>
+              <Text style={baseStyles.badgeText}>{totalCount > 9 ? "9+" : totalCount}</Text>
             </View>
           )}
         </TouchableOpacity>

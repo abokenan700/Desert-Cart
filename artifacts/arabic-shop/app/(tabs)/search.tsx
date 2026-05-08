@@ -98,6 +98,16 @@ function getProductForTerm(term: string): Product | undefined {
   );
 }
 
+// ─── Module-level static styles for ListViewCard ─────────────────────────────
+const listViewCardBaseStyles = StyleSheet.create({
+  info: { flex: 1, padding: 12, justifyContent: "space-between" },
+  topRow: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "flex-start" },
+  ratingRow: { flexDirection: "row-reverse", alignItems: "center", gap: 4, marginBottom: 8 },
+  priceGroup: { flexDirection: "row-reverse", alignItems: "baseline", gap: 6 },
+  discountText: { color: "#fff", fontSize: 10, fontFamily: "Cairo_700Bold" },
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ─── List-view card ────────────────────────────────────────────────────────
 function ListViewCard({ product }: { product: Product }) {
   const colors = useColors();
@@ -129,19 +139,14 @@ function ListViewCard({ product }: { product: Product }) {
           }),
         },
         image: { width: 100, aspectRatio: 3 / 4, backgroundColor: colors.secondary },
-        info: { flex: 1, padding: 12, justifyContent: "space-between" },
-        topRow: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "flex-start" },
         brand: { fontSize: 11, fontFamily: "Cairo_400Regular", color: colors.mutedForeground, textAlign: "right" },
         name: { fontSize: 14, fontFamily: "Cairo_600SemiBold", color: colors.text, textAlign: "right", writingDirection: "rtl", lineHeight: 20, marginTop: 3, marginBottom: 6 },
-        ratingRow: { flexDirection: "row-reverse", alignItems: "center", gap: 4, marginBottom: 8 },
         ratingText: { fontSize: 11, fontFamily: "Cairo_400Regular", color: colors.mutedForeground },
         priceRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
-        priceGroup: { flexDirection: "row-reverse", alignItems: "baseline", gap: 6 },
         price: { fontSize: 16, fontFamily: "Cairo_700Bold", color: colors.primary },
         original: { fontSize: 12, fontFamily: "Cairo_400Regular", color: colors.mutedForeground, textDecorationLine: "line-through" },
         addBtn: { width: 34, height: 34, borderRadius: 10, backgroundColor: colors.primary, alignItems: "center", justifyContent: "center" },
         discountBadge: { backgroundColor: colors.primary, borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2 },
-        discountText: { color: "#fff", fontSize: 10, fontFamily: "Cairo_700Bold" },
       }),
     [colors]
   );
@@ -153,14 +158,14 @@ function ListViewCard({ product }: { product: Product }) {
       activeOpacity={0.9}
     >
       <Image source={product.image} style={styles.image} resizeMode="cover" />
-      <View style={styles.info}>
+      <View style={listViewCardBaseStyles.info}>
         <View>
-          <View style={styles.topRow}>
+          <View style={listViewCardBaseStyles.topRow}>
             <Text style={styles.brand}>{product.brand}</Text>
             <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
               {product.discount && (
                 <View style={styles.discountBadge}>
-                  <Text style={styles.discountText}>-{product.discount}٪</Text>
+                  <Text style={listViewCardBaseStyles.discountText}>-{product.discount}٪</Text>
                 </View>
               )}
               <TouchableOpacity onPress={() => toggleWishlist(product)} hitSlop={8}>
@@ -169,13 +174,13 @@ function ListViewCard({ product }: { product: Product }) {
             </View>
           </View>
           <Text style={styles.name} numberOfLines={2}>{product.nameAr}</Text>
-          <View style={styles.ratingRow}>
+          <View style={listViewCardBaseStyles.ratingRow}>
             <Text style={styles.ratingText}>({product.reviewCount.toLocaleString("ar-SA")})</Text>
             <RatingStars rating={product.rating} size={11} />
           </View>
         </View>
         <View style={styles.priceRow}>
-          <View style={styles.priceGroup}>
+          <View style={listViewCardBaseStyles.priceGroup}>
             {product.originalPrice && (
               <Text style={styles.original}>{product.originalPrice.toLocaleString("ar-SA")}</Text>
             )}
@@ -210,6 +215,34 @@ function HighlightedText({ text, highlight, style }: { text: string; highlight: 
     </Text>
   );
 }
+
+// ─── Module-level static styles for SearchScreen ─────────────────────────────
+const searchBaseStyles = StyleSheet.create({
+  filterBtnWrapper: { borderRadius: 14, overflow: "hidden", position: "relative" },
+  sortChipsContent: { paddingHorizontal: 16, paddingVertical: 10, flexDirection: "row-reverse", gap: 8 },
+  grid: { flexDirection: "row-reverse", flexWrap: "wrap", paddingHorizontal: 12, paddingTop: 4, justifyContent: "space-between" },
+  gridItem: { paddingHorizontal: 4 },
+  suggestionsRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", marginBottom: 10 },
+  tagsRow: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 8 },
+  emptyContainer: { alignItems: "center", paddingTop: 60, gap: 12, paddingHorizontal: 32 },
+  emptyTagsRow: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 8, justifyContent: "center", marginTop: 8 },
+  priceRangeRow: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 8, marginBottom: 8 },
+  pillsRow: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 8, marginBottom: 8 },
+  sortOptionLeft: { flexDirection: "row-reverse", alignItems: "center", gap: 10 },
+  overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" },
+  filterHeaderRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", marginBottom: 20 },
+  applyBtnWrapper: { borderRadius: 14, overflow: "hidden", marginTop: 20 },
+  applyBtnGrad: { paddingVertical: 16, alignItems: "center" },
+  applyBtnText: { color: "#fff", fontSize: 16, fontFamily: "Cairo_700Bold" },
+  toggleThumb: { width: 23, height: 23, borderRadius: 12, backgroundColor: "#fff" },
+  l3BreadcrumbLeft: { flexDirection: "row-reverse", alignItems: "center", gap: 6, flex: 1 },
+  popularSection: { paddingHorizontal: 16, paddingTop: 20, paddingBottom: 8 },
+  emptyClearBtnText: { color: "#fff", fontSize: 13, fontFamily: "Cairo_600SemiBold" },
+  viewToggleBtn: { width: 28, height: 28, borderRadius: 6, alignItems: "center", justifyContent: "center" },
+  sortChipText: { fontSize: 12, fontFamily: "Cairo_600SemiBold" },
+  pillText: { fontSize: 12, fontFamily: "Cairo_600SemiBold" },
+});
+// ─────────────────────────────────────────────────────────────────────────────
 
 // ─── Main screen ───────────────────────────────────────────────────────────
 function SearchScreen() {
@@ -470,7 +503,6 @@ function SearchScreen() {
           paddingHorizontal: 12,
         },
         viewToggle: { flexDirection: "row-reverse", alignItems: "center", backgroundColor: colors.card, borderRadius: 8, padding: 1, gap: 1, borderWidth: 1, borderColor: `${colors.border}70` },
-        viewToggleBtn: { width: 28, height: 28, borderRadius: 6, alignItems: "center", justifyContent: "center" },
         filterRow: {
           flexDirection: "row-reverse",
           alignItems: "center",
@@ -498,7 +530,6 @@ function SearchScreen() {
           }),
         },
         input: { flex: 1, fontSize: 14, fontFamily: "Cairo_400Regular", color: colors.text, textAlign: "right", writingDirection: "rtl" },
-        filterBtnWrapper: { borderRadius: 14, overflow: "hidden", position: "relative" },
         filterBtn: { width: 36, height: 36, backgroundColor: activeFilterCount > 0 ? colors.navy : colors.primary, borderRadius: 10, alignItems: "center", justifyContent: "center" },
         filterBadge: { position: "absolute", top: -4, left: -4, width: 18, height: 18, borderRadius: 9, backgroundColor: colors.gold, alignItems: "center", justifyContent: "center", borderWidth: 1.5, borderColor: colors.card, zIndex: 1 },
         filterBadgeText: { color: "#fff", fontSize: 9, fontFamily: "Cairo_700Bold" },
@@ -532,7 +563,6 @@ function SearchScreen() {
           borderBottomWidth: 1,
           borderBottomColor: `${colors.primary}25`,
         },
-        l3BreadcrumbLeft: { flexDirection: "row-reverse", alignItems: "center", gap: 6, flex: 1 },
         l3BreadcrumbText: { fontSize: 12, fontFamily: "Cairo_600SemiBold", color: colors.primary, textAlign: "right" },
         l3BreadcrumbDismiss: {
           width: 22,
@@ -544,64 +574,44 @@ function SearchScreen() {
         },
         // Sort chips
         sortChipsScroll: { backgroundColor: colors.card, borderBottomWidth: 1, borderBottomColor: colors.border },
-        sortChipsContent: { paddingHorizontal: 16, paddingVertical: 10, flexDirection: "row-reverse", gap: 8 },
         sortChip: { flexDirection: "row-reverse", alignItems: "center", gap: 5, paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20, borderWidth: 1.5 },
-        sortChipText: { fontSize: 12, fontFamily: "Cairo_600SemiBold" },
         // Results bar
         resultsBar: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, paddingVertical: 8, backgroundColor: colors.background },
         resultsCount: { fontSize: 13, fontFamily: "Cairo_600SemiBold", color: colors.mutedForeground },
         resultsHighlight: { color: colors.primary, fontFamily: "Cairo_700Bold" },
         // Grid
-        grid: { flexDirection: "row-reverse", flexWrap: "wrap", paddingHorizontal: 12, paddingTop: 4, justifyContent: "space-between" },
-        gridItem: { paddingHorizontal: 4 },
         // Suggestions panel (recent searches)
         suggestionsPanel: { backgroundColor: colors.card, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: colors.border },
-        suggestionsRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", marginBottom: 10 },
         suggestionsTitle: { fontSize: 13, fontFamily: "Cairo_700Bold", color: colors.text },
         clearHistoryBtn: { fontSize: 12, fontFamily: "Cairo_600SemiBold", color: colors.primary },
         recentItem: { flexDirection: "row-reverse", alignItems: "center", gap: 10, paddingVertical: 9, borderBottomWidth: 1, borderBottomColor: `${colors.border}50` },
         recentThumb: { width: 32, height: 42, borderRadius: 8, backgroundColor: colors.secondary },
         recentText: { flex: 1, fontSize: 14, fontFamily: "Cairo_400Regular", color: colors.text, textAlign: "right" },
         // Popular section
-        popularSection: { paddingHorizontal: 16, paddingTop: 20, paddingBottom: 8 },
         sectionTitle: { fontSize: 16, fontFamily: "Cairo_700Bold", color: colors.text, textAlign: "right", marginBottom: 12 },
-        tagsRow: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 8 },
         tag: { flexDirection: "row-reverse", alignItems: "center", gap: 5, backgroundColor: colors.secondary, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, borderWidth: 1, borderColor: colors.border },
         tagText: { fontSize: 13, fontFamily: "Cairo_400Regular", color: colors.text },
         // Empty state
-        emptyContainer: { alignItems: "center", paddingTop: 60, gap: 12, paddingHorizontal: 32 },
         emptyIcon: { width: 80, height: 80, borderRadius: 40, backgroundColor: `${colors.border}50`, alignItems: "center", justifyContent: "center", marginBottom: 8 },
         emptyTitle: { fontSize: 17, fontFamily: "Cairo_700Bold", color: colors.text, textAlign: "center" },
         emptySubtitle: { fontSize: 13, fontFamily: "Cairo_400Regular", color: colors.mutedForeground, textAlign: "center" },
         emptyClearBtn: { marginTop: 8, backgroundColor: colors.primary, borderRadius: 12, paddingHorizontal: 24, paddingVertical: 10 },
-        emptyClearBtnText: { color: "#fff", fontSize: 13, fontFamily: "Cairo_600SemiBold" },
-        emptyTagsRow: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 8, justifyContent: "center", marginTop: 8 },
         // Filter modal
-        overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" },
         filterSheet: { backgroundColor: colors.card, borderTopLeftRadius: 26, borderTopRightRadius: 26, paddingTop: 8, paddingHorizontal: 20, paddingBottom: 40, maxHeight: height * 0.92 },
         filterHandle: { width: 42, height: 4, backgroundColor: colors.border, borderRadius: 2, alignSelf: "center", marginBottom: 16, marginTop: 8 },
-        filterHeaderRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", marginBottom: 20 },
         filterTitle: { fontSize: 18, fontFamily: "Cairo_700Bold", color: colors.text },
         resetBtn: { fontSize: 13, fontFamily: "Cairo_600SemiBold", color: colors.destructive },
         filterLabel: { fontSize: 14, fontFamily: "Cairo_700Bold", color: colors.text, textAlign: "right", marginBottom: 12, marginTop: 4 },
         filterDivider: { height: 1, backgroundColor: colors.border, marginVertical: 16 },
         sortOptionRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: `${colors.border}60` },
-        sortOptionLeft: { flexDirection: "row-reverse", alignItems: "center", gap: 10 },
         sortOptionText: { fontSize: 14, fontFamily: "Cairo_400Regular", color: colors.text },
-        priceRangeRow: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 8, marginBottom: 8 },
         priceRangePill: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1.5 },
-        pillsRow: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 8, marginBottom: 8 },
         pill: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1.5 },
-        pillText: { fontSize: 12, fontFamily: "Cairo_600SemiBold" },
         brandCheckRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: `${colors.border}40` },
         brandCheckText: { fontSize: 13, fontFamily: "Cairo_400Regular", color: colors.text, flex: 1, textAlign: "right" },
         toggleRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", paddingVertical: 12 },
         toggleLabel: { fontSize: 14, fontFamily: "Cairo_600SemiBold", color: colors.text, textAlign: "right" },
         toggleTrack: { width: 48, height: 27, borderRadius: 14, padding: 2, justifyContent: "center" },
-        toggleThumb: { width: 23, height: 23, borderRadius: 12, backgroundColor: "#fff" },
-        applyBtnWrapper: { borderRadius: 14, overflow: "hidden", marginTop: 20 },
-        applyBtnGrad: { paddingVertical: 16, alignItems: "center" },
-        applyBtnText: { color: "#fff", fontSize: 16, fontFamily: "Cairo_700Bold" },
       }),
     [colors, topPad, inputFocused, activeFilterCount, height]
   );
@@ -614,7 +624,7 @@ function SearchScreen() {
         onPress={() => { Haptics.selectionAsync(); onToggle(); }}
         activeOpacity={0.8}
       >
-        <Animated.View style={[styles.toggleThumb, { alignSelf: value ? "flex-start" : "flex-end" }]} />
+        <Animated.View style={[searchBaseStyles.toggleThumb, { alignSelf: value ? "flex-start" : "flex-end" }]} />
       </TouchableOpacity>
     </View>
   );
@@ -682,7 +692,7 @@ function SearchScreen() {
       {/* ── Recent searches panel ── */}
       {showSuggestions && recentSearches.length > 0 && (
         <View style={[styles.suggestionsPanel, { position: "absolute", top: 0, left: 0, right: 0, zIndex: 200 }]}>
-          <View style={styles.suggestionsRow}>
+          <View style={searchBaseStyles.suggestionsRow}>
             <Text style={styles.suggestionsTitle}>عمليات البحث الأخيرة</Text>
             <TouchableOpacity onPress={handleClearHistory}>
               <Text style={styles.clearHistoryBtn}>مسح الكل</Text>
@@ -724,19 +734,19 @@ function SearchScreen() {
       <View style={styles.filterRow}>
         <View style={styles.viewToggle}>
           <TouchableOpacity
-            style={[styles.viewToggleBtn, viewMode === "grid" && { backgroundColor: colors.secondary }]}
+            style={[searchBaseStyles.viewToggleBtn, viewMode === "grid" && { backgroundColor: colors.secondary }]}
             onPress={() => { Haptics.selectionAsync(); setViewMode("grid"); }}
           >
             <Ionicons name="grid-outline" size={18} color={viewMode === "grid" ? colors.primary : colors.mutedForeground} />
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.viewToggleBtn, viewMode === "list" && { backgroundColor: colors.secondary }]}
+            style={[searchBaseStyles.viewToggleBtn, viewMode === "list" && { backgroundColor: colors.secondary }]}
             onPress={() => { Haptics.selectionAsync(); setViewMode("list"); }}
           >
             <Ionicons name="list-outline" size={18} color={viewMode === "list" ? colors.primary : colors.mutedForeground} />
           </TouchableOpacity>
         </View>
-        <View style={styles.filterBtnWrapper}>
+        <View style={searchBaseStyles.filterBtnWrapper}>
           {activeFilterCount > 0 && (
             <View style={styles.filterBadge}>
               <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
@@ -773,7 +783,7 @@ function SearchScreen() {
       {/* ── L3 breadcrumb bar ── */}
       {l3Context && !showSuggestions && !showAutocomplete && (
         <View style={styles.l3BreadcrumbBar}>
-          <View style={styles.l3BreadcrumbLeft}>
+          <View style={searchBaseStyles.l3BreadcrumbLeft}>
             <Ionicons name="layers-outline" size={14} color={colors.primary} />
             <Text style={styles.l3BreadcrumbText} numberOfLines={1}>
               {l3Context.l2name ? `${l3Context.l2name} › ${l3Context.l3}` : l3Context.l3}
@@ -793,7 +803,7 @@ function SearchScreen() {
       {/* ── Sort chips ── */}
       {!showPopular && !showSuggestions && !showAutocomplete && (
         <>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.sortChipsScroll} contentContainerStyle={styles.sortChipsContent}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.sortChipsScroll} contentContainerStyle={searchBaseStyles.sortChipsContent}>
             {SORT_OPTIONS.map((opt) => {
               const active = sortBy === opt.id;
               return (
@@ -803,7 +813,7 @@ function SearchScreen() {
                   onPress={() => { Haptics.selectionAsync(); setSortBy(opt.id); }}
                 >
                   <Ionicons name={opt.icon} size={13} color={active ? "#fff" : colors.mutedForeground} />
-                  <Text style={[styles.sortChipText, { color: active ? "#fff" : colors.text }]}>{opt.label}</Text>
+                  <Text style={[searchBaseStyles.sortChipText, { color: active ? "#fff" : colors.text }]}>{opt.label}</Text>
                 </TouchableOpacity>
               );
             })}
@@ -826,9 +836,9 @@ function SearchScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} colors={[colors.primary]} />}
       >
         {refreshing ? (
-          <View style={[styles.grid, { paddingTop: 12 }]}>
+          <View style={[searchBaseStyles.grid, { paddingTop: 12 }]}>
             {[1, 2, 3, 4, 5, 6].map((k) => (
-              <View key={k} style={styles.gridItem}><ProductCardSkeleton /></View>
+              <View key={k} style={searchBaseStyles.gridItem}><ProductCardSkeleton /></View>
             ))}
           </View>
         ) : showPopular || showSuggestions ? (
@@ -839,9 +849,9 @@ function SearchScreen() {
             </View>
 
             {viewMode === "grid" ? (
-              <View style={styles.grid}>
+              <View style={searchBaseStyles.grid}>
                 {PRODUCTS.map((product) => (
-                  <View key={product.id} style={styles.gridItem}>
+                  <View key={product.id} style={searchBaseStyles.gridItem}>
                     <ProductCard product={product} />
                   </View>
                 ))}
@@ -853,7 +863,7 @@ function SearchScreen() {
             )}
           </>
         ) : filteredProducts.length === 0 ? (
-          <View style={styles.emptyContainer}>
+          <View style={searchBaseStyles.emptyContainer}>
             <View style={styles.emptyIcon}>
               <Ionicons name="search-outline" size={36} color={colors.mutedForeground} />
             </View>
@@ -863,10 +873,10 @@ function SearchScreen() {
             <Text style={styles.emptySubtitle}>جرّب كلمة مختلفة أو تحقق من الإملاء</Text>
             {debouncedQuery.trim() !== "" && (
               <TouchableOpacity style={styles.emptyClearBtn} onPress={() => { setQuery(""); setDebouncedQuery(""); }}>
-                <Text style={styles.emptyClearBtnText}>مسح البحث</Text>
+                <Text style={searchBaseStyles.emptyClearBtnText}>مسح البحث</Text>
               </TouchableOpacity>
             )}
-            <View style={styles.emptyTagsRow}>
+            <View style={searchBaseStyles.emptyTagsRow}>
               {POPULAR_SEARCHES.slice(0, 4).map((s) => (
                 <TouchableOpacity key={s} style={styles.tag} onPress={() => { setQuery(s); setDebouncedQuery(s); }}>
                   <Text style={styles.tagText}>{s}</Text>
@@ -875,9 +885,9 @@ function SearchScreen() {
             </View>
           </View>
         ) : viewMode === "grid" ? (
-          <View style={styles.grid}>
+          <View style={searchBaseStyles.grid}>
             {filteredProducts.map((product) => (
-              <View key={product.id} style={styles.gridItem}>
+              <View key={product.id} style={searchBaseStyles.gridItem}>
                 <ProductCard
                   product={product}
                   onLongPress={() => handleCompareAdd(product)}
@@ -910,13 +920,13 @@ function SearchScreen() {
 
       {/* ── Filter bottom sheet ── */}
       <Modal transparent visible={filterVisible} animationType="none" statusBarTranslucent>
-        <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={closeFilter}>
+        <TouchableOpacity style={searchBaseStyles.overlay} activeOpacity={1} onPress={closeFilter}>
           <Animated.View style={[styles.filterSheet, { transform: [{ translateY: filterAnim }] }]}>
             <TouchableOpacity activeOpacity={1}>
               <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={styles.filterHandle} />
 
-                <View style={styles.filterHeaderRow}>
+                <View style={searchBaseStyles.filterHeaderRow}>
                   <TouchableOpacity onPress={resetAllFilters}>
                     <Text style={styles.resetBtn}>إعادة تعيين</Text>
                   </TouchableOpacity>
@@ -930,7 +940,7 @@ function SearchScreen() {
                 {SORT_OPTIONS.map((option) => (
                   <TouchableOpacity key={option.id} style={styles.sortOptionRow} onPress={() => { Haptics.selectionAsync(); setSortBy(option.id); }}>
                     <Ionicons name={sortBy === option.id ? "radio-button-on" : "radio-button-off"} size={20} color={sortBy === option.id ? colors.primary : colors.mutedForeground} />
-                    <View style={styles.sortOptionLeft}>
+                    <View style={searchBaseStyles.sortOptionLeft}>
                       <Ionicons name={option.icon} size={16} color={sortBy === option.id ? colors.primary : colors.mutedForeground} />
                       <Text style={[styles.sortOptionText, sortBy === option.id && { color: colors.primary, fontFamily: "Cairo_600SemiBold" }]}>{option.label}</Text>
                     </View>
@@ -941,7 +951,7 @@ function SearchScreen() {
 
                 {/* Price range */}
                 <Text style={styles.filterLabel}>نطاق السعر</Text>
-                <View style={styles.priceRangeRow}>
+                <View style={searchBaseStyles.priceRangeRow}>
                   {PRICE_RANGES.map((item) => {
                     const isSelected = priceRange[0] === item.range[0] && priceRange[1] === item.range[1];
                     return (
@@ -960,7 +970,7 @@ function SearchScreen() {
 
                 {/* Rating filter */}
                 <Text style={styles.filterLabel}>التقييم الأدنى</Text>
-                <View style={styles.pillsRow}>
+                <View style={searchBaseStyles.pillsRow}>
                   {RATING_OPTIONS.map((opt) => {
                     const active = minRating === opt.stars;
                     return (
@@ -969,7 +979,7 @@ function SearchScreen() {
                         style={[styles.pill, { backgroundColor: active ? colors.primary : colors.secondary, borderColor: active ? colors.primary : colors.border }]}
                         onPress={() => { Haptics.selectionAsync(); setMinRating(opt.stars); }}
                       >
-                        <Text style={[styles.pillText, { color: active ? "#fff" : colors.text }]}>{opt.label}</Text>
+                        <Text style={[searchBaseStyles.pillText, { color: active ? "#fff" : colors.text }]}>{opt.label}</Text>
                       </TouchableOpacity>
                     );
                   })}
@@ -979,7 +989,7 @@ function SearchScreen() {
 
                 {/* Delivery speed */}
                 <Text style={styles.filterLabel}>سرعة التوصيل</Text>
-                <View style={styles.pillsRow}>
+                <View style={searchBaseStyles.pillsRow}>
                   {DELIVERY_OPTIONS.map((opt) => {
                     const active = deliverySpeed === opt.id;
                     return (
@@ -988,7 +998,7 @@ function SearchScreen() {
                         style={[styles.pill, { backgroundColor: active ? colors.primary : colors.secondary, borderColor: active ? colors.primary : colors.border }]}
                         onPress={() => { Haptics.selectionAsync(); setDeliverySpeed(opt.id as any); }}
                       >
-                        <Text style={[styles.pillText, { color: active ? "#fff" : colors.text }]}>{opt.label}</Text>
+                        <Text style={[searchBaseStyles.pillText, { color: active ? "#fff" : colors.text }]}>{opt.label}</Text>
                       </TouchableOpacity>
                     );
                   })}
@@ -1025,14 +1035,14 @@ function SearchScreen() {
                 {renderToggle(inStockOnly, () => setInStockOnly((v) => !v), "متوفر في المخزن فقط")}
 
                 {/* Apply button */}
-                <View style={styles.applyBtnWrapper}>
+                <View style={searchBaseStyles.applyBtnWrapper}>
                   <LinearGradient colors={["#E63946", "#C1121F"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
                     <TouchableOpacity
-                      style={styles.applyBtnGrad}
+                      style={searchBaseStyles.applyBtnGrad}
                       onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); closeFilter(); }}
                       activeOpacity={0.88}
                     >
-                      <Text style={styles.applyBtnText}>
+                      <Text style={searchBaseStyles.applyBtnText}>
                         تطبيق الفلاتر{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
                       </Text>
                     </TouchableOpacity>

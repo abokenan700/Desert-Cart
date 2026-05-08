@@ -56,6 +56,33 @@ function toArabicNumeral(n: number): string {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ─── Module-level static styles (no color tokens) ────────────────────────────
+const baseStyles = StyleSheet.create({
+  headerContent: { flexDirection: "row-reverse", alignItems: "center", gap: 14, marginTop: 10 },
+  avatar: {
+    width: 68, height: 68, borderRadius: 34,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    alignItems: "center", justifyContent: "center",
+    borderWidth: 2.5, borderColor: "rgba(255,255,255,0.5)",
+  },
+  avatarText: { fontSize: 26, fontFamily: "Cairo_700Bold", color: "#fff" },
+  userInfo: { flex: 1 },
+  userName: { fontSize: 20, fontFamily: "Cairo_700Bold", color: "#fff", textAlign: "right" },
+  userEmail: { fontSize: 13, fontFamily: "Cairo_400Regular", color: "rgba(255,255,255,0.8)", textAlign: "right", marginTop: 2 },
+  editBtn: {
+    backgroundColor: "rgba(255,255,255,0.2)", borderRadius: 10,
+    paddingHorizontal: 12, paddingVertical: 6,
+    flexDirection: "row-reverse", alignItems: "center",
+    gap: 5, marginTop: 10, alignSelf: "flex-end",
+  },
+  editBtnText: { color: "#fff", fontSize: 13, fontFamily: "Cairo_600SemiBold" },
+  statItem: { alignItems: "center", gap: 4 },
+  toggleLeft: { flexDirection: "row-reverse", alignItems: "center", gap: 12 },
+  lastItem: { borderBottomWidth: 0 },
+  menuBadgeText: { color: "#fff", fontSize: 11, fontFamily: "Cairo_700Bold" },
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function ProfileScreen() {
   const colors = useColors();
   const { isDark, toggleTheme } = useTheme();
@@ -104,57 +131,6 @@ export default function ProfileScreen() {
       paddingBottom: 30,
       paddingHorizontal: 16,
     },
-    headerContent: {
-      flexDirection: "row-reverse",
-      alignItems: "center",
-      gap: 14,
-      marginTop: 10,
-    },
-    avatar: {
-      width: 68,
-      height: 68,
-      borderRadius: 34,
-      backgroundColor: "rgba(255,255,255,0.2)",
-      alignItems: "center",
-      justifyContent: "center",
-      borderWidth: 2.5,
-      borderColor: "rgba(255,255,255,0.5)",
-    },
-    avatarText: {
-      fontSize: 26,
-      fontFamily: "Cairo_700Bold",
-      color: "#fff",
-    },
-    userInfo: { flex: 1 },
-    userName: {
-      fontSize: 20,
-      fontFamily: "Cairo_700Bold",
-      color: "#fff",
-      textAlign: "right",
-    },
-    userEmail: {
-      fontSize: 13,
-      fontFamily: "Cairo_400Regular",
-      color: "rgba(255,255,255,0.8)",
-      textAlign: "right",
-      marginTop: 2,
-    },
-    editBtn: {
-      backgroundColor: "rgba(255,255,255,0.2)",
-      borderRadius: 10,
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-      flexDirection: "row-reverse",
-      alignItems: "center",
-      gap: 5,
-      marginTop: 10,
-      alignSelf: "flex-end",
-    },
-    editBtnText: {
-      color: "#fff",
-      fontSize: 13,
-      fontFamily: "Cairo_600SemiBold",
-    },
     statsCard: {
       marginHorizontal: 16,
       marginTop: -20,
@@ -169,7 +145,6 @@ export default function ProfileScreen() {
         web: { boxShadow: "0 4px 12px rgba(0,0,0,0.1)" } as any,
       }),
     },
-    statItem: { alignItems: "center", gap: 4 },
     statValue: {
       fontSize: 22,
       fontFamily: "Cairo_800ExtraBold",
@@ -206,11 +181,6 @@ export default function ProfileScreen() {
       flexDirection: "row-reverse",
       alignItems: "center",
       justifyContent: "space-between",
-    },
-    toggleLeft: {
-      flexDirection: "row-reverse",
-      alignItems: "center",
-      gap: 12,
     },
     toggleIconBox: {
       width: 40,
@@ -249,7 +219,6 @@ export default function ProfileScreen() {
       borderBottomWidth: 1,
       borderBottomColor: colors.border,
     },
-    lastItem: { borderBottomWidth: 0 },
     menuIconBox: {
       width: 38,
       height: 38,
@@ -270,11 +239,6 @@ export default function ProfileScreen() {
       borderRadius: 10,
       paddingHorizontal: 8,
       paddingVertical: 2,
-    },
-    menuBadgeText: {
-      color: "#fff",
-      fontSize: 11,
-      fontFamily: "Cairo_700Bold",
     },
     versionText: {
       textAlign: "center",
@@ -316,15 +280,15 @@ export default function ProfileScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>س</Text>
+        <View style={baseStyles.headerContent}>
+          <View style={baseStyles.avatar}>
+            <Text style={baseStyles.avatarText}>س</Text>
           </View>
-          <View style={styles.userInfo}>
-            <Text style={styles.userName}>سارة العمري</Text>
-            <Text style={styles.userEmail}>sara.omari@email.com</Text>
-            <TouchableOpacity style={styles.editBtn}>
-              <Text style={styles.editBtnText}>تعديل الملف</Text>
+          <View style={baseStyles.userInfo}>
+            <Text style={baseStyles.userName}>سارة العمري</Text>
+            <Text style={baseStyles.userEmail}>sara.omari@email.com</Text>
+            <TouchableOpacity style={baseStyles.editBtn}>
+              <Text style={baseStyles.editBtnText}>تعديل الملف</Text>
               <Ionicons name="create-outline" size={14} color="#fff" />
             </TouchableOpacity>
           </View>
@@ -336,22 +300,22 @@ export default function ProfileScreen() {
         contentContainerStyle={{ paddingBottom: 90 + bottomPad }}
       >
         <View style={styles.statsCard}>
-          <View style={styles.statItem}>
+          <View style={baseStyles.statItem}>
             <Text style={styles.statValue}>{toArabicNumeral(ordersCount)}</Text>
             <Text style={styles.statLabel}>طلب</Text>
           </View>
           <View style={styles.statDivider} />
-          <View style={styles.statItem}>
+          <View style={baseStyles.statItem}>
             <Text style={styles.statValue}>{wishlistStatValue}</Text>
             <Text style={styles.statLabel}>مفضلة</Text>
           </View>
           <View style={styles.statDivider} />
-          <View style={styles.statItem}>
+          <View style={baseStyles.statItem}>
             <Text style={styles.statValue}>{toArabicNumeral(deliveredCount)}</Text>
             <Text style={styles.statLabel}>تقييم</Text>
           </View>
           <View style={styles.statDivider} />
-          <View style={styles.statItem}>
+          <View style={baseStyles.statItem}>
             <Text style={[styles.statValue, { fontSize: 16 }]}>{membershipTier}</Text>
             <Text style={styles.statLabel}>عضوية</Text>
           </View>
@@ -359,7 +323,7 @@ export default function ProfileScreen() {
 
         <View style={styles.toggleCard}>
           <View style={styles.toggleRow}>
-            <View style={styles.toggleLeft}>
+            <View style={baseStyles.toggleLeft}>
               <View style={[styles.toggleIconBox, { backgroundColor: colors.goldLight }]}>
                 <Ionicons name="notifications" size={20} color={colors.gold} />
               </View>
@@ -373,7 +337,7 @@ export default function ProfileScreen() {
             />
           </View>
           <View style={styles.toggleRowLast}>
-            <View style={styles.toggleLeft}>
+            <View style={baseStyles.toggleLeft}>
               <View
                 style={[
                   styles.toggleIconBox,
@@ -408,7 +372,7 @@ export default function ProfileScreen() {
                   key={item.id}
                   style={[
                     styles.menuItem,
-                    idx === section.items.length - 1 && styles.lastItem,
+                    idx === section.items.length - 1 && baseStyles.lastItem,
                   ]}
                   onPress={() => handleMenuPress(item.id)}
                   activeOpacity={0.7}
@@ -444,7 +408,7 @@ export default function ProfileScreen() {
                         },
                       ]}
                     >
-                      <Text style={styles.menuBadgeText}>{item.badge}</Text>
+                      <Text style={baseStyles.menuBadgeText}>{item.badge}</Text>
                     </View>
                   )}
                   {!item.color && (

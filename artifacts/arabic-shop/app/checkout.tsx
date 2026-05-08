@@ -40,6 +40,30 @@ const LABEL_OPTIONS = [
   { label: "آخر", icon: "location-outline" },
 ] as const;
 
+// ─── Module-level static styles (no color tokens) ────────────────────────────
+const baseStyles = StyleSheet.create({
+  row2: { flexDirection: "row-reverse", gap: 10 },
+  inputHalf: { flex: 1 },
+  paymentInfo: { flex: 1, gap: 2 },
+  couponChipsRow: { flexDirection: "row-reverse", gap: 8, marginBottom: 12 },
+  couponBtnGrad: { borderRadius: 12, overflow: "hidden" },
+  couponBtnInner: { paddingHorizontal: 16, paddingVertical: 12, alignItems: "center", justifyContent: "center" },
+  couponBtnText: { color: "#fff", fontSize: 14, fontFamily: "Cairo_600SemiBold" },
+  orderRow: { flexDirection: "row-reverse", justifyContent: "space-between", marginBottom: 10 },
+  reviewItemInfo: { flex: 1, gap: 3 },
+  nextBtnGrad: { paddingVertical: 17, alignItems: "center", justifyContent: "center" },
+  nextBtnText: { color: "#fff", fontSize: 17, fontFamily: "Cairo_700Bold" },
+  placeOrderGrad: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 10, paddingVertical: 18 },
+  placeOrderText: { color: "#fff", fontSize: 17, fontFamily: "Cairo_700Bold" },
+  saveToggleThumb: { width: 21, height: 21, borderRadius: 11, backgroundColor: "#fff" },
+  couponRow: { flexDirection: "row-reverse", gap: 10, marginTop: 4 },
+  stepItem: { flex: 1, alignItems: "center", gap: 6 },
+  savedAddressRow: { flexDirection: "row-reverse", gap: 10, marginBottom: 16 },
+  orDivider: { flexDirection: "row-reverse", alignItems: "center", gap: 10, marginBottom: 14 },
+  labelChipsRow: { flexDirection: "row-reverse", gap: 8, marginBottom: 14 },
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
 function CheckoutScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
@@ -226,11 +250,6 @@ function CheckoutScreen() {
           borderBottomWidth: 1,
           borderBottomColor: colors.border,
         },
-        stepItem: {
-          flex: 1,
-          alignItems: "center",
-          gap: 6,
-        },
         stepCircle: {
           width: 34,
           height: 34,
@@ -271,11 +290,6 @@ function CheckoutScreen() {
           borderBottomColor: colors.border,
           paddingBottom: 10,
         },
-        savedAddressRow: {
-          flexDirection: "row-reverse",
-          gap: 10,
-          marginBottom: 16,
-        },
         savedAddressChip: {
           flex: 1,
           borderRadius: 12,
@@ -292,12 +306,6 @@ function CheckoutScreen() {
           fontSize: 11,
           fontFamily: "Cairo_400Regular",
           color: colors.mutedForeground,
-        },
-        orDivider: {
-          flexDirection: "row-reverse",
-          alignItems: "center",
-          gap: 10,
-          marginBottom: 14,
         },
         orLine: {
           flex: 1,
@@ -330,8 +338,6 @@ function CheckoutScreen() {
           borderColor: colors.border,
           marginBottom: 12,
         },
-        row2: { flexDirection: "row-reverse", gap: 10 },
-        inputHalf: { flex: 1 },
         paymentOption: {
           flexDirection: "row-reverse",
           alignItems: "center",
@@ -348,7 +354,6 @@ function CheckoutScreen() {
           alignItems: "center",
           justifyContent: "center",
         },
-        paymentInfo: { flex: 1, gap: 2 },
         paymentLabel: {
           fontSize: 14,
           fontFamily: "Cairo_600SemiBold",
@@ -359,11 +364,6 @@ function CheckoutScreen() {
           fontFamily: "Cairo_400Regular",
           color: colors.mutedForeground,
           textAlign: "right",
-        },
-        couponChipsRow: {
-          flexDirection: "row-reverse",
-          gap: 8,
-          marginBottom: 12,
         },
         couponChip: {
           borderRadius: 10,
@@ -395,11 +395,6 @@ function CheckoutScreen() {
           color: colors.success,
           textAlign: "right",
         },
-        couponRow: {
-          flexDirection: "row-reverse",
-          gap: 10,
-          marginTop: 4,
-        },
         couponInput: {
           flex: 1,
           backgroundColor: colors.secondary,
@@ -412,26 +407,6 @@ function CheckoutScreen() {
           textAlign: "right",
           borderWidth: 1,
           borderColor: colors.border,
-        },
-        couponBtnGrad: {
-          borderRadius: 12,
-          overflow: "hidden",
-        },
-        couponBtnInner: {
-          paddingHorizontal: 16,
-          paddingVertical: 12,
-          alignItems: "center",
-          justifyContent: "center",
-        },
-        couponBtnText: {
-          color: "#fff",
-          fontSize: 14,
-          fontFamily: "Cairo_600SemiBold",
-        },
-        orderRow: {
-          flexDirection: "row-reverse",
-          justifyContent: "space-between",
-          marginBottom: 10,
         },
         orderLabel: {
           fontSize: 14,
@@ -475,7 +450,6 @@ function CheckoutScreen() {
           borderRadius: 10,
           backgroundColor: colors.secondary,
         },
-        reviewItemInfo: { flex: 1, gap: 3 },
         reviewItemName: {
           fontSize: 13,
           fontFamily: "Cairo_600SemiBold",
@@ -502,16 +476,6 @@ function CheckoutScreen() {
           borderRadius: 16,
           overflow: "hidden",
         },
-        nextBtnGrad: {
-          paddingVertical: 17,
-          alignItems: "center",
-          justifyContent: "center",
-        },
-        nextBtnText: {
-          color: "#fff",
-          fontSize: 17,
-          fontFamily: "Cairo_700Bold",
-        },
         placeOrderWrapper: {
           marginHorizontal: 16,
           marginTop: 16,
@@ -531,18 +495,6 @@ function CheckoutScreen() {
             } as any,
           }),
         },
-        placeOrderGrad: {
-          flexDirection: "row-reverse",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 10,
-          paddingVertical: 18,
-        },
-        placeOrderText: {
-          color: "#fff",
-          fontSize: 17,
-          fontFamily: "Cairo_700Bold",
-        },
         fieldError: {
           fontSize: 12,
           fontFamily: "Cairo_400Regular",
@@ -554,11 +506,6 @@ function CheckoutScreen() {
         inputInvalid: {
           borderColor: colors.destructive,
           borderWidth: 1.5,
-        },
-        labelChipsRow: {
-          flexDirection: "row-reverse",
-          gap: 8,
-          marginBottom: 14,
         },
         labelChip: {
           flexDirection: "row-reverse",
@@ -595,12 +542,6 @@ function CheckoutScreen() {
           padding: 2,
           justifyContent: "center",
         },
-        saveToggleThumb: {
-          width: 21,
-          height: 21,
-          borderRadius: 11,
-          backgroundColor: "#fff",
-        },
         deleteAddressBtn: {
           position: "absolute",
           top: 6,
@@ -623,7 +564,7 @@ function CheckoutScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>عنوان التوصيل</Text>
 
-            <View style={styles.savedAddressRow}>
+            <View style={baseStyles.savedAddressRow}>
               {addresses.map((addr) => {
                 const active = selectedAddress === addr.id;
                 return (
@@ -699,7 +640,7 @@ function CheckoutScreen() {
             </View>
 
             <TouchableOpacity
-              style={styles.orDivider}
+              style={baseStyles.orDivider}
               onPress={() => {
                 setUseNewAddress(true);
                 setSelectedAddress("");
@@ -719,7 +660,7 @@ function CheckoutScreen() {
             {useNewAddress && (
               <>
                 <Text style={styles.inputLabel}>تسمية العنوان</Text>
-                <View style={styles.labelChipsRow}>
+                <View style={baseStyles.labelChipsRow}>
                   {LABEL_OPTIONS.map((opt) => {
                     const active = newAddressLabel === opt.label;
                     return (
@@ -803,8 +744,8 @@ function CheckoutScreen() {
             {!!fieldErrors.city && (
               <Text style={styles.fieldError}>✕ {fieldErrors.city}</Text>
             )}
-            <View style={styles.row2}>
-              <View style={styles.inputHalf}>
+            <View style={baseStyles.row2}>
+              <View style={baseStyles.inputHalf}>
                 <Text style={styles.inputLabel}>الحي</Text>
                 <TextInput
                   style={[
@@ -825,7 +766,7 @@ function CheckoutScreen() {
                   <Text style={styles.fieldError}>✕ {fieldErrors.district}</Text>
                 )}
               </View>
-              <View style={styles.inputHalf}>
+              <View style={baseStyles.inputHalf}>
                 <Text style={styles.inputLabel}>الرمز البريدي</Text>
                 <TextInput
                   style={styles.input}
@@ -871,7 +812,7 @@ function CheckoutScreen() {
                 >
                   <Animated.View
                     style={[
-                      styles.saveToggleThumb,
+                      baseStyles.saveToggleThumb,
                       { alignSelf: saveNewAddress ? "flex-start" : "flex-end" },
                     ]}
                   />
@@ -887,11 +828,11 @@ function CheckoutScreen() {
               end={{ x: 1, y: 0 }}
             >
               <TouchableOpacity
-                style={styles.nextBtnGrad}
+                style={baseStyles.nextBtnGrad}
                 onPress={validateAndAdvance}
                 activeOpacity={0.88}
               >
-                <Text style={styles.nextBtnText}>التالي: طريقة الدفع ←</Text>
+                <Text style={baseStyles.nextBtnText}>التالي: طريقة الدفع ←</Text>
               </TouchableOpacity>
             </LinearGradient>
           </View>
@@ -931,7 +872,7 @@ function CheckoutScreen() {
                     size={20}
                     color={active ? colors.primary : colors.mutedForeground}
                   />
-                  <View style={styles.paymentInfo}>
+                  <View style={baseStyles.paymentInfo}>
                     <Text
                       style={[
                         styles.paymentLabel,
@@ -993,7 +934,7 @@ function CheckoutScreen() {
               </View>
             ) : (
               <>
-                <View style={styles.couponChipsRow}>
+                <View style={baseStyles.couponChipsRow}>
                   {QUICK_COUPON_CODES.map((code) => (
                     <TouchableOpacity
                       key={code}
@@ -1022,7 +963,7 @@ function CheckoutScreen() {
 
                 <Animated.View
                   style={[
-                    styles.couponRow,
+                    baseStyles.couponRow,
                     {
                       transform: [
                         {
@@ -1050,16 +991,16 @@ function CheckoutScreen() {
                     }}
                     autoCapitalize="characters"
                   />
-                  <View style={styles.couponBtnGrad}>
+                  <View style={baseStyles.couponBtnGrad}>
                     <LinearGradient
                       colors={["#E63946", "#C1121F"]}
-                      style={styles.couponBtnInner}
+                      style={baseStyles.couponBtnInner}
                     >
                       <TouchableOpacity
                         onPress={() => applyCoupon(couponCode)}
                         activeOpacity={0.85}
                       >
-                        <Text style={styles.couponBtnText}>تطبيق</Text>
+                        <Text style={baseStyles.couponBtnText}>تطبيق</Text>
                       </TouchableOpacity>
                     </LinearGradient>
                   </View>
@@ -1089,14 +1030,14 @@ function CheckoutScreen() {
               end={{ x: 1, y: 0 }}
             >
               <TouchableOpacity
-                style={styles.nextBtnGrad}
+                style={baseStyles.nextBtnGrad}
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   setStep(2);
                 }}
                 activeOpacity={0.88}
               >
-                <Text style={styles.nextBtnText}>التالي: مراجعة الطلب ←</Text>
+                <Text style={baseStyles.nextBtnText}>التالي: مراجعة الطلب ←</Text>
               </TouchableOpacity>
             </LinearGradient>
           </View>
@@ -1115,7 +1056,7 @@ function CheckoutScreen() {
                 style={styles.reviewItemImg}
                 resizeMode="cover"
               />
-              <View style={styles.reviewItemInfo}>
+              <View style={baseStyles.reviewItemInfo}>
                 <Text style={styles.reviewItemName} numberOfLines={2}>
                   {item.product.nameAr}
                 </Text>
@@ -1134,13 +1075,13 @@ function CheckoutScreen() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>ملخص الدفع</Text>
-          <View style={styles.orderRow}>
+          <View style={baseStyles.orderRow}>
             <Text style={styles.orderLabel}>المجموع الجزئي</Text>
             <Text style={styles.orderValue}>
               {subtotal.toLocaleString("ar-SA")} ر.س
             </Text>
           </View>
-          <View style={styles.orderRow}>
+          <View style={baseStyles.orderRow}>
             <Text style={styles.orderLabel}>التوصيل</Text>
             <Text style={[styles.orderValue, { color: colors.success }]}>
               {delivery === 0
@@ -1148,14 +1089,14 @@ function CheckoutScreen() {
                 : `${delivery.toLocaleString("ar-SA")} ر.س`}
             </Text>
           </View>
-          <View style={styles.orderRow}>
+          <View style={baseStyles.orderRow}>
             <Text style={styles.orderLabel}>خصم العضوية</Text>
             <Text style={[styles.orderValue, { color: colors.success }]}>
               -{discount.toLocaleString("ar-SA")} ر.س
             </Text>
           </View>
           {appliedCoupon && (
-            <View style={styles.orderRow}>
+            <View style={baseStyles.orderRow}>
               <Text style={[styles.orderLabel, { color: colors.success }]}>
                 كوبون ({appliedCoupon.label})
               </Text>
@@ -1184,7 +1125,7 @@ function CheckoutScreen() {
             end={{ x: 1, y: 0 }}
           >
             <TouchableOpacity
-              style={styles.placeOrderGrad}
+              style={baseStyles.placeOrderGrad}
               onPress={handlePlaceOrder}
               disabled={placing}
               activeOpacity={0.88}
@@ -1192,12 +1133,12 @@ function CheckoutScreen() {
               {placing ? (
                 <>
                   <ActivityIndicator color="#fff" size="small" />
-                  <Text style={styles.placeOrderText}>جاري التأكيد...</Text>
+                  <Text style={baseStyles.placeOrderText}>جاري التأكيد...</Text>
                 </>
               ) : (
                 <>
                   <Ionicons name="checkmark-circle" size={22} color="#fff" />
-                  <Text style={styles.placeOrderText}>
+                  <Text style={baseStyles.placeOrderText}>
                     تأكيد الطلب — {finalTotal.toLocaleString("ar-SA")} ر.س
                   </Text>
                 </>
@@ -1233,7 +1174,7 @@ function CheckoutScreen() {
                 ]}
               />
             )}
-            <View style={styles.stepItem}>
+            <View style={baseStyles.stepItem}>
               <TouchableOpacity
                 onPress={() => idx < step && setStep(idx)}
                 activeOpacity={idx < step ? 0.7 : 1}

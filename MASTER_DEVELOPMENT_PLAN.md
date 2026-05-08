@@ -203,7 +203,7 @@
 
 ### Issues
 
-**[H-P01] `StyleSheet.create` inside `useMemo` across 14 screens and components**
+**✅ [H-P01] `StyleSheet.create` inside `useMemo` across 14 screens and components** — DONE
 - Pattern used in: `index.tsx`, `cart.tsx`, `checkout.tsx`, `product/[id].tsx`, `order-history.tsx`, `order-tracking.tsx`, `order-success.tsx`, `my-coupons.tsx`, `wishlist.tsx`, `profile.tsx`, `search.tsx`, `ProductCard.tsx`, `CompareModal.tsx`, `HomeHeader.tsx`, and more
 - `StyleSheet.create` inside `useMemo` is not wrong but defeats the purpose — styles that don't depend on runtime values should be hoisted to module level
 - Currently, every theme toggle recreates ALL StyleSheet objects for ALL mounted screens simultaneously

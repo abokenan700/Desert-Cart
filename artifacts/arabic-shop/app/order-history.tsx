@@ -24,6 +24,56 @@ const TABS = [
   { id: "cancelled", label: "ملغي" },
 ];
 
+// ─── Module-level static styles (no color tokens) ────────────────────────────
+const baseStyles = StyleSheet.create({
+  cardTop: {
+    flexDirection: "row-reverse",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  statusBadge: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 4,
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  statusText: {
+    fontSize: 12,
+    fontFamily: "Cairo_600SemiBold",
+  },
+  actionBtns: {
+    flexDirection: "row-reverse",
+    gap: 8,
+  },
+  actionBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  actionBtnText: {
+    fontSize: 12,
+    fontFamily: "Cairo_600SemiBold",
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 80,
+    gap: 12,
+  },
+  tab: {
+    paddingHorizontal: 14,
+    paddingVertical: 13,
+    borderBottomWidth: 2,
+    borderBottomColor: "transparent",
+  },
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function OrderHistoryScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
@@ -108,6 +158,7 @@ export default function OrderHistoryScreen() {
     [activeTab]
   );
 
+  // Only color-token-dependent or runtime-value-dependent styles here
   const styles = useMemo(
     () =>
       StyleSheet.create({
@@ -143,12 +194,6 @@ export default function OrderHistoryScreen() {
           borderBottomColor: colors.border,
           paddingHorizontal: 12,
         },
-        tab: {
-          paddingHorizontal: 14,
-          paddingVertical: 13,
-          borderBottomWidth: 2,
-          borderBottomColor: "transparent",
-        },
         tabText: {
           fontSize: 13,
           fontFamily: "Cairo_600SemiBold",
@@ -163,28 +208,10 @@ export default function OrderHistoryScreen() {
           borderWidth: 1,
           borderColor: colors.border,
         },
-        cardTop: {
-          flexDirection: "row-reverse",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 12,
-        },
         orderNum: {
           fontSize: 15,
           fontFamily: "Cairo_700Bold",
           color: colors.text,
-        },
-        statusBadge: {
-          flexDirection: "row-reverse",
-          alignItems: "center",
-          gap: 4,
-          borderRadius: 20,
-          paddingHorizontal: 10,
-          paddingVertical: 4,
-        },
-        statusText: {
-          fontSize: 12,
-          fontFamily: "Cairo_600SemiBold",
         },
         date: {
           fontSize: 12,
@@ -213,27 +240,6 @@ export default function OrderHistoryScreen() {
           fontSize: 17,
           fontFamily: "Cairo_800ExtraBold",
           color: colors.primary,
-        },
-        actionBtns: {
-          flexDirection: "row-reverse",
-          gap: 8,
-        },
-        actionBtn: {
-          paddingHorizontal: 14,
-          paddingVertical: 7,
-          borderRadius: 10,
-          borderWidth: 1,
-        },
-        actionBtnText: {
-          fontSize: 12,
-          fontFamily: "Cairo_600SemiBold",
-        },
-        emptyContainer: {
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          paddingTop: 80,
-          gap: 12,
         },
         emptyTitle: {
           fontSize: 18,
@@ -264,7 +270,7 @@ export default function OrderHistoryScreen() {
           <TouchableOpacity
             key={tab.id}
             style={[
-              styles.tab,
+              baseStyles.tab,
               activeTab === tab.id && { borderBottomColor: colors.primary },
             ]}
             onPress={() => setActiveTab(tab.id)}
@@ -289,7 +295,7 @@ export default function OrderHistoryScreen() {
         contentContainerStyle={{ paddingBottom: 24 + bottomPad }}
       >
         {filtered.length === 0 ? (
-          <View style={styles.emptyContainer}>
+          <View style={baseStyles.emptyContainer}>
             <Ionicons name="bag-outline" size={56} color={colors.border} />
             <Text style={styles.emptyTitle}>لا توجد طلبات</Text>
             <Text style={styles.emptyText}>لم تقم بأي طلبات في هذه الفئة بعد</Text>
@@ -299,10 +305,10 @@ export default function OrderHistoryScreen() {
             const sc = STATUS_COLORS[order.status];
             return (
               <View key={order.id} style={styles.orderCard}>
-                <View style={styles.cardTop}>
-                  <View style={[styles.statusBadge, { backgroundColor: sc.bg }]}>
+                <View style={baseStyles.cardTop}>
+                  <View style={[baseStyles.statusBadge, { backgroundColor: sc.bg }]}>
                     <Ionicons name={sc.icon} size={14} color={sc.text} />
-                    <Text style={[styles.statusText, { color: sc.text }]}>
+                    <Text style={[baseStyles.statusText, { color: sc.text }]}>
                       {order.statusAr}
                     </Text>
                   </View>
@@ -313,11 +319,11 @@ export default function OrderHistoryScreen() {
                   {order.items.join("، ")}
                 </Text>
                 <View style={styles.cardBottom}>
-                  <View style={styles.actionBtns}>
+                  <View style={baseStyles.actionBtns}>
                     {order.status === "shipping" && (
                       <TouchableOpacity
                         style={[
-                          styles.actionBtn,
+                          baseStyles.actionBtn,
                           { borderColor: colors.primary, backgroundColor: colors.primaryLight },
                         ]}
                         onPress={() =>
@@ -327,29 +333,29 @@ export default function OrderHistoryScreen() {
                           } as any)
                         }
                       >
-                        <Text style={[styles.actionBtnText, { color: colors.primary }]}>
+                        <Text style={[baseStyles.actionBtnText, { color: colors.primary }]}>
                           تتبع
                         </Text>
                       </TouchableOpacity>
                     )}
                     {order.status === "delivered" && (
                       <TouchableOpacity
-                        style={[styles.actionBtn, { borderColor: colors.border }]}
+                        style={[baseStyles.actionBtn, { borderColor: colors.border }]}
                         onPress={() => handleReorder(order)}
                         accessibilityLabel="إعادة الطلب"
                       >
-                        <Text style={[styles.actionBtnText, { color: colors.text }]}>
+                        <Text style={[baseStyles.actionBtnText, { color: colors.text }]}>
                           إعادة الطلب
                         </Text>
                       </TouchableOpacity>
                     )}
                     {order.status !== "cancelled" && (
                       <TouchableOpacity
-                        style={[styles.actionBtn, { borderColor: colors.border }]}
+                        style={[baseStyles.actionBtn, { borderColor: colors.border }]}
                         onPress={() => handleInvoice(order)}
                         accessibilityLabel="عرض الفاتورة"
                       >
-                        <Text style={[styles.actionBtnText, { color: colors.mutedForeground }]}>
+                        <Text style={[baseStyles.actionBtnText, { color: colors.mutedForeground }]}>
                           الفاتورة
                         </Text>
                       </TouchableOpacity>
