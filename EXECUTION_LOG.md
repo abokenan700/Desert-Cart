@@ -456,6 +456,136 @@ EXPO_NO_TELEMETRY=1 pnpm exec expo export → ✅ نجح (3.28 MB bundle)
 
 ---
 
+---
+
+## المرحلة الرابعة — Code Quality & TypeScript
+
+### ✅ [H-CQ01] `as any` casts used in 12+ locations
+
+**تاريخ التنفيذ:** 8 مايو 2026
+
+#### المشكلة الموصوفة في الخطة
+استُخدم `as any` في 12+ موقعاً عبر قاعدة الكود:
+- `router.push({ ... } as any)` في checkout وPDP وorder-tracking
+- `<Ionicons name={step.icon as any} />` في order-tracking وorder-success
+- `{ boxShadow: "..." } as any` لأنماط الظل على الويب
+
+#### الحل المُنفَّذ
+
+**1. أنواع Expo Router:**
+- تحقق: Expo Router v4+ يُولّد أنواعاً مُجمَّعة تلقائياً في `.expo/types/router.d.ts` — لا حاجة لأنواع يدوية للروابط
+- حُذف `router.push(...) as any` في checkout وPDP وorder-tracking وorder-success وorder-history
+
+**2. `types/icons.ts` — نوع IoniconsName:**
+```typescript
+import type { ComponentProps } from "react";
+import type { Ionicons } from "@expo/vector-icons";
+export type IoniconsName = ComponentProps<typeof Ionicons>["name"];
+```
+- استُبدل `as any` على جميع أسماء أيقونات Ionicons في 8 ملفات
+
+**3. `utils/webStyles.ts` — مساعدات ظل الويب:**
+```typescript
+export function webShadow(elevation: number): ViewStyle { ... }
+export const WEB_RTL: ViewStyle = { writingDirection: "rtl" };
+```
+- استُبدل `{ boxShadow: "..." } as any` في 6 ملفات بـ `webShadow(n)`
+
+**التحقق:**
+```
+grep "as any" **/*.tsx **/*.ts → 0 نتائج
+pnpm exec tsc --noEmit --skipLibCheck → 0 أخطاء جديدة
+expo export → ✅ 3.32 MB bundle
+```
+
+**الملفات المعدّلة (22 ملف):**
+`types/icons.ts` (جديد)، `utils/webStyles.ts` (جديد)، checkout.tsx، order-tracking.tsx، order-success.tsx، order-history.tsx، product/[id].tsx، wishlist.tsx، categories.tsx، index.tsx، cart.tsx، search.tsx، profile.tsx، ProductCardSkeleton.tsx، CustomTabBar.tsx، AddressContext.tsx
+
+---
+
+### ✅ [M-CQ03] `React.createElement("iframe", ...)` — مكوّن web-only غير مُنمَّط
+
+**تاريخ التنفيذ:** 8 مايو 2026
+
+#### المشكلة الموصوفة في الخطة
+`order-tracking.tsx` كان يحتوي على:
+```tsx
+{Platform.OS === "web" ? (
+  React.createElement("iframe", {
+    src: "https://www.openstreetmap.org/export/embed.html?bbox=46.65,24.65,46.80,24.77...",
+    style: { width: "100%", height: "100%", border: "none" },
+    title: "خريطة التتبع المباشر",
+    loading: "lazy",
+  })
+) : (
+  <>
+    <Ionicons name="map-outline" size={36} color={colors.primary} />
+    <Text style={styles.mapText}>خريطة التتبع المباشر</Text>
+  </>
+)}
+```
+
+**المشكلتان:**
+1. `React.createElement("iframe", {...})` بشكل string يحصل على `any` لجميع الـ props — لا TypeScript checking
+2. غير idiomatc: منطق Platform مكرر داخل الشاشة بدلاً من عزله في مكوّن مستقل
+
+#### الحل المُنفَّذ — `components/OpenStreetMapEmbed.tsx`
+
+**البنية:**
+```
+components/OpenStreetMapEmbed.tsx
+  ├── OsmBoundingBox = [west, south, east, north]  (tuple type)
+  ├── OsmLatLng = [lat, lng]                        (tuple type)
+  ├── OsmLayer = "mapnik" | "cyclemap"              (union type)
+  ├── OpenStreetMapEmbedProps { bbox, marker, layer, title, containerStyle }
+  ├── buildOsmEmbedUrl(bbox, marker, layer): string  (pure function)
+  ├── WebIframe(props: React.IframeHTMLAttributes<HTMLIFrameElement>)  (internal)
+  └── OpenStreetMapEmbed (default export) — Platform-aware component
+```
+
+**الحل الجوهري — `WebIframe`:**
+```typescript
+function WebIframe(props: React.IframeHTMLAttributes<HTMLIFrameElement>): React.ReactElement {
+  // props typed as IframeHTMLAttributes → full TypeScript checking on:
+  // src, title, loading, sandbox, allow, referrerpolicy, aria-label, style…
+  return React.createElement("iframe", props as object) as React.ReactElement;
+}
+```
+`React.IframeHTMLAttributes<HTMLIFrameElement>` متوفر في `@types/react` — لا يحتاج تثبيت إضافي.
+
+**التحسينات الإضافية:**
+- `referrerPolicy="no-referrer"` للخصوصية
+- `aria-label={title}` لإمكانية الوصول
+- `display: "block"` يمنع الـ inline-box gap تحت الـ iframe
+- الـ native fallback يحتوي الآن على `accessibilityRole="image"`
+- Default coords مُعلَّقة في JSDoc: Riyadh city centre (Al-Malaz / KAFD corridor)
+
+**التحديث في `order-tracking.tsx`:**
+```tsx
+// قبل: 12 سطر مع Platform check + React.createElement + native fallback
+// بعد: سطر واحد نظيف
+<OpenStreetMapEmbed />
+```
+- حُذف `React` default import (لم يعد مستخدماً بعد إزالة `React.createElement`)
+- `Platform` يبقى (مستخدم في 3 أماكن أخرى في الملف)
+
+#### التحقق
+```
+pnpm exec tsc --noEmit --skipLibCheck
+→ 0 أخطاء جديدة في OpenStreetMapEmbed.tsx
+→ 0 أخطاء جديدة في order-tracking.tsx
+→ 11 خطأ pre-existing في cart/edit-profile/my-coupons/CustomTabBar (غير متعلقة بهذه المهمة)
+
+EXPO_NO_TELEMETRY=1 pnpm exec expo export --platform web --output-dir dist
+→ ✅ نجح — 3.32 MB bundle (نفس الحجم)
+```
+
+#### الملفات المعدّلة
+- `artifacts/arabic-shop/components/OpenStreetMapEmbed.tsx` — **جديد** (222 سطر)
+- `artifacts/arabic-shop/app/order-tracking.tsx` — استبدال 12 سطراً بـ `<OpenStreetMapEmbed />`، حذف `React` default import
+
+---
+
 ### ✅ المرحلة الثانية — مكتملة بالكامل
 جميع مهام Phase 2 من MASTER_DEVELOPMENT_PLAN.md منجزة:
 

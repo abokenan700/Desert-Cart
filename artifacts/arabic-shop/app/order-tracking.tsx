@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import {
   View,
@@ -17,6 +17,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import type { IoniconsName } from "@/types/icons";
 import { useColors } from "@/hooks/useColors";
 import { useOrder } from "@/context/OrderContext";
+import OpenStreetMapEmbed from "@/components/OpenStreetMapEmbed";
 
 const DRIVER_PHONE = "+966501234567";
 
@@ -354,19 +355,7 @@ function OrderTrackingScreen() {
         </View>
 
         <View style={styles.mapCard}>
-          {Platform.OS === "web" ? (
-            React.createElement("iframe", {
-              src: "https://www.openstreetmap.org/export/embed.html?bbox=46.65,24.65,46.80,24.77&layer=mapnik&marker=24.7136,46.6753",
-              style: { width: "100%", height: "100%", border: "none" },
-              title: "خريطة التتبع المباشر",
-              loading: "lazy",
-            })
-          ) : (
-            <>
-              <Ionicons name="map-outline" size={36} color={colors.primary} />
-              <Text style={styles.mapText}>خريطة التتبع المباشر</Text>
-            </>
-          )}
+          <OpenStreetMapEmbed />
         </View>
 
         <View style={styles.driverCard}>
