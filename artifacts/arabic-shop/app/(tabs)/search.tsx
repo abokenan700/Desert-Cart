@@ -90,6 +90,7 @@ const RATING_OPTIONS = [
 
 const UNIQUE_BRANDS = [...new Set(PRODUCTS.map((p) => p.brand))];
 const MAX_RECENT = 6;
+const PAGE_SIZE = 12;
 
 function getProductForTerm(term: string): Product | undefined {
   const q = term.toLowerCase();
@@ -272,6 +273,7 @@ function SearchScreen() {
   const [compareList, setCompareList] = useState<Product[]>([]);
   const [compareVisible, setCompareVisible] = useState(false);
   const [l3Context, setL3Context] = useState<{ l2name: string; l3: string; l3id: string } | null>(null);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const filterAnim = useRef(new Animated.Value(height)).current;
   const resultsOpacity = useRef(new Animated.Value(1)).current;
@@ -454,6 +456,30 @@ function SearchScreen() {
       default: return [...products].sort((a, b) => (b.soldCount ?? 0) - (a.soldCount ?? 0));
     }
   }, [debouncedQuery, brandFilter, filterBrands, selectedCategory, sortBy, priceRange, flashSaleOnly, inStockOnly, minRating, deliverySpeed, l3Context]);
+
+  // Reset pagination when any filter changes
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [filteredProducts]);
+
+  const paginatedFiltered = useMemo(
+    () => filteredProducts.slice(0, visibleCount),
+    [filteredProducts, visibleCount]
+  );
+
+  const paginatedAll = useMemo(
+    () => PRODUCTS.slice(0, visibleCount),
+    [visibleCount]
+  );
+
+  const hasMoreFiltered = visibleCount < filteredProducts.length;
+  const hasMoreAll = visibleCount < PRODUCTS.length;
+
+  const loadMore = useCallback(() => {
+    const isShowingAll = query.trim() === "" || inputFocused;
+    const total = isShowingAll ? PRODUCTS.length : filteredProducts.length;
+    setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, total));
+  }, [query, inputFocused, filteredProducts.length]);
 
   const autocompleteSuggestions = useMemo(() => {
     if (query.trim().length < 2) return [];
@@ -850,7 +876,7 @@ function SearchScreen() {
 
             {viewMode === "grid" ? (
               <View style={searchBaseStyles.grid}>
-                {PRODUCTS.map((product) => (
+                {paginatedAll.map((product) => (
                   <View key={product.id} style={searchBaseStyles.gridItem}>
                     <ProductCard product={product} />
                   </View>
@@ -858,8 +884,25 @@ function SearchScreen() {
               </View>
             ) : (
               <View style={{ paddingTop: 4 }}>
-                {PRODUCTS.map((product) => <ListViewCard key={product.id} product={product} />)}
+                {paginatedAll.map((product) => <ListViewCard key={product.id} product={product} />)}
               </View>
+            )}
+            {hasMoreAll && (
+              <TouchableOpacity
+                onPress={loadMore}
+                style={{
+                  marginHorizontal: 16,
+                  marginVertical: 12,
+                  paddingVertical: 14,
+                  borderRadius: 14,
+                  backgroundColor: colors.secondary,
+                  alignItems: "center",
+                }}
+              >
+                <Text style={{ fontFamily: "Cairo_600SemiBold", fontSize: 14, color: colors.primary }}>
+                  تحميل المزيد ({PRODUCTS.length - visibleCount} منتج متبقٍّ)
+                </Text>
+              </TouchableOpacity>
             )}
           </>
         ) : filteredProducts.length === 0 ? (
@@ -885,20 +928,58 @@ function SearchScreen() {
             </View>
           </View>
         ) : viewMode === "grid" ? (
-          <View style={searchBaseStyles.grid}>
-            {filteredProducts.map((product) => (
-              <View key={product.id} style={searchBaseStyles.gridItem}>
-                <ProductCard
-                  product={product}
-                  onLongPress={() => handleCompareAdd(product)}
-                />
-              </View>
-            ))}
-          </View>
+          <>
+            <View style={searchBaseStyles.grid}>
+              {paginatedFiltered.map((product) => (
+                <View key={product.id} style={searchBaseStyles.gridItem}>
+                  <ProductCard
+                    product={product}
+                    onLongPress={() => handleCompareAdd(product)}
+                  />
+                </View>
+              ))}
+            </View>
+            {hasMoreFiltered && (
+              <TouchableOpacity
+                onPress={loadMore}
+                style={{
+                  marginHorizontal: 16,
+                  marginVertical: 12,
+                  paddingVertical: 14,
+                  borderRadius: 14,
+                  backgroundColor: colors.secondary,
+                  alignItems: "center",
+                }}
+              >
+                <Text style={{ fontFamily: "Cairo_600SemiBold", fontSize: 14, color: colors.primary }}>
+                  تحميل المزيد ({filteredProducts.length - visibleCount} منتج متبقٍّ)
+                </Text>
+              </TouchableOpacity>
+            )}
+          </>
         ) : (
-          <View style={{ paddingTop: 8 }}>
-            {filteredProducts.map((product) => <ListViewCard key={product.id} product={product} />)}
-          </View>
+          <>
+            <View style={{ paddingTop: 8 }}>
+              {paginatedFiltered.map((product) => <ListViewCard key={product.id} product={product} />)}
+            </View>
+            {hasMoreFiltered && (
+              <TouchableOpacity
+                onPress={loadMore}
+                style={{
+                  marginHorizontal: 16,
+                  marginVertical: 12,
+                  paddingVertical: 14,
+                  borderRadius: 14,
+                  backgroundColor: colors.secondary,
+                  alignItems: "center",
+                }}
+              >
+                <Text style={{ fontFamily: "Cairo_600SemiBold", fontSize: 14, color: colors.primary }}>
+                  تحميل المزيد ({filteredProducts.length - visibleCount} منتج متبقٍّ)
+                </Text>
+              </TouchableOpacity>
+            )}
+          </>
         )}
       </Animated.ScrollView>
 

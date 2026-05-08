@@ -40,6 +40,8 @@ import {
   NEW_ARRIVALS,
 } from "@/data/mockData";
 
+const PAGE_SIZE = 12;
+
 // ─── Module-level static styles (no color tokens, no runtime values) ─────────
 const baseStyles = StyleSheet.create({
   horizontalList: { paddingHorizontal: 12, gap: 8 },
@@ -136,6 +138,7 @@ function HomeScreen() {
   const [voiceVisible, setVoiceVisible] = useState(false);
   const [notificationsVisible, setNotificationsVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const { notifications, markAllRead } = useNotifications();
   const { recentlyViewed } = useRecentlyViewed();
 
@@ -168,6 +171,11 @@ function HomeScreen() {
     [selectedCategory]
   );
 
+  // Reset pagination when category changes
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [selectedCategory]);
+
   // Best Sellers — the data source for the top-level FlatList (true virtualization)
   const filteredBestSellers = useMemo(
     () =>
@@ -176,6 +184,20 @@ function HomeScreen() {
         : PRODUCTS.filter((p) => p.categoryId === selectedCategory),
     [selectedCategory]
   );
+
+  // Paginated slice for the FlatList
+  const paginatedBestSellers = useMemo(
+    () => filteredBestSellers.slice(0, visibleCount),
+    [filteredBestSellers, visibleCount]
+  );
+
+  const hasMoreBestSellers = visibleCount < filteredBestSellers.length;
+
+  const loadMoreBestSellers = useCallback(() => {
+    if (hasMoreBestSellers) {
+      setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, filteredBestSellers.length));
+    }
+  }, [hasMoreBestSellers, filteredBestSellers.length]);
 
   // Today's Picks — 4 items rendered as plain View+map inside ListHeaderComponent
   const todaysPicks = useMemo(
@@ -542,7 +564,7 @@ function HomeScreen() {
        * contentContainerStyle.paddingHorizontal on the nested FlatList.
        */}
       <FlatList
-        data={refreshing ? [] : filteredBestSellers}
+        data={refreshing ? [] : paginatedBestSellers}
         numColumns={2}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
@@ -554,6 +576,27 @@ function HomeScreen() {
             <ProductCard product={item} />
           </View>
         )}
+        ListFooterComponent={
+          hasMoreBestSellers ? (
+            <TouchableOpacity
+              onPress={loadMoreBestSellers}
+              style={{
+                marginHorizontal: 16,
+                marginVertical: 12,
+                paddingVertical: 14,
+                borderRadius: 14,
+                backgroundColor: colors.secondary,
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ fontFamily: "Cairo_600SemiBold", fontSize: 14, color: colors.primary }}>
+                تحميل المزيد ({filteredBestSellers.length - visibleCount} منتج متبقٍّ)
+              </Text>
+            </TouchableOpacity>
+          ) : null
+        }
+        onEndReached={loadMoreBestSellers}
+        onEndReachedThreshold={0.4}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -562,7 +605,6 @@ function HomeScreen() {
             colors={[colors.primary]}
           />
         }
-        // Performance tuning
         initialNumToRender={6}
         maxToRenderPerBatch={8}
         windowSize={5}
