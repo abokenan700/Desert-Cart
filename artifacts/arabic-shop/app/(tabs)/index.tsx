@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import {
   View,
   Text,
@@ -125,7 +126,7 @@ const baseStyles = StyleSheet.create({
 });
 // ─────────────────────────────────────────────────────────────────────────────
 
-export default function HomeScreen() {
+function HomeScreen() {
   const { width } = useWindowDimensions();
   const colors = useColors();
   const insets = useSafeAreaInsets();
@@ -584,5 +585,13 @@ export default function HomeScreen() {
         onMarkAllRead={markAllRead}
       />
     </View>
+  );
+}
+
+export default function HomeScreenWithBoundary() {
+  return (
+    <ErrorBoundary>
+      <HomeScreen />
+    </ErrorBoundary>
   );
 }

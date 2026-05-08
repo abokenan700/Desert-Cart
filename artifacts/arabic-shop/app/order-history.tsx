@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import {
   View,
   Text,
@@ -74,7 +75,7 @@ const baseStyles = StyleSheet.create({
 });
 // ─────────────────────────────────────────────────────────────────────────────
 
-export default function OrderHistoryScreen() {
+function OrderHistoryScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { showToast } = useAppToast();
@@ -369,5 +370,13 @@ export default function OrderHistoryScreen() {
         )}
       </ScrollView>
     </View>
+  );
+}
+
+export default function OrderHistoryScreenWithBoundary() {
+  return (
+    <ErrorBoundary>
+      <OrderHistoryScreen />
+    </ErrorBoundary>
   );
 }

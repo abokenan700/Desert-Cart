@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import {
   View,
   Text,
@@ -122,7 +123,7 @@ const baseStyles = StyleSheet.create({
 });
 // ─────────────────────────────────────────────────────────────────────────────
 
-export default function MyCouponsScreen() {
+function MyCouponsScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
@@ -311,5 +312,13 @@ export default function MyCouponsScreen() {
         })}
       </ScrollView>
     </View>
+  );
+}
+
+export default function MyCouponsScreenWithBoundary() {
+  return (
+    <ErrorBoundary>
+      <MyCouponsScreen />
+    </ErrorBoundary>
   );
 }

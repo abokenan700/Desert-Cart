@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import {
   View,
   Text,
@@ -548,7 +549,7 @@ function ContentHeader({ sub, l1Id }: { sub: Level2Category; l1Id: string }) {
 }
 
 /* ── Main screen ─────────────────────────────────────────────── */
-export default function CategoriesScreen() {
+function CategoriesScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
@@ -854,3 +855,11 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
 });
+
+export default function CategoriesScreenWithBoundary() {
+  return (
+    <ErrorBoundary>
+      <CategoriesScreen />
+    </ErrorBoundary>
+  );
+}

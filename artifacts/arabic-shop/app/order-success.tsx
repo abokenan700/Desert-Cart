@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useMemo } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import {
   View,
   Text,
@@ -131,7 +132,7 @@ const baseStyles = StyleSheet.create({
 });
 // ─────────────────────────────────────────────────────────────────────────────
 
-export default function OrderSuccessScreen() {
+function OrderSuccessScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { orderNumber: passedOrderNumber } = useLocalSearchParams<{ orderNumber?: string }>();
@@ -261,5 +262,13 @@ export default function OrderSuccessScreen() {
         </TouchableOpacity>
       </Animated.View>
     </Animated.View>
+  );
+}
+
+export default function OrderSuccessScreenWithBoundary() {
+  return (
+    <ErrorBoundary>
+      <OrderSuccessScreen />
+    </ErrorBoundary>
   );
 }

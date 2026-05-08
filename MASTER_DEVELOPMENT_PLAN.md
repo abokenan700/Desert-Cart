@@ -700,7 +700,7 @@ These significantly affect the perceived quality and usability of the app.
 | H-A02 | Window resize breaks card widths | Use `useWindowDimensions()` | ✅ Done |
 | H-P01 | `StyleSheet.create` in `useMemo` | Hoist static styles to module level |
 | H-P02 | Nested FlatLists kill virtualization | Migrate to `FlashList` | ✅ Done |
-| H-E01 | Error boundaries missing on most screens | Wrap all tab screens |
+| H-E01 | Error boundaries missing on most screens | Wrap all tab screens | ✅ Done |
 | H-AC01 | Tab bar not screen-reader accessible | Add `accessibilityRole="tab"` |
 | H-R01 | Color swatches render LTR | Fix `flexDirection` |
 

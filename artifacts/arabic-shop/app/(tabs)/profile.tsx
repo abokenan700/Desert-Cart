@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import {
   View,
   Text,
@@ -83,7 +84,7 @@ const baseStyles = StyleSheet.create({
 });
 // ─────────────────────────────────────────────────────────────────────────────
 
-export default function ProfileScreen() {
+function ProfileScreen() {
   const colors = useColors();
   const { isDark, toggleTheme } = useTheme();
   const insets = useSafeAreaInsets();
@@ -427,5 +428,13 @@ export default function ProfileScreen() {
         <Text style={styles.versionText}>الإصدار ١.٠.٠ — الأسطورة</Text>
       </ScrollView>
     </View>
+  );
+}
+
+export default function ProfileScreenWithBoundary() {
+  return (
+    <ErrorBoundary>
+      <ProfileScreen />
+    </ErrorBoundary>
   );
 }

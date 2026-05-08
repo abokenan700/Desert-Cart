@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import {
   View,
   Text,
@@ -59,7 +60,7 @@ const SORT_OPTIONS: { id: SortOption; label: string; icon: string }[] = [
   { id: "rating", label: "الأعلى تقييماً", icon: "star-outline" },
 ];
 
-export default function WishlistScreen() {
+function WishlistScreen() {
   const { height } = useWindowDimensions();
   const colors = useColors();
   const insets = useSafeAreaInsets();
@@ -380,5 +381,13 @@ export default function WishlistScreen() {
         </TouchableOpacity>
       </Modal>
     </View>
+  );
+}
+
+export default function WishlistScreenWithBoundary() {
+  return (
+    <ErrorBoundary>
+      <WishlistScreen />
+    </ErrorBoundary>
   );
 }

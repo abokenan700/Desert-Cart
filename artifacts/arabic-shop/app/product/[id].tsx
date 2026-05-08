@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import {
   View,
   Text,
@@ -31,8 +32,16 @@ import ReviewModal from "@/components/ReviewModal";
 import ProductCard from "@/components/ProductCard";
 import { PRODUCTS } from "@/data/mockData";
 
-export default function ProductDetailScreen() {
+function ProductDetailScreen() {
   return <ProductDetailInner />;
+}
+
+export default function ProductDetailScreenWithBoundary() {
+  return (
+    <ErrorBoundary>
+      <ProductDetailScreen />
+    </ErrorBoundary>
+  );
 }
 
 const TRUST_BADGES = [

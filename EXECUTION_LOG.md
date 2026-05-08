@@ -220,12 +220,45 @@
 
 ---
 
+### ✅ [H-E01] ErrorBoundary missing on most screens
+- **الوصف في الخطة:** أغلب شاشات التطبيق كانت بدون `ErrorBoundary` — أي خطأ غير متوقع في render يُسقط التطبيق بالكامل بدلاً من عرض شاشة استرداد للمستخدم.
+- **الإصلاح الكامل:**
+
+  **الشاشات التي تضمّنت ErrorBoundary بالفعل (قبل هذه المهمة):**
+  - `app/(tabs)/cart.tsx` ✅
+  - `app/(tabs)/search.tsx` ✅
+  - `app/checkout.tsx` ✅
+  - `app/order-tracking.tsx` ✅
+  - `app/_layout.tsx` ✅ (جذر التطبيق)
+
+  **الشاشات التي أُضيف إليها ErrorBoundary (هذه المهمة):**
+  - `app/(tabs)/index.tsx` → `HomeScreenWithBoundary`
+  - `app/(tabs)/categories.tsx` → `CategoriesScreenWithBoundary`
+  - `app/(tabs)/wishlist.tsx` → `WishlistScreenWithBoundary`
+  - `app/(tabs)/profile.tsx` → `ProfileScreenWithBoundary`
+  - `app/order-success.tsx` → `OrderSuccessScreenWithBoundary`
+  - `app/order-history.tsx` → `OrderHistoryScreenWithBoundary`
+  - `app/my-coupons.tsx` → `MyCouponsScreenWithBoundary`
+  - `app/product/[id].tsx` → `ProductDetailScreenWithBoundary`
+
+  **نمط التطبيق المتّبع** (مطابق لـ `cart.tsx` و `search.tsx`):
+  1. إعادة تسمية `export default function XxxScreen` → `function XxxScreen` (داخلي)
+  2. إضافة `export default function XxxScreenWithBoundary()` يلفّ الشاشة بـ `<ErrorBoundary>`
+  3. هذا النمط يعزل كل شاشة في bubble مستقلة — عطل أي شاشة لا يؤثر على بقية التطبيق
+
+- **النتيجة:**
+  - قبل: خطأ في render أي شاشة = سقوط كامل التطبيق.
+  - بعد: كل شاشة محاطة بـ `ErrorBoundary` → `ErrorFallback` (يدعم "إعادة المحاولة" + عرض stack trace في DEV).
+  - التغطية: **13 من 13 شاشة** محمية (5 كانت موجودة + 8 أُضيفت)
+
+- **الملفات المعدّلة:** 8 ملفات شاشة
+- **commit:** _(current session)_
+
+---
+
 ### ⏳ المرحلة الثانية المتبقية
 | ID | المهمة |
 |----|--------|
-| H-D03 | Reviews recycled across products — create unique reviews per product |
-| H-A02 | `Dimensions.get("window")` at module level — breaks on resize |
 | H-P01 | `StyleSheet.create` inside `useMemo` — recreates on every theme toggle |
-| H-E01 | `ErrorBoundary` missing on most screens |
 | H-AC01 | Tab bar has no `accessibilityRole` on tab items |
 | H-R01 | Color swatches in `ProductCard` render LTR — should be RTL |
