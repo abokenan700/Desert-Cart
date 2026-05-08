@@ -17,6 +17,7 @@ import { useColors } from "@/hooks/useColors";
 import { useTheme } from "@/context/ThemeContext";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { useUser } from "@/context/UserContext";
 import { ACTIVE_ORDER, MOCK_ORDERS } from "@/data/mockOrders";
 import { COUPONS, isCouponExpired, COUPON_MAP } from "@/data/coupons";
 
@@ -90,6 +91,7 @@ function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const { totalCount } = useCart();
   const { count: wishlistCount } = useWishlist();
+  const { profile, avatarInitial } = useUser();
   const [notifications, setNotifications] = useState(true);
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
@@ -282,13 +284,16 @@ function ProfileScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={baseStyles.headerContent}>
-          <View style={baseStyles.avatar}>
-            <Text style={baseStyles.avatarText}>س</Text>
+          <View style={[baseStyles.avatar, { backgroundColor: profile.avatarColor }]}>
+            <Text style={baseStyles.avatarText}>{avatarInitial}</Text>
           </View>
           <View style={baseStyles.userInfo}>
-            <Text style={baseStyles.userName}>سارة العمري</Text>
-            <Text style={baseStyles.userEmail}>sara.omari@email.com</Text>
-            <TouchableOpacity style={baseStyles.editBtn}>
+            <Text style={baseStyles.userName}>{profile.name}</Text>
+            <Text style={baseStyles.userEmail}>{profile.email}</Text>
+            <TouchableOpacity
+              style={baseStyles.editBtn}
+              onPress={() => router.push("/edit-profile" as any)}
+            >
               <Text style={baseStyles.editBtnText}>تعديل الملف</Text>
               <Ionicons name="create-outline" size={14} color="#fff" />
             </TouchableOpacity>

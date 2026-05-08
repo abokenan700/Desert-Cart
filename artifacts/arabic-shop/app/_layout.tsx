@@ -27,6 +27,7 @@ import { useAppToast } from "@/context/AppToastContext";
 import { OrderProvider } from "@/context/OrderContext";
 import { ReviewsProvider } from "@/context/ReviewsContext";
 import { AddressProvider } from "@/context/AddressContext";
+import { UserProvider } from "@/context/UserContext";
 
 I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
@@ -42,6 +43,7 @@ function AppProviders({ children }: { children: React.ReactNode }) {
         <ThemeProvider>
           <AppToastProvider>
             <QueryClientProvider client={queryClient}>
+              <UserProvider>
               <CartProvider>
                 <AddressProvider>
                 <OrderProvider>
@@ -59,6 +61,7 @@ function AppProviders({ children }: { children: React.ReactNode }) {
                 </OrderProvider>
                 </AddressProvider>
               </CartProvider>
+              </UserProvider>
             </QueryClientProvider>
           </AppToastProvider>
         </ThemeProvider>
@@ -120,6 +123,10 @@ function RootLayoutNav() {
         />
         <Stack.Screen
           name="my-coupons"
+          options={{ headerShown: false, presentation: "card" }}
+        />
+        <Stack.Screen
+          name="edit-profile"
           options={{ headerShown: false, presentation: "card" }}
         />
       </Stack>
