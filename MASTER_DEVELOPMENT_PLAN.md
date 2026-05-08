@@ -701,7 +701,7 @@ These significantly affect the perceived quality and usability of the app.
 | H-P01 | `StyleSheet.create` in `useMemo` | Hoist static styles to module level |
 | H-P02 | Nested FlatLists kill virtualization | Migrate to `FlashList` | ✅ Done |
 | H-E01 | Error boundaries missing on most screens | Wrap all tab screens | ✅ Done |
-| H-AC01 | Tab bar not screen-reader accessible | Add `accessibilityRole="tab"` |
+| H-AC01 | Tab bar not screen-reader accessible | Add `accessibilityRole="tab"` | ✅ Done |
 | H-R01 | Color swatches render LTR | Fix `flexDirection` |
 
 ### Phase 3 — Feature Completeness (1–2 weeks)

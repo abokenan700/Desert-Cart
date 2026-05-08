@@ -113,9 +113,11 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
         </Svg>
       </View>
 
-      {/* ── Floating active circle ── */}
+      {/* ── Floating active circle (decorative — hidden from screen readers) ── */}
       <Animated.View
         pointerEvents="none"
+        importantForAccessibility="no-hide-descendants"
+        accessible={false}
         style={[
           styles.circleOuter,
           {
@@ -148,17 +150,31 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
       </Animated.View>
 
       {/* ── Tab row ── */}
-      <View style={[styles.tabRow, { top: TOP_PAD, height: BAR_H }]}>
+      <View
+        style={[styles.tabRow, { top: TOP_PAD, height: BAR_H }]}
+        accessibilityRole="tablist"
+      >
         {orderedRoutes.map((route) => {
           const focused = route.name === activeRouteName;
           const cfg     = TAB_CONFIG[route.name];
           const badge   = route.name === "wishlist" && wishlistCount > 0 ? wishlistCount : null;
+
+          // Build a descriptive label: name + badge count if present
+          const a11yLabel = badge !== null
+            ? `${cfg.label}، ${badge} عناصر`
+            : cfg.label;
 
           return (
             <TouchableOpacity
               key={route.name}
               style={styles.tabItem}
               activeOpacity={0.7}
+              // ── Accessibility ──────────────────────────────────────────────
+              accessibilityRole="tab"
+              accessibilityLabel={a11yLabel}
+              accessibilityState={{ selected: focused }}
+              accessibilityHint={focused ? undefined : `انتقل إلى ${cfg.label}`}
+              // ──────────────────────────────────────────────────────────────
               onPress={() => {
                 const ev = navigation.emit({
                   type: "tabPress",
@@ -168,11 +184,21 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
                 if (!focused && !ev.defaultPrevented) navigation.navigate(route.name);
               }}
             >
-              {/* Icon placeholder: hidden for active (circle shows it), visible for inactive */}
+              {/* Icon placeholder: hidden for active (circle shows it), visible for inactive.
+                  Both are importantForAccessibility="no" — the TouchableOpacity label is
+                  the sole a11y element; icon + label text are decorative duplicates. */}
               {focused ? (
-                <View style={{ width: 24, height: 24 }} />
+                <View
+                  style={{ width: 24, height: 24 }}
+                  importantForAccessibility="no"
+                  accessible={false}
+                />
               ) : (
-                <View style={{ position: "relative" }}>
+                <View
+                  style={{ position: "relative" }}
+                  importantForAccessibility="no"
+                  accessible={false}
+                >
                   <Ionicons name={cfg.icon as any} size={22} color={colors.mutedForeground} />
                   {badge !== null && (
                     <View style={[styles.badge, { backgroundColor: colors.primary }]}>
@@ -191,6 +217,8 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
                   },
                 ]}
                 numberOfLines={1}
+                importantForAccessibility="no"
+                accessible={false}
               >
                 {cfg.label}
               </Text>

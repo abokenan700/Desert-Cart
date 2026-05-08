@@ -256,9 +256,37 @@
 
 ---
 
+### ✅ [H-AC01] Tab bar not screen-reader accessible
+- **الوصف في الخطة:** شريط التبويب المخصص (`CustomTabBar`) كان بدون `accessibilityRole` أو `accessibilityLabel` — قارئات الشاشة (VoiceOver/TalkBack) تقرأ التبويبات كأزرار مجهولة بدون سياق.
+- **الإصلاح الكامل:**
+
+  **`components/CustomTabBar.tsx`:**
+  - **`<View accessibilityRole="tablist">`** على حاوية صف التبويبات — يُعلن للمساعد أن هذه قائمة تبويبات متكاملة.
+  - **كل `TouchableOpacity` تبويب:**
+    - `accessibilityRole="tab"` — الدور الصحيح (tab ضمن tablist)
+    - `accessibilityLabel={cfg.label}` — الاسم العربي الكامل (مثل "الرئيسية"، "الأقسام")
+    - `accessibilityLabel` يتضمن عدد العناصر عند وجود badge: `"المفضلة، 3 عناصر"`
+    - `accessibilityState={{ selected: focused }}` — يُعلن للمساعد أي تبويب نشط حالياً
+    - `accessibilityHint` — تلميح "انتقل إلى ..." للتبويبات غير النشطة فقط
+  - **الدائرة المتحركة (`Animated.View`)** — زخرفية بحتة:
+    - `importantForAccessibility="no-hide-descendants"` — تُخفيها وكل محتواها من شجرة إمكانية الوصول
+    - `accessible={false}` — يمنع VoiceOver من الوقوف عليها
+  - **الأيقونات ونص التسمية** داخل كل تبويب:
+    - `importantForAccessibility="no"` + `accessible={false}` — تُخفيها لأن التسمية على `TouchableOpacity` تُغطيها
+
+- **النتيجة:**
+  - قبل: قارئ الشاشة يقرأ "زر، زر، زر" × 5 بدون معنى.
+  - بعد: يقرأ "قائمة تبويبات، الرئيسية — محدد، الأقسام — غير محدد، اكتشف — غير محدد، ..." — مطابق لمعايير WCAG 2.1 للتبويبات.
+  - التبويب المحدد يُعلَن تلقائياً كـ "selected" في كل منصة.
+
+- **الملفات المعدّلة:**
+  - `artifacts/arabic-shop/components/CustomTabBar.tsx`
+- **commit:** _(current session)_
+
+---
+
 ### ⏳ المرحلة الثانية المتبقية
 | ID | المهمة |
 |----|--------|
 | H-P01 | `StyleSheet.create` inside `useMemo` — recreates on every theme toggle |
-| H-AC01 | Tab bar has no `accessibilityRole` on tab items |
 | H-R01 | Color swatches in `ProductCard` render LTR — should be RTL |
