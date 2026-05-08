@@ -6,7 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
-  Dimensions,
+  useWindowDimensions,
   Platform,
   RefreshControl,
   Animated,
@@ -41,9 +41,8 @@ import {
   FEATURED_PRODUCTS,
 } from "@/data/mockData";
 
-const { width } = Dimensions.get("window");
-
 export default function HomeScreen() {
+  const { width } = useWindowDimensions();
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { showToast } = useAppToast();
@@ -329,7 +328,7 @@ export default function HomeScreen() {
           color: colors.mutedForeground,
         },
       }),
-    [colors]
+    [colors, width]
   );
 
   return (

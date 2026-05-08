@@ -10,7 +10,7 @@ import {
   Modal,
   TextInput,
   Animated,
-  Dimensions,
+  useWindowDimensions,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -25,8 +25,6 @@ import ProductCard from "@/components/ProductCard";
 import { Product } from "@/data/mockData";
 import { CATEGORIES } from "@/data/mockData";
 
-const { height } = Dimensions.get("window");
-
 type SortOption = "recent" | "price_asc" | "price_desc" | "rating";
 
 const SORT_OPTIONS: { id: SortOption; label: string; icon: string }[] = [
@@ -37,6 +35,7 @@ const SORT_OPTIONS: { id: SortOption; label: string; icon: string }[] = [
 ];
 
 export default function WishlistScreen() {
+  const { height } = useWindowDimensions();
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { items, count, collections, addToWishlist, toggleWishlist, createCollection, addToCollection } = useWishlist();

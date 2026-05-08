@@ -7,13 +7,11 @@ import {
   StyleSheet,
   Animated,
   Platform,
-  Dimensions,
+  useWindowDimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useColors } from "@/hooks/useColors";
-
-const { width, height } = Dimensions.get("window");
 
 interface VoiceSearchProps {
   onResult: (text: string) => void;
@@ -37,6 +35,7 @@ const DEMO_QUERIES = [
 ];
 
 export default function VoiceSearch({ onResult, onClose, visible }: VoiceSearchProps) {
+  const { width } = useWindowDimensions();
   const colors = useColors();
   const [status, setStatus] = useState<"idle" | "listening" | "processing" | "done">("idle");
   const [transcript, setTranscript] = useState("");
@@ -305,7 +304,7 @@ export default function VoiceSearch({ onResult, onClose, visible }: VoiceSearchP
       fontFamily: "Cairo_600SemiBold",
       color: colors.text,
     },
-  }), [colors]);
+  }), [colors, width]);
 
   const statusLabel =
     status === "idle"

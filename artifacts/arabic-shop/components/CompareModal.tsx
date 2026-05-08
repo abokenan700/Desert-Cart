@@ -8,7 +8,7 @@ import {
   Image,
   StyleSheet,
   Platform,
-  Dimensions,
+  useWindowDimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -18,8 +18,6 @@ import { useAppToast } from "@/context/AppToastContext";
 import { Product } from "@/data/mockData";
 import RatingStars from "@/components/RatingStars";
 import * as Haptics from "expo-haptics";
-
-const { width, height } = Dimensions.get("window");
 
 interface CompareModalProps {
   products: Product[];
@@ -78,6 +76,7 @@ const ROWS: CompareRow[] = [
 ];
 
 export default function CompareModal({ products, visible, onClose, onClear }: CompareModalProps) {
+  const { width, height } = useWindowDimensions();
   const colors = useColors();
   const { addToCart } = useCart();
   const { showToast } = useAppToast();
@@ -268,7 +267,7 @@ export default function CompareModal({ products, visible, onClose, onClear }: Co
       fontSize: 13,
       fontFamily: "Cairo_600SemiBold",
     },
-  }), [colors]);
+  }), [colors, width, height]);
 
   const handleAddToCart = (product: Product) => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);

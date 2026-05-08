@@ -7,7 +7,7 @@ import {
   TextInput,
   StyleSheet,
   Animated,
-  Dimensions,
+  useWindowDimensions,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -15,8 +15,6 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useColors } from "@/hooks/useColors";
-
-const { height } = Dimensions.get("window");
 
 interface ReviewModalProps {
   visible: boolean;
@@ -38,6 +36,7 @@ export default function ReviewModal({
   onSubmit,
   onClose,
 }: ReviewModalProps) {
+  const { height } = useWindowDimensions();
   const colors = useColors();
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -216,7 +215,7 @@ export default function ReviewModal({
       fontFamily: "Cairo_400Regular",
       color: colors.mutedForeground,
     },
-  }), [colors]);
+  }), [colors, height]);
 
   const isValid = rating > 0 && comment.trim().length >= 5;
 

@@ -696,8 +696,8 @@ These significantly affect the perceived quality and usability of the app.
 | H-F02 | Category L3 taps do nothing | Navigate to filtered search |
 | H-F03 | Saved addresses are hardcoded | Create `AddressContext` |
 | H-D02 | Only 12 products, 6 shared images | Expand catalog to 40+ |
-| H-D03 | Reviews recycled across products | Create unique reviews per product |
-| H-A02 | Window resize breaks card widths | Use `useWindowDimensions()` |
+| H-D03 | Reviews recycled across products | Create unique reviews per product | ✅ Done |
+| H-A02 | Window resize breaks card widths | Use `useWindowDimensions()` | ✅ Done |
 | H-P01 | `StyleSheet.create` in `useMemo` | Hoist static styles to module level |
 | H-P02 | Nested FlatLists kill virtualization | Migrate to `FlashList` |
 | H-E01 | Error boundaries missing on most screens | Wrap all tab screens |

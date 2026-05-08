@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Animated,
-  Dimensions,
+  useWindowDimensions,
   Platform,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -17,9 +17,6 @@ import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { Product } from "@/data/mockData";
 import { useFlashSaleTimer } from "@/hooks/useFlashSaleTimer";
-
-const { width } = Dimensions.get("window");
-export const CARD_WIDTH = (width - 48) / 2;
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -36,6 +33,8 @@ const ProductCard = React.memo(function ProductCard({
   compact = false,
   onLongPress,
 }: ProductCardProps) {
+  const { width } = useWindowDimensions();
+  const cardWidth = (width - 48) / 2;
   const colors = useColors();
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
@@ -379,7 +378,7 @@ const ProductCard = React.memo(function ProductCard({
   );
 
   return (
-    <Animated.View style={[{ width: CARD_WIDTH }, style, { transform: [{ scale: scaleAnim }] }]}>
+    <Animated.View style={[{ width: cardWidth }, style, { transform: [{ scale: scaleAnim }] }]}>
       <TouchableOpacity
         activeOpacity={1}
         onPressIn={handlePressIn}

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import {
   Animated,
-  Dimensions,
+  useWindowDimensions,
   Modal,
   Platform,
   ScrollView,
@@ -13,8 +13,6 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
 import { NotificationItem } from "@/context/NotificationsContext";
-
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 interface NotificationDrawerProps {
   visible: boolean;
@@ -29,8 +27,9 @@ export default function NotificationDrawer({
   onClose,
   onMarkAllRead,
 }: NotificationDrawerProps) {
+  const { width } = useWindowDimensions();
   const colors = useColors();
-  const slide = useRef(new Animated.Value(SCREEN_WIDTH)).current;
+  const slide = useRef(new Animated.Value(width)).current;
 
   useEffect(() => {
     if (visible) {
@@ -42,12 +41,12 @@ export default function NotificationDrawer({
       }).start();
     } else {
       Animated.timing(slide, {
-        toValue: SCREEN_WIDTH,
+        toValue: width,
         duration: 220,
         useNativeDriver: true,
       }).start();
     }
-  }, [visible, slide]);
+  }, [visible, slide, width]);
 
   const styles = useMemo(() => StyleSheet.create({
     overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.45)" },

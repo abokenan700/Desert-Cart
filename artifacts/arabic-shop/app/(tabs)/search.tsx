@@ -17,7 +17,7 @@ import {
   TouchableOpacity,
   Modal,
   Animated,
-  Dimensions,
+  useWindowDimensions,
   Platform,
   RefreshControl,
   Image,
@@ -37,8 +37,6 @@ import CategoryRow from "@/components/CategoryRow";
 import VoiceSearch from "@/components/VoiceSearch";
 import RatingStars from "@/components/RatingStars";
 import { PRODUCTS, CATEGORIES, Product } from "@/data/mockData";
-
-const { width, height } = Dimensions.get("window");
 
 const SORT_OPTIONS = [
   { id: "popular", label: "الأكثر شعبية", icon: "flame-outline" as const },
@@ -205,6 +203,7 @@ function HighlightedText({ text, highlight, style }: { text: string; highlight: 
 
 // ─── Main screen ───────────────────────────────────────────────────────────
 function SearchScreen() {
+  const { height } = useWindowDimensions();
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { showToast } = useAppToast();
@@ -579,7 +578,7 @@ function SearchScreen() {
         applyBtnGrad: { paddingVertical: 16, alignItems: "center" },
         applyBtnText: { color: "#fff", fontSize: 16, fontFamily: "Cairo_700Bold" },
       }),
-    [colors, topPad, inputFocused, activeFilterCount]
+    [colors, topPad, inputFocused, activeFilterCount, height]
   );
 
   const renderToggle = (value: boolean, onToggle: () => void, label: string) => (

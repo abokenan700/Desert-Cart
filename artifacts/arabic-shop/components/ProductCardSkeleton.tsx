@@ -1,7 +1,6 @@
 import React, { useRef, useEffect } from "react";
-import { View, StyleSheet, Animated, Platform } from "react-native";
+import { View, StyleSheet, Animated, Platform, useWindowDimensions } from "react-native";
 import { useColors } from "@/hooks/useColors";
-import { CARD_WIDTH } from "@/components/ProductCard";
 
 function ShimmerBar({
   width,
@@ -41,6 +40,8 @@ function ShimmerBar({
 }
 
 export default function ProductCardSkeleton() {
+  const { width: screenWidth } = useWindowDimensions();
+  const cardWidth = (screenWidth - 48) / 2;
   const colors = useColors();
   const shimmerAnim = useRef(new Animated.Value(0)).current;
 
@@ -58,12 +59,11 @@ export default function ProductCardSkeleton() {
 
   const shimmerX = shimmerAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [CARD_WIDTH, -CARD_WIDTH],
+    outputRange: [cardWidth, -cardWidth],
   });
 
   return (
-    <View style={[styles.card, { backgroundColor: colors.card }]}>
-      {/* Image placeholder */}
+    <View style={[{ width: cardWidth, borderRadius: 20, overflow: "hidden", marginBottom: 16 }, shadowStyle, { backgroundColor: colors.card }]}>
       <View
         style={[
           styles.imagePlaceholder,
@@ -97,23 +97,18 @@ export default function ProductCardSkeleton() {
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    width: CARD_WIDTH,
-    borderRadius: 20,
-    overflow: "hidden",
-    marginBottom: 16,
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.08,
-        shadowRadius: 12,
-      },
-      android: { elevation: 3 },
-      web: { boxShadow: "0 4px 12px rgba(0,0,0,0.08)" } as any,
-    }),
+const shadowStyle = Platform.select({
+  ios: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
   },
+  android: { elevation: 3 },
+  web: { boxShadow: "0 4px 12px rgba(0,0,0,0.08)" } as any,
+}) ?? {};
+
+const styles = StyleSheet.create({
   imagePlaceholder: {
     width: "100%",
     aspectRatio: 3 / 4,

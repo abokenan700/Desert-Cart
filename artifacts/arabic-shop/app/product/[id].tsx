@@ -6,7 +6,7 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  Dimensions,
+  useWindowDimensions,
   Platform,
   Animated,
   NativeSyntheticEvent,
@@ -30,9 +30,6 @@ import RatingStars from "@/components/RatingStars";
 import ReviewModal from "@/components/ReviewModal";
 import ProductCard from "@/components/ProductCard";
 import { PRODUCTS } from "@/data/mockData";
-
-const { width, height } = Dimensions.get("window");
-const IMAGE_HEIGHT = height * 0.50;
 
 export default function ProductDetailScreen() {
   return <ProductDetailInner />;
@@ -84,6 +81,8 @@ function getQA(categoryId: string) {
 }
 
 function ProductDetailInner() {
+  const { width, height } = useWindowDimensions();
+  const IMAGE_HEIGHT = height * 0.50;
   const { id } = useLocalSearchParams<{ id: string }>();
   const colors = useColors();
   const insets = useSafeAreaInsets();
@@ -410,7 +409,7 @@ function ProductDetailInner() {
         qaSubmitBtn: { backgroundColor: colors.primary, borderRadius: 14, paddingVertical: 14, alignItems: "center" },
         qaSubmitText: { color: "#fff", fontSize: 15, fontFamily: "Cairo_700Bold" },
       }),
-    [colors, topPad, bottomPad]
+    [colors, topPad, bottomPad, width, height]
   );
 
   return (

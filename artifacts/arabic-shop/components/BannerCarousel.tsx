@@ -5,15 +5,13 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
-  Dimensions,
+  useWindowDimensions,
 } from "react-native";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import { Banner } from "@/data/mockData";
 
-const { width } = Dimensions.get("window");
 const BANNER_HEIGHT = 185;
-const BANNER_WIDTH = width - 8;
 const AUTO_PLAY_INTERVAL = 4200;
 
 interface BannerCarouselProps {
@@ -21,6 +19,8 @@ interface BannerCarouselProps {
 }
 
 export default function BannerCarousel({ banners }: BannerCarouselProps) {
+  const { width } = useWindowDimensions();
+  const bannerWidth = width - 8;
   const scrollRef = useRef<ScrollView>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -30,11 +30,11 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
     timerRef.current = setInterval(() => {
       setActiveIndex((prev) => {
         const next = (prev + 1) % banners.length;
-        scrollRef.current?.scrollTo({ x: next * BANNER_WIDTH, animated: true });
+        scrollRef.current?.scrollTo({ x: next * bannerWidth, animated: true });
         return next;
       });
     }, AUTO_PLAY_INTERVAL);
-  }, [banners.length]);
+  }, [banners.length, bannerWidth]);
 
   useEffect(() => {
     startTimer();
@@ -46,13 +46,13 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
   const handleScroll = useCallback(
     (e: any) => {
       const x = e.nativeEvent.contentOffset.x;
-      const index = Math.round(x / BANNER_WIDTH);
+      const index = Math.round(x / bannerWidth);
       if (index !== activeIndex && index >= 0 && index < banners.length) {
         setActiveIndex(index);
         startTimer();
       }
     },
-    [activeIndex, banners.length, startTimer]
+    [activeIndex, banners.length, startTimer, bannerWidth]
   );
 
   // Per-banner navigation — uses ctaRoute.pathname + ctaRoute.params from data
@@ -72,7 +72,7 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
         container: { marginHorizontal: 4, marginTop: 4, marginBottom: 0 },
         scroll: { borderRadius: 22, overflow: "hidden" },
         slide: {
-          width: BANNER_WIDTH,
+          width: bannerWidth,
           height: BANNER_HEIGHT,
           borderRadius: 22,
           overflow: "hidden",
@@ -83,7 +83,7 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
           resizeMode: "cover",
         },
       }),
-    []
+    [bannerWidth]
   );
 
   return (
@@ -97,7 +97,7 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
         scrollEventThrottle={16}
         style={styles.scroll}
         decelerationRate="fast"
-        snapToInterval={BANNER_WIDTH}
+        snapToInterval={bannerWidth}
         snapToAlignment="center"
       >
         {banners.map((banner) => (
