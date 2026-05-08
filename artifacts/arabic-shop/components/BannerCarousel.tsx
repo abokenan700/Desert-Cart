@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
+import type { Href } from "expo-router";
 import { Banner } from "@/data/mockData";
 
 const BANNER_HEIGHT = 185;
@@ -60,9 +61,9 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     const { pathname, params } = banner.ctaRoute;
     if (params && Object.keys(params).length > 0) {
-      router.push({ pathname, params } as any);
+      router.push({ pathname, params } as Href);
     } else {
-      router.push(pathname as any);
+      router.push(pathname as Href);
     }
   }, []);
 

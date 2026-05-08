@@ -19,6 +19,8 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams, router } from "expo-router";
+import type { Href } from "expo-router";
+import { webShadow } from "@/utils/webStyles";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useColors } from "@/hooks/useColors";
@@ -282,7 +284,7 @@ function ProductDetailInner() {
           ...Platform.select({
             ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 4 },
             android: { elevation: 3 },
-            web: { boxShadow: "0 2px 6px rgba(0,0,0,0.15)" } as any,
+            web: webShadow("0 2px 6px rgba(0,0,0,0.15)"),
           }),
         },
         backBtn: { position: "absolute", top: topPad + 10, right: 16 },
@@ -802,7 +804,7 @@ function ProductDetailInner() {
                   <TouchableOpacity
                     key={p.id}
                     style={{ width: 130, backgroundColor: colors.card, borderRadius: 14, overflow: "hidden", borderWidth: 1, borderColor: colors.border }}
-                    onPress={() => router.push(`/product/${p.id}` as any)}
+                    onPress={() => router.push(`/product/${p.id}` as Href)}
                     activeOpacity={0.88}
                   >
                     <Image source={p.image} style={{ width: 130, height: 130 }} resizeMode="cover" />
@@ -823,7 +825,7 @@ function ProductDetailInner() {
           <>
             <View style={styles.sectionDivider} />
             <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, paddingTop: 16, paddingBottom: 12 }}>
-              <TouchableOpacity onPress={() => router.push("/(tabs)/search" as any)}>
+              <TouchableOpacity onPress={() => router.push("/(tabs)/search" as Href)}>
                 <Text style={{ fontSize: 13, fontFamily: "Cairo_600SemiBold", color: colors.primary }}>عرض الكل</Text>
               </TouchableOpacity>
               <Text style={{ fontSize: 18, fontFamily: "Cairo_700Bold", color: colors.text, textAlign: "right" }}>قد يعجبك أيضاً ✨</Text>

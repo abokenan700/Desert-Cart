@@ -12,11 +12,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
 import { useNotifications } from "@/context/NotificationsContext";
 import type { NotificationItem } from "@/context/NotificationsContext";
+import type { IoniconsName } from "@/types/icons";
+import { webShadow } from "@/utils/webStyles";
 
 const TOAST_DURATION = 4000;
 const SLIDE_DURATION = 380;
 
-const TYPE_CONFIG: Record<NotificationItem["type"], { icon: string; color: string }> = {
+const TYPE_CONFIG: Record<NotificationItem["type"], { icon: IoniconsName; color: string }> = {
   order: { icon: "bag-check-outline", color: "#3B82F6" },
   delivery: { icon: "car-outline", color: "#10B981" },
   deal: { icon: "pricetag-outline", color: "#F5A623" },
@@ -105,7 +107,7 @@ export default function ToastNotification() {
           shadowRadius: 20,
         },
         android: { elevation: 12 },
-        web: { boxShadow: "0 8px 20px rgba(0,0,0,0.18)" } as any,
+        web: webShadow("0 8px 20px rgba(0,0,0,0.18)"),
       }),
     },
     iconBox: {
@@ -170,7 +172,7 @@ export default function ToastNotification() {
         activeOpacity={0.95}
       >
         <View style={[styles.iconBox, { backgroundColor: `${cfg.color}18` }]}>
-          <Ionicons name={cfg.icon as any} size={22} color={cfg.color} />
+          <Ionicons name={cfg.icon} size={22} color={cfg.color} />
         </View>
         <View style={styles.textCol}>
           <Text style={styles.title} numberOfLines={1}>

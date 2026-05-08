@@ -15,6 +15,8 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
+import type { Href } from "expo-router";
+import { webShadow, WEB_RTL } from "@/utils/webStyles";
 import { useColors } from "@/hooks/useColors";
 import { CATEGORY_TREE, Level1Category, Level2Category } from "@/data/categoryData";
 import { CATEGORIES } from "@/data/mockData";
@@ -266,7 +268,7 @@ function L1TabItem({
           accessibilityRole="button"
           accessibilityState={{ selected: isSelected }}
         >
-          <Ionicons name={cat.icon as any} size={24} color={isSelected ? "#fff" : cat.color} />
+          <Ionicons name={cat.icon} size={24} color={isSelected ? "#fff" : cat.color} />
         </Pressable>
       </Animated.View>
       <Text
@@ -288,7 +290,7 @@ function L1TabStrip({ selectedId, onSelect }: { selectedId: string; onSelect: (i
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={[styles.tabScrollView, Platform.OS === "web" && ({ direction: "rtl" } as any)]}
+        style={[styles.tabScrollView, Platform.OS === "web" && WEB_RTL]}
         contentContainerStyle={styles.tabStrip}
       >
         {cats.map((cat) => (
@@ -320,7 +322,7 @@ function RichBanner({ l1 }: { l1: Level1Category }) {
         </View>
         <TouchableOpacity
           style={[bannerStyles.cta, { backgroundColor: "#fff" }]}
-          onPress={() => router.push(`/(tabs)/search?category=${l1.id}` as any)}
+          onPress={() => router.push(`/(tabs)/search?category=${l1.id}` as Href)}
           activeOpacity={0.8}
         >
           <Text style={[bannerStyles.ctaText, { color: l1.color }]}>تصفح الكل</Text>
@@ -341,7 +343,7 @@ const bannerStyles = StyleSheet.create({
     ...Platform.select({
       ios:     { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 10 },
       android: { elevation: 4 },
-      web:     { boxShadow: "0 4px 14px rgba(0,0,0,0.15)" } as any,
+      web:     webShadow("0 4px 14px rgba(0,0,0,0.15)"),
     }),
   },
   gradient: {
@@ -387,7 +389,7 @@ const bannerStyles = StyleSheet.create({
     ...Platform.select({
       ios:     { shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.12, shadowRadius: 4 },
       android: { elevation: 2 },
-      web:     { boxShadow: "0 2px 6px rgba(0,0,0,0.12)" } as any,
+      web:     webShadow("0 2px 6px rgba(0,0,0,0.12)"),
     }),
   },
   ctaText: {
@@ -427,7 +429,7 @@ function L2SidebarItem({
         ]}
       >
         <Ionicons
-          name={sub.icon as any}
+          name={sub.icon}
           size={17}
           color={isSelected ? sub.color : colors.mutedForeground}
         />
@@ -506,7 +508,7 @@ function L3CircleCard({
             />
           ) : (
             <Ionicons
-              name={parentSub.icon as any}
+              name={parentSub.icon}
               size={Math.round(circleSize * 0.38)}
               color={parentSub.color}
             />
@@ -527,7 +529,7 @@ function ContentHeader({ sub, l1Id }: { sub: Level2Category; l1Id: string }) {
     <View style={[styles.contentHeader, { backgroundColor: `${sub.color}0D`, borderBottomColor: `${sub.color}25` }]}>
       <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8, flex: 1 }}>
         <View style={[styles.contentHeaderIcon, { backgroundColor: sub.bgColor }]}>
-          <Ionicons name={sub.icon as any} size={14} color={sub.color} />
+          <Ionicons name={sub.icon} size={14} color={sub.color} />
         </View>
         <View style={{ alignItems: "flex-end", flex: 1 }}>
           <Text style={[styles.contentHeaderText, { color: colors.text }]}>{sub.nameAr}</Text>
@@ -538,7 +540,7 @@ function ContentHeader({ sub, l1Id }: { sub: Level2Category; l1Id: string }) {
       </View>
       <TouchableOpacity
         style={[styles.browseAllBtn, { backgroundColor: sub.color }]}
-        onPress={() => router.push(`/(tabs)/search?category=${l1Id}` as any)}
+        onPress={() => router.push(`/(tabs)/search?category=${l1Id}` as Href)}
         activeOpacity={0.8}
       >
         <Text style={styles.browseAllText}>تصفح الكل</Text>
@@ -622,7 +624,7 @@ function CategoriesScreen() {
           ...Platform.select({
             ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 4 },
             android: { elevation: 2 },
-            web: { boxShadow: "0 2px 4px rgba(0,0,0,0.06)" } as any,
+            web: webShadow("0 2px 4px rgba(0,0,0,0.06)"),
           }),
         },
         searchText: {
@@ -705,7 +707,7 @@ function CategoriesScreen() {
                         l3: item.nameAr,
                         l3id: item.id,
                       },
-                    } as any)
+                    } as Href)
                   }
                 />
               ))}
@@ -748,7 +750,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios:     { shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 6 },
       android: { elevation: 3 },
-      web:     { boxShadow: "0 2px 8px rgba(0,0,0,0.1)" } as any,
+      web:     webShadow("0 2px 8px rgba(0,0,0,0.1)"),
     }),
   },
   tabLabel: {
@@ -845,7 +847,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios:     { shadowColor: "#000", shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.1, shadowRadius: 8 },
       android: { elevation: 3 },
-      web:     { boxShadow: "0 3px 10px rgba(0,0,0,0.1)" } as any,
+      web:     webShadow("0 3px 10px rgba(0,0,0,0.1)"),
     }),
   },
   subName: {

@@ -22,6 +22,8 @@ import { useColors } from "@/hooks/useColors";
 import { useWishlist, WishlistCollection } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
 import { useAppToast } from "@/context/AppToastContext";
+import type { IoniconsName } from "@/types/icons";
+import type { Href } from "expo-router";
 import ProductCard from "@/components/ProductCard";
 import { Product, PRODUCTS, CATEGORIES } from "@/data/mockData";
 
@@ -77,7 +79,7 @@ const baseStyles = StyleSheet.create({
 });
 // ─────────────────────────────────────────────────────────────────────────────
 
-const SORT_OPTIONS: { id: SortOption; label: string; icon: string }[] = [
+const SORT_OPTIONS: { id: SortOption; label: string; icon: IoniconsName }[] = [
   { id: "recent",     label: "الأحدث",          icon: "time-outline"       },
   { id: "price_asc",  label: "الأرخص",           icon: "arrow-up-outline"   },
   { id: "price_desc", label: "الأغلى",           icon: "arrow-down-outline" },
@@ -576,7 +578,7 @@ function WishlistScreen() {
               style={[styles.sortChip, { backgroundColor: active ? colors.primary : colors.secondary, borderColor: active ? colors.primary : colors.border }]}
               onPress={() => { Haptics.selectionAsync(); setSortBy(opt.id); }}
             >
-              <Ionicons name={opt.icon as any} size={12} color={active ? "#fff" : colors.mutedForeground} />
+              <Ionicons name={opt.icon} size={12} color={active ? "#fff" : colors.mutedForeground} />
               <Text style={[baseStyles.sortChipText, { color: active ? "#fff" : colors.text }]}>{opt.label}</Text>
             </TouchableOpacity>
           );
@@ -622,7 +624,7 @@ function WishlistScreen() {
           </View>
           <Text style={styles.emptyTitle}>قائمتك فارغة</Text>
           <Text style={styles.emptyText}>أضف المنتجات التي تعجبك إلى المفضلة لتجدها هنا دائماً</Text>
-          <TouchableOpacity style={styles.shopBtn} onPress={() => router.push("/(tabs)" as any)}>
+          <TouchableOpacity style={styles.shopBtn} onPress={() => router.push("/(tabs)" as Href)}>
             <Text style={baseStyles.shopBtnText}>اكتشف المنتجات</Text>
           </TouchableOpacity>
         </View>

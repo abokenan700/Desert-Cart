@@ -14,6 +14,8 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import type { Href } from "expo-router";
+import { webShadow, WEB_RTL } from "@/utils/webStyles";
 import { useColors } from "@/hooks/useColors";
 import { useAppToast } from "@/context/AppToastContext";
 import { useCart } from "@/context/CartContext";
@@ -216,11 +218,11 @@ function HomeScreen() {
   }, [showToast]);
 
   const handleBrandPress = useCallback((brandNameAr: string) => {
-    router.push({ pathname: "/(tabs)/search", params: { brand: brandNameAr } } as any);
+    router.push({ pathname: "/(tabs)/search", params: { brand: brandNameAr } } as Href);
   }, []);
 
   const handleCollectionPress = useCallback((categoryId: string) => {
-    router.push({ pathname: "/(tabs)/search", params: { category: categoryId } } as any);
+    router.push({ pathname: "/(tabs)/search", params: { category: categoryId } } as Href);
   }, []);
 
   // Dynamic styles (depend on color tokens or runtime values)
@@ -278,7 +280,7 @@ function HomeScreen() {
               shadowRadius: 12,
             },
             android: { elevation: 6 },
-            web: { boxShadow: "0 4px 16px rgba(230,57,70,0.22)" } as any,
+            web: webShadow("0 4px 16px rgba(230,57,70,0.22)"),
           }),
         },
         flashTitle: { fontSize: 17, fontFamily: "Cairo_700Bold", color: colors.text },
@@ -369,7 +371,7 @@ function HomeScreen() {
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={baseStyles.horizontalList}
-              style={Platform.OS === "web" ? ({ direction: "rtl" } as any) : undefined}
+              style={Platform.OS === "web" ? WEB_RTL : undefined}
               keyExtractor={(item) => `flash-${item.id}`}
               renderItem={({ item }) => (
                 <ProductCard product={item} style={styles.horizontalCard} compact />
@@ -394,7 +396,7 @@ function HomeScreen() {
             activeOpacity={0.85}
             onPress={() =>
               router.push(
-                totalCount > 0 ? ("/(tabs)/cart" as any) : "/(tabs)/search"
+                totalCount > 0 ? ("/(tabs)/cart" as Href) : "/(tabs)/search"
               )
             }
           >
@@ -415,7 +417,7 @@ function HomeScreen() {
               router.push({
                 pathname: "/(tabs)/search",
                 params: { sale: "true" },
-              } as any)
+              } as Href)
             }
           >
             <Ionicons name="gift" size={24} color="rgba(255,255,255,0.7)" />
@@ -450,7 +452,7 @@ function HomeScreen() {
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={baseStyles.horizontalList}
-            style={Platform.OS === "web" ? ({ direction: "rtl" } as any) : undefined}
+            style={Platform.OS === "web" ? WEB_RTL : undefined}
             keyExtractor={(item) => `new-${item.id}`}
             renderItem={({ item }) => <ProductCard product={item} />}
           />
@@ -467,7 +469,7 @@ function HomeScreen() {
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={baseStyles.horizontalList}
-              style={Platform.OS === "web" ? ({ direction: "rtl" } as any) : undefined}
+              style={Platform.OS === "web" ? WEB_RTL : undefined}
               keyExtractor={(item) => `recent-${item.id}`}
               renderItem={({ item }) => <ProductCard product={item} />}
             />

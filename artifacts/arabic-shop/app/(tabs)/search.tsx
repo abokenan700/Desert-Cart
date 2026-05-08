@@ -26,6 +26,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, router } from "expo-router";
+import type { Href } from "expo-router";
+import { webShadow } from "@/utils/webStyles";
 import * as Haptics from "expo-haptics";
 import { useColors } from "@/hooks/useColors";
 import { useAppToast } from "@/context/AppToastContext";
@@ -76,7 +78,9 @@ const PRICE_RANGES: { label: string; range: [number, number] }[] = [
   { label: "أكثر من ١٠٠٠", range: [1000, 2000] },
 ];
 
-const DELIVERY_OPTIONS = [
+type DeliverySpeed = "any" | "1day" | "2-3days";
+
+const DELIVERY_OPTIONS: Array<{ id: DeliverySpeed; label: string }> = [
   { id: "any", label: "أي وقت" },
   { id: "1day", label: "خلال يوم ⚡" },
   { id: "2-3days", label: "٢–٣ أيام" },
@@ -136,7 +140,7 @@ function ListViewCard({ product }: { product: Product }) {
               shadowRadius: 6,
             },
             android: { elevation: 2 },
-            web: { boxShadow: "0 2px 6px rgba(0,0,0,0.07)" } as any,
+            web: webShadow("0 2px 6px rgba(0,0,0,0.07)"),
           }),
         },
         image: { width: 100, aspectRatio: 3 / 4, backgroundColor: colors.secondary },
@@ -155,7 +159,7 @@ function ListViewCard({ product }: { product: Product }) {
   return (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => router.push(`/product/${product.id}` as any)}
+      onPress={() => router.push(`/product/${product.id}` as Href)}
       activeOpacity={0.9}
     >
       <Image source={product.image} style={styles.image} resizeMode="cover" />
@@ -265,7 +269,7 @@ function SearchScreen() {
   const [flashSaleOnly, setFlashSaleOnly] = useState(params.sale === "true");
   const [inStockOnly, setInStockOnly] = useState(false);
   const [minRating, setMinRating] = useState(0);
-  const [deliverySpeed, setDeliverySpeed] = useState<"any" | "1day" | "2-3days">("any");
+  const [deliverySpeed, setDeliverySpeed] = useState<DeliverySpeed>("any");
   const [filterBrands, setFilterBrands] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [recentSearches, setRecentSearches] = useState<string[]>(["فستان سهرة", "حقيبة جلدية", "ساعة ذكية"]);
@@ -552,7 +556,7 @@ function SearchScreen() {
           ...Platform.select({
             ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 4 },
             android: { elevation: 2 },
-            web: { boxShadow: "0 2px 4px rgba(0,0,0,0.06)" } as any,
+            web: webShadow("0 2px 4px rgba(0,0,0,0.06)"),
           }),
         },
         input: { flex: 1, fontSize: 14, fontFamily: "Cairo_400Regular", color: colors.text, textAlign: "right", writingDirection: "rtl" },
@@ -567,7 +571,7 @@ function SearchScreen() {
           ...Platform.select({
             ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 8 },
             android: { elevation: 4 },
-            web: { boxShadow: "0 4px 8px rgba(0,0,0,0.08)" } as any,
+            web: webShadow("0 4px 8px rgba(0,0,0,0.08)"),
           }),
         },
         autocompleteItem: { flexDirection: "row-reverse", alignItems: "center", paddingHorizontal: 16, paddingVertical: 13, gap: 10, borderBottomWidth: 1, borderBottomColor: `${colors.border}40` },
@@ -1077,7 +1081,7 @@ function SearchScreen() {
                       <TouchableOpacity
                         key={opt.id}
                         style={[styles.pill, { backgroundColor: active ? colors.primary : colors.secondary, borderColor: active ? colors.primary : colors.border }]}
-                        onPress={() => { Haptics.selectionAsync(); setDeliverySpeed(opt.id as any); }}
+                        onPress={() => { Haptics.selectionAsync(); setDeliverySpeed(opt.id); }}
                       >
                         <Text style={[searchBaseStyles.pillText, { color: active ? "#fff" : colors.text }]}>{opt.label}</Text>
                       </TouchableOpacity>

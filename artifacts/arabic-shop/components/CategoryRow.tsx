@@ -11,6 +11,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { Category } from "@/data/mockData";
 import { useColors } from "@/hooks/useColors";
+import { webShadow, WEB_RTL } from "@/utils/webStyles";
 
 interface CategoryRowProps {
   categories: Category[];
@@ -52,7 +53,7 @@ const baseStyles = StyleSheet.create({
         shadowRadius: 6,
       },
       android: { elevation: 3 },
-      web: { boxShadow: "0 2px 8px rgba(0,0,0,0.1)" } as any,
+      web: webShadow("0 2px 8px rgba(0,0,0,0.1)"),
     }),
   },
   label: {
@@ -95,7 +96,7 @@ function CategoryItem({ cat, isSelected, onSelect, textColor }: CategoryItemProp
           accessibilityState={{ selected: isSelected }}
         >
           <Ionicons
-            name={cat.icon as any}
+            name={cat.icon}
             size={24}
             color={isSelected ? "#fff" : cat.color}
           />
@@ -128,7 +129,7 @@ const CategoryRow = React.memo(function CategoryRow({
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      style={[scrollStyle, Platform.OS === "web" && ({ direction: "rtl" } as any)]}
+      style={[scrollStyle, Platform.OS === "web" && WEB_RTL]}
       contentContainerStyle={baseStyles.contentContainer}
     >
       {categories.map((cat) => (

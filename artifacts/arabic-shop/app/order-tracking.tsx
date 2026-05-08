@@ -14,12 +14,21 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
+import type { IoniconsName } from "@/types/icons";
 import { useColors } from "@/hooks/useColors";
 import { useOrder } from "@/context/OrderContext";
 
 const DRIVER_PHONE = "+966501234567";
 
-const TRACKING_STEPS = [
+const TRACKING_STEPS: Array<{
+  id: number;
+  titleAr: string;
+  descAr: string;
+  icon: IoniconsName;
+  time: string;
+  done: boolean;
+  active?: boolean;
+}> = [
   {
     id: 1,
     titleAr: "تم تأكيد الطلب",
@@ -401,7 +410,7 @@ function OrderTrackingScreen() {
                     ]}
                   >
                     <Ionicons
-                      name={step.icon as any}
+                      name={step.icon}
                       size={20}
                       color={step.done || step.active ? "#fff" : colors.mutedForeground}
                     />

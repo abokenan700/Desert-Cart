@@ -1,3 +1,5 @@
+import type { IoniconsName } from "@/types/icons";
+
 export interface Level3Item {
   id: string;
   nameAr: string;
@@ -7,7 +9,7 @@ export interface Level3Item {
 export interface Level2Category {
   id: string;
   nameAr: string;
-  icon: string;
+  icon: IoniconsName;
   color: string;
   bgColor: string;
   parentId: string;
@@ -18,7 +20,7 @@ export interface Level2Category {
 export interface Level1Category {
   id: string;
   nameAr: string;
-  icon: string;
+  icon: IoniconsName;
   color: string;
   bgColor: string;
   subCategories: Level2Category[];
@@ -28,7 +30,7 @@ export interface Level1Category {
 export interface Category {
   id: string;
   nameAr: string;
-  icon: string;
+  icon: IoniconsName;
   color: string;
   bgColor: string;
 }

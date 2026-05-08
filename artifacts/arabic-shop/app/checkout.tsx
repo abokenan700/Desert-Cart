@@ -16,6 +16,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import type { Href } from "expo-router";
+import type { IoniconsName } from "@/types/icons";
+import { webShadow } from "@/utils/webStyles";
 import * as Haptics from "expo-haptics";
 import { useColors } from "@/hooks/useColors";
 import { useCart } from "@/context/CartContext";
@@ -27,18 +30,18 @@ import { useAppToast } from "@/context/AppToastContext";
 
 const STEPS = ["العنوان", "الدفع", "المراجعة"];
 
-const PAYMENT_METHODS = [
+const PAYMENT_METHODS: Array<{ id: string; label: string; icon: IoniconsName; sub: string }> = [
   { id: "card", label: "بطاقة بنكية", icon: "card-outline", sub: "Visa, Mastercard, Mada" },
   { id: "apple", label: "Apple Pay", icon: "logo-apple", sub: "سريع وآمن" },
   { id: "cash", label: "الدفع عند الاستلام", icon: "cash-outline", sub: "ادفع حين يصلك الطلب" },
   { id: "wallet", label: "المحفظة", icon: "wallet-outline", sub: "رصيدك: ٢٥٠ ر.س" },
 ];
 
-const LABEL_OPTIONS = [
+const LABEL_OPTIONS: Array<{ label: string; icon: IoniconsName }> = [
   { label: "المنزل", icon: "home-outline" },
   { label: "العمل", icon: "business-outline" },
   { label: "آخر", icon: "location-outline" },
-] as const;
+];
 
 // ─── Module-level static styles (no color tokens) ────────────────────────────
 const baseStyles = StyleSheet.create({
@@ -209,7 +212,7 @@ function CheckoutScreen() {
       router.replace({
         pathname: "/order-success",
         params: { orderNumber: orderNum },
-      } as any);
+      } as Href);
     }, 1600);
   }, [clearCart, scheduleOrderNotifications, placeBtnScale]);
 
@@ -490,9 +493,7 @@ function CheckoutScreen() {
               shadowRadius: 10,
             },
             android: { elevation: 6 },
-            web: {
-              boxShadow: `0 4px 14px ${colors.primary}50`,
-            } as any,
+            web: webShadow(`0 4px 14px ${colors.primary}50`),
           }),
         },
         fieldError: {
@@ -595,7 +596,7 @@ function CheckoutScreen() {
                   >
                     <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6 }}>
                       <Ionicons
-                        name={(addr.labelIcon ?? "location-outline") as any}
+                        name={addr.labelIcon ?? "location-outline"}
                         size={14}
                         color={active ? colors.primary : colors.mutedForeground}
                       />
@@ -675,7 +676,7 @@ function CheckoutScreen() {
                         ]}
                         onPress={() => { Haptics.selectionAsync(); setNewAddressLabel(opt.label); }}
                       >
-                        <Ionicons name={opt.icon as any} size={14} color={active ? colors.primary : colors.mutedForeground} />
+                        <Ionicons name={opt.icon} size={14} color={active ? colors.primary : colors.mutedForeground} />
                         <Text style={[styles.labelChipText, { color: active ? colors.primary : colors.text }]}>
                           {opt.label}
                         </Text>
@@ -894,7 +895,7 @@ function CheckoutScreen() {
                     ]}
                   >
                     <Ionicons
-                      name={method.icon as any}
+                      name={method.icon}
                       size={22}
                       color={active ? colors.primary : colors.mutedForeground}
                     />

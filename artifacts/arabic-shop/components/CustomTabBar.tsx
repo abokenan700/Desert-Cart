@@ -14,6 +14,7 @@ import { useColors } from "@/hooks/useColors";
 import { useTheme } from "@/context/ThemeContext";
 import { useWishlist } from "@/context/WishlistContext";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import type { IoniconsName } from "@/types/icons";
 
 // ─── Layout constants ────────────────────────────────────────────────────────
 const CIRCLE_R   = 30;  // active tab floating circle radius
@@ -30,7 +31,7 @@ const TOP_PAD = CIRCLE_ABOVE + CIRCLE_R; // = 34 px
 // ─── Tab meta ────────────────────────────────────────────────────────────────
 const VISIBLE_ORDER = ["profile", "wishlist", "search", "categories", "index"];
 
-const TAB_CONFIG: Record<string, { label: string; icon: string; iconFocused: string }> = {
+const TAB_CONFIG: Record<string, { label: string; icon: IoniconsName; iconFocused: IoniconsName }> = {
   index:      { label: "الرئيسية", icon: "home-outline",   iconFocused: "home" },
   categories: { label: "الأقسام",  icon: "grid-outline",   iconFocused: "grid" },
   search:     { label: "اكتشف",    icon: "search-outline", iconFocused: "search" },
@@ -138,7 +139,7 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
           const badge = route.name === "wishlist" && wishlistCount > 0 ? wishlistCount : null;
           return (
             <View key={route.name} style={{ alignItems: "center", justifyContent: "center" }}>
-              <Ionicons name={cfg.iconFocused as any} size={26} color={colors.primary} />
+              <Ionicons name={cfg.iconFocused} size={26} color={colors.primary} />
               {badge !== null && (
                 <View style={[styles.badge, { backgroundColor: colors.primary }]}>
                   <Text style={styles.badgeText}>{badge > 9 ? "9+" : badge}</Text>
@@ -199,7 +200,7 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
                   importantForAccessibility="no"
                   accessible={false}
                 >
-                  <Ionicons name={cfg.icon as any} size={22} color={colors.mutedForeground} />
+                  <Ionicons name={cfg.icon} size={22} color={colors.mutedForeground} />
                   {badge !== null && (
                     <View style={[styles.badge, { backgroundColor: colors.primary }]}>
                       <Text style={styles.badgeText}>{badge > 9 ? "9+" : badge}</Text>

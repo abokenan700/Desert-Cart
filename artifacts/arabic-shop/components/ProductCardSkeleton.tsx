@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from "react";
-import { View, StyleSheet, Animated, Platform, useWindowDimensions } from "react-native";
+import { View, StyleSheet, Animated, Platform, useWindowDimensions, DimensionValue } from "react-native";
+import { webShadow } from "@/utils/webStyles";
 import { useColors } from "@/hooks/useColors";
 
 function ShimmerBar({
@@ -17,7 +18,7 @@ function ShimmerBar({
   return (
     <View
       style={{
-        width: width as any,
+        width: width as DimensionValue,
         height,
         borderRadius,
         backgroundColor: colors.border,
@@ -31,7 +32,7 @@ function ShimmerBar({
           bottom: 0,
           width: "60%",
           backgroundColor: "rgba(255,255,255,0.55)",
-          transform: [{ translateX: shimmerX as any }],
+          transform: [{ translateX: shimmerX as Animated.AnimatedInterpolation<number> }],
           borderRadius,
         }}
       />
@@ -77,7 +78,7 @@ export default function ProductCardSkeleton() {
             bottom: 0,
             width: "50%",
             backgroundColor: "rgba(255,255,255,0.45)",
-            transform: [{ translateX: shimmerX as any }],
+            transform: [{ translateX: shimmerX as Animated.AnimatedInterpolation<number> }],
           }}
         />
       </View>
@@ -105,7 +106,7 @@ const shadowStyle = Platform.select({
     shadowRadius: 12,
   },
   android: { elevation: 3 },
-  web: { boxShadow: "0 4px 12px rgba(0,0,0,0.08)" } as any,
+  web: webShadow("0 4px 12px rgba(0,0,0,0.08)"),
 }) ?? {};
 
 const styles = StyleSheet.create({

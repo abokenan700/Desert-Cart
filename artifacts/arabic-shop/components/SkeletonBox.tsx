@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, ViewStyle } from "react-native";
+import { Animated, ViewStyle, DimensionValue } from "react-native";
 import { useColors } from "@/hooks/useColors";
 
 interface SkeletonBoxProps {
@@ -41,7 +41,7 @@ export default function SkeletonBox({
     <Animated.View
       style={[
         {
-          width: width as any,
+          width: width as DimensionValue,
           height,
           borderRadius,
           backgroundColor: colors.border,

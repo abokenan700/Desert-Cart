@@ -11,9 +11,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useAppToast, ToastVariant } from "@/context/AppToastContext";
 import { useColors } from "@/hooks/useColors";
+import type { IoniconsName } from "@/types/icons";
+import { webShadow } from "@/utils/webStyles";
 
 type VariantConfig = {
-  icon: string;
+  icon: IoniconsName;
   bg: string;
   textColor: string;
   borderColor: string;
@@ -117,7 +119,7 @@ export default function AppToast() {
         onPress={hideToast}
         activeOpacity={0.9}
       >
-        <Ionicons name={cfg.icon as any} size={20} color={cfg.textColor} />
+        <Ionicons name={cfg.icon} size={20} color={cfg.textColor} />
         <Text style={[styles.message, { color: cfg.textColor }]}>
           {toast.message}
         </Text>
@@ -153,7 +155,7 @@ const styles = StyleSheet.create({
         shadowRadius: 16,
       },
       android: { elevation: 10 },
-      web: { boxShadow: "0 6px 20px rgba(0,0,0,0.22)" } as any,
+      web: webShadow("0 6px 20px rgba(0,0,0,0.22)"),
     }),
   },
   message: {

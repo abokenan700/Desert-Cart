@@ -12,6 +12,8 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import type { Href } from "expo-router";
+import { webShadow } from "@/utils/webStyles";
 import { useColors } from "@/hooks/useColors";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
@@ -210,7 +212,7 @@ const ProductCard = React.memo(function ProductCard({
   }, [scaleAnim]);
 
   const handlePress = useCallback(() => {
-    router.push(`/product/${product.id}` as any);
+    router.push(`/product/${product.id}` as Href);
   }, [product.id]);
 
   const handleAddToCart = useCallback(() => {
@@ -257,7 +259,7 @@ const ProductCard = React.memo(function ProductCard({
               shadowRadius: 12,
             },
             android: { elevation: 5 },
-            web: { boxShadow: "0 4px 12px rgba(0,0,0,0.12)" } as any,
+            web: webShadow("0 4px 12px rgba(0,0,0,0.12)"),
           }),
         },
         imageContainer: {

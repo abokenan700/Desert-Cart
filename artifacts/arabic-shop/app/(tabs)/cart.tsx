@@ -16,6 +16,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import type { Href } from "expo-router";
+import { webShadow } from "@/utils/webStyles";
 import * as Haptics from "expo-haptics";
 import { useColors } from "@/hooks/useColors";
 import { useCart, CartItem } from "@/context/CartContext";
@@ -126,7 +128,7 @@ function SwipeableCartItem({ item, onUpdate, onRemove, onSaveForLater }: Swipeab
           ...Platform.select({
             ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 8 },
             android: { elevation: 3 },
-            web: { boxShadow: "0 2px 8px rgba(0,0,0,0.08)" } as any,
+            web: webShadow("0 2px 8px rgba(0,0,0,0.08)"),
           }),
         },
         productImage: { width: 90, height: 112, borderRadius: 12, backgroundColor: colors.secondary },
@@ -169,7 +171,7 @@ function SwipeableCartItem({ item, onUpdate, onRemove, onSaveForLater }: Swipeab
             if (openState.current !== "none") {
               snapClose();
             } else {
-              router.push(`/product/${item.product.id}` as any);
+              router.push(`/product/${item.product.id}` as Href);
             }
           }}
         >
@@ -389,7 +391,7 @@ function CartScreen() {
           ...Platform.select({
             ios: { shadowColor: colors.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.35, shadowRadius: 10 },
             android: { elevation: 6 },
-            web: { boxShadow: `0 4px 12px ${colors.primary}55` } as any,
+            web: webShadow(`0 4px 12px ${colors.primary}55`),
           }),
         },
         swipeHintText: { fontSize: 11, fontFamily: "Cairo_400Regular", color: colors.mutedForeground },
@@ -427,7 +429,7 @@ function CartScreen() {
           <Text style={styles.emptyText}>أضف منتجات لتبدأ تجربة تسوق رائعة</Text>
           <View style={styles.shopBtnWrapper}>
             <LinearGradient colors={["#E63946", "#C1121F"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={cartBaseStyles.shopGrad}>
-              <TouchableOpacity onPress={() => router.push("/(tabs)/" as any)} activeOpacity={0.85}>
+              <TouchableOpacity onPress={() => router.push("/(tabs)/" as Href)} activeOpacity={0.85}>
                 <Text style={cartBaseStyles.shopBtnText}>ابدأ التسوق</Text>
               </TouchableOpacity>
             </LinearGradient>
@@ -604,7 +606,7 @@ function CartScreen() {
                 <TouchableOpacity
                   key={p.id}
                   style={styles.crossSellCard}
-                  onPress={() => router.push(`/product/${p.id}` as any)}
+                  onPress={() => router.push(`/product/${p.id}` as Href)}
                   activeOpacity={0.88}
                 >
                   <Image source={p.image} style={styles.crossSellImg} resizeMode="cover" />

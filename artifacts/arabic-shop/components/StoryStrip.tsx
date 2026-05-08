@@ -11,6 +11,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import { useColors } from "@/hooks/useColors";
+import { webShadow, WEB_RTL } from "@/utils/webStyles";
 
 interface Collection {
   id: string;
@@ -138,7 +139,7 @@ export default function StoryStrip({ onCollectionPress }: StoryStripProps) {
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={contentStyle}
-        style={Platform.OS === "web" ? ({ direction: "rtl" } as any) : undefined}
+        style={Platform.OS === "web" ? WEB_RTL : undefined}
       >
         {COLLECTIONS.map((col) => (
           <StoryCard
@@ -191,7 +192,7 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
       },
       android: { elevation: 5 },
-      web: { boxShadow: "0 4px 12px rgba(0,0,0,0.18)" } as any,
+      web: webShadow("0 4px 12px rgba(0,0,0,0.18)"),
     }),
   },
   gradient: {

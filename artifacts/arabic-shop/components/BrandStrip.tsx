@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import * as Haptics from "expo-haptics";
 import { useColors } from "@/hooks/useColors";
+import { webShadow, WEB_RTL } from "@/utils/webStyles";
 
 interface Brand {
   id: string;
@@ -138,7 +139,7 @@ function buildStyles(colors: ReturnType<typeof import("@/hooks/useColors").useCo
           shadowRadius: 6,
         },
         android: { elevation: 4 },
-        web: { boxShadow: "0 3px 8px rgba(0,0,0,0.15)" } as any,
+        web: webShadow("0 3px 8px rgba(0,0,0,0.15)"),
       }),
     },
     logoImage: {
@@ -168,7 +169,7 @@ export default function BrandStrip({ onBrandPress }: BrandStripProps) {
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
-        style={Platform.OS === "web" ? ({ direction: "rtl" } as any) : undefined}
+        style={Platform.OS === "web" ? WEB_RTL : undefined}
       >
         {BRANDS.map((brand) => (
           <TouchableOpacity

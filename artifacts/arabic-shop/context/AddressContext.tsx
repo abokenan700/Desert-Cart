@@ -7,13 +7,14 @@ import React, {
   useState,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import type { IoniconsName } from "@/types/icons";
 
 const STORAGE_KEY = "@al-ostora/addresses";
 
 export type SavedAddress = {
   id: string;
   label: string;
-  labelIcon: string;
+  labelIcon: IoniconsName;
   fullName: string;
   phone: string;
   city: string;

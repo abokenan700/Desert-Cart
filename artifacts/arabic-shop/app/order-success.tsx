@@ -11,6 +11,8 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
+import type { Href } from "expo-router";
+import type { IoniconsName } from "@/types/icons";
 import { useColors } from "@/hooks/useColors";
 import { useOrder } from "@/context/OrderContext";
 
@@ -214,12 +216,14 @@ function OrderSuccessScreen() {
         </View>
 
         <View style={baseStyles.stepsRow}>
-          {[
-            { icon: "checkmark-circle", label: "تأكيد الطلب" },
-            { icon: "cube", label: "التحضير" },
-            { icon: "car", label: "الشحن" },
-            { icon: "home", label: "التسليم" },
-          ].map((s, i) => (
+          {(
+            [
+              { icon: "checkmark-circle" as IoniconsName, label: "تأكيد الطلب" },
+              { icon: "cube" as IoniconsName, label: "التحضير" },
+              { icon: "car" as IoniconsName, label: "الشحن" },
+              { icon: "home" as IoniconsName, label: "التسليم" },
+            ] as Array<{ icon: IoniconsName; label: string }>
+          ).map((s, i) => (
             <React.Fragment key={i}>
               {i > 0 && <View style={[baseStyles.stepConnector, { backgroundColor: colors.border }]} />}
               <View style={baseStyles.stepItem}>
@@ -230,7 +234,7 @@ function OrderSuccessScreen() {
                   ]}
                 >
                   <Ionicons
-                    name={s.icon as any}
+                    name={s.icon}
                     size={20}
                     color={i === 0 ? "#fff" : colors.mutedForeground}
                   />
@@ -247,7 +251,7 @@ function OrderSuccessScreen() {
             router.push({
               pathname: "/order-tracking",
               params: { orderNumber },
-            } as any)
+            } as Href)
           }
         >
           <Text style={baseStyles.trackBtnText}>تتبع الطلب</Text>

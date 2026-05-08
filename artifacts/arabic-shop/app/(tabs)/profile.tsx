@@ -13,6 +13,9 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import type { Href } from "expo-router";
+import type { IoniconsName } from "@/types/icons";
+import { webShadow } from "@/utils/webStyles";
 import { useColors } from "@/hooks/useColors";
 import { useTheme } from "@/context/ThemeContext";
 import { useCart } from "@/context/CartContext";
@@ -23,7 +26,7 @@ import { COUPONS, isCouponExpired, COUPON_MAP } from "@/data/coupons";
 
 interface MenuItem {
   id: string;
-  icon: string;
+  icon: IoniconsName;
   label: string;
   badge?: string;
   color?: string;
@@ -145,7 +148,7 @@ function ProfileScreen() {
       ...Platform.select({
         ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12 },
         android: { elevation: 4 },
-        web: { boxShadow: "0 4px 12px rgba(0,0,0,0.1)" } as any,
+        web: webShadow("0 4px 12px rgba(0,0,0,0.1)"),
       }),
     },
     statValue: {
@@ -256,16 +259,16 @@ function ProfileScreen() {
   const handleMenuPress = (id: string) => {
     switch (id) {
       case "orders":
-        router.push("/order-history" as any);
+        router.push("/order-history" as Href);
         break;
       case "track":
         router.push({
           pathname: "/order-tracking",
           params: { orderNumber: ACTIVE_ORDER?.number ?? "" },
-        } as any);
+        } as Href);
         break;
       case "coupons":
-        router.push("/my-coupons" as any);
+        router.push("/my-coupons" as Href);
         break;
       case "logout":
         Alert.alert("تسجيل الخروج", "هل تريد تسجيل الخروج من حسابك؟", [
@@ -292,7 +295,7 @@ function ProfileScreen() {
             <Text style={baseStyles.userEmail}>{profile.email}</Text>
             <TouchableOpacity
               style={baseStyles.editBtn}
-              onPress={() => router.push("/edit-profile" as any)}
+              onPress={() => router.push("/edit-profile" as Href)}
             >
               <Text style={baseStyles.editBtnText}>تعديل الملف</Text>
               <Ionicons name="create-outline" size={14} color="#fff" />
@@ -392,7 +395,7 @@ function ProfileScreen() {
                     ]}
                   >
                     <Ionicons
-                      name={item.icon as any}
+                      name={item.icon}
                       size={20}
                       color={item.color || colors.primary}
                     />
