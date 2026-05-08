@@ -710,10 +710,10 @@ These turn the MVP into a believable production application.
 | ID | Issue | Fix |
 |----|-------|-----|
 | H-F04 | Voice search is a stub | Integrate Web Speech API | ✅ Done |
-| H-F05 | Wishlist collections have no UI | Build collections UI |
+| H-F05 | Wishlist collections have no UI | Build collections UI | ✅ Done |
 | M-F10 | No profile edit | Add Edit Profile screen |
 | M-F07 | No pagination | Implement cursor pagination |
-| M-S06 | Collections API has no UI | Either build or remove |
+| M-S06 | Collections API has no UI | Either build or remove | ✅ Done |
 | M-U07 | Fake urgency/viewing count removed in Phase 1 | — |
 | M-U08 | Category L3 taps addressed in Phase 2 | — |
 | M-D04 | CATEGORIES and CATEGORY_TREE not linked | Derive from single source |
